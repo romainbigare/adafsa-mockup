@@ -12,12 +12,18 @@
    farm-analysis). Unified to 0.85 per refactor spec — imperceptible.
    -------------------------------------------------------------------------- */
 .glass-panel {
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+  /* Several panel variants (.cat-panel, .mod-panel, .panel-collapse) set
+     overflow:hidden on this same element to clip their accordion body/header
+     to the rounded corners. A plain box-shadow would get hard-clipped at that
+     same edge; filter:drop-shadow() is computed after the element's own
+     clipping, so the shadow still bleeds outward. Keep it a single soft layer
+     so it reads as elevation, not a heavy halo. */
+  filter: drop-shadow(0 6px 16px rgba(15, 23, 42, 0.16));
 }
 
 /* --------------------------------------------------------------------------
@@ -203,6 +209,14 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
 }
 .cat-panel.open .cat-toggle { background: #16a34a; }
 .cat-panel.open .cat-toggle-thumb { transform: translateX(13px); }
+
+/* Farm-boundary band modules reuse the accordion mechanics but are a separate
+   group from the category browsers (so category-panel wiring never touches
+   them). Same collapse/toggle behaviour, keyed off .mod-panel.open. */
+.mod-panel { overflow: hidden; }
+.mod-panel.open .cat-body { max-height: 320px; }
+.mod-panel.open .cat-toggle { background: #16a34a; }
+.mod-panel.open .cat-toggle-thumb { transform: translateX(13px); }
 
 /* Subtle stacked-bar summary of the major-category shares. */
 .cat-chart-bar {

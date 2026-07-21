@@ -15,6 +15,7 @@
       // dataset / view mode
       currentDataset: 'plots',
       activeCategory: null,    // null (Overview) | 'landuse' | 'crops' | 'trees' — expanded category panel
+      activeModule: null,      // null | 'ier' | 'yield' | 'water' — farm-boundary band module (mutually exclusive with a category)
       isFirstLoad: true,
 
       // feature/layer bookkeeping

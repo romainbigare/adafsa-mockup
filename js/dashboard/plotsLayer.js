@@ -21,20 +21,32 @@
     return c || '#999';
   }
 
-  // A cluster is coloured by the majority value (type) of the shapes it holds:
-  // tally the members' types, take the most common, and colour the bubble with
-  // that type's colour. Falls back to neutral green for an empty cluster.
+  // Resolved fill/outline colour for a single feature. When a farm-boundary
+  // band module is active it wins (colour by band); otherwise the feature is
+  // coloured by its taxonomy value. This is the single per-shape colour source
+  // used by both the polygon layers and the cluster majority tally.
+  function featureColor(state, ref) {
+    if (state.activeModule) {
+      var m = W.dashboard.modules.byKey(state.activeModule);
+      if (m) return W.dashboard.modules.colorOf(m, ref);
+    }
+    return colorFor(state, ref.type);
+  }
+
+  // A cluster is coloured by the majority value of the shapes it holds: tally
+  // the members' resolved colours (band colour when a module is active, else
+  // taxonomy colour), take the most common. Neutral green for an empty cluster.
   function majorityColor(state, markers) {
     var counts = {};
     var best = null, bestN = 0;
     for (var i = 0; i < markers.length; i++) {
       var ref = markers[i]._featureRef;
       if (!ref) continue;
-      var t = ref.type;
-      counts[t] = (counts[t] || 0) + 1;
-      if (counts[t] > bestN) { bestN = counts[t]; best = t; }
+      var c = featureColor(state, ref);
+      counts[c] = (counts[c] || 0) + 1;
+      if (counts[c] > bestN) { bestN = counts[c]; best = c; }
     }
-    return best ? colorFor(state, best) : NEUTRAL;
+    return best || NEUTRAL;
   }
 
   // Creates the cluster layer for the zoomed-out view (centroid markers with
@@ -206,7 +218,7 @@
       for (var r = 0; r < rings.length; r++) {
         var ring = rings[r];
         var poly = L.polygon(ring, {
-          color: colorFor(state, type), weight: 1, opacity: 0.8, fillOpacity: 0.35
+          color: featureColor(state, featureData), weight: 1, opacity: 0.8, fillOpacity: 0.35
         });
         poly._featureRef = featureData;
         poly.bindPopup(
@@ -274,16 +286,21 @@
     }
   }
 
-  // Recolour every layer from the taxonomy: shapes by their own type value,
-  // clusters by their members' majority value. Colours follow whichever
-  // category dataset (Land Use / Crops / Trees / plots) is currently loaded.
+  // Recolour every layer: shapes by their own value, clusters by their members'
+  // majority value. When a farm-boundary band module is active, every shape is
+  // coloured by its band (per-feature, so shapes of the same type can differ);
+  // otherwise shapes take their taxonomy colour (constant per type). Colours
+  // follow whichever dataset (Land Use / Crops / Trees / plots) is loaded.
   function applyColoring(state) {
+    var byModule = !!state.activeModule;
     // Update polygon colors
     for (var type in state.layerGroups) {
       (function (type) {
-        var typeColor = colorFor(state, type);
+        var typeColor = byModule ? null : colorFor(state, type);
         state.layerGroups[type].eachLayer(function (poly) {
-          if (poly._featureRef) poly.setStyle({ color: typeColor, fillColor: typeColor });
+          if (!poly._featureRef) return;
+          var c = byModule ? featureColor(state, poly._featureRef) : typeColor;
+          poly.setStyle({ color: c, fillColor: c });
         });
       })(type);
     }
@@ -316,6 +333,9 @@
     if (state.currentDataset === 'plots') {
       state.farmFeatures = state.allFeatures.slice();
       state.totalFarmCount = state.totalFarms;
+      // Precompute the per-farm module values (IER / yield deviation / water)
+      // once, on the same objects the map + module panels read from.
+      W.dashboard.modules.prepare(state.farmFeatures);
     }
 
     W.dashboard.layersPanel.build(state);
@@ -335,11 +355,12 @@
 
   W.dashboard.plotsLayer = {
     colorFor: colorFor,
+    featureColor: featureColor,
+    applyColoring: applyColoring,
     init: init,
     clearAllFeatures: clearAllFeatures,
     loadDataset: loadDataset,
     updateLayerMode: updateLayerMode,
-    applyColoring: applyColoring,
     selectFarm: selectFarm,
     clearSelection: clearSelection
   };

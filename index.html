@@ -44,7 +44,7 @@
     <div class="relative z-10 w-full h-full pointer-events-none">
 
     <!-- Left panels container (overview + category browsers stacked) -->
-    <div id="left-panels" class="absolute left-4 top-4 z-20 flex flex-col gap-2 pointer-events-auto overflow-y-auto scroll-thin" style="width:260px; max-height: calc(100vh - 6rem)">
+    <div id="left-panels" class="absolute left-5 top-4 z-20 flex flex-col gap-2 pointer-events-auto scroll-thin" style="width:260px">
 
     <!-- Overview Box (always farm-based metrics) -->
     <div id="viewport-stats" class="glass-panel viewport-stats">
@@ -152,6 +152,66 @@
             <button class="vp-unselect-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Unselect all</button>
           </div>
           <div class="space-y-0.5 max-h-56 overflow-y-auto scroll-thin" id="vp-trees"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Farm-boundary band modules — collapsed by default; opening one colours
+         the farm boundaries by its band (mutually exclusive with the browsers
+         above). Legend rows + counts are injected by modulesPanel.js. -->
+    <div class="mod-panel glass-panel" data-mod-panel="ier">
+      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
+        <span class="flex items-center gap-2 min-w-0">
+          <span class="material-symbols-outlined text-brand-600 flex-shrink-0" style="font-size:16px;">water_drop</span>
+          <span class="font-label-caps text-gray-900 whitespace-nowrap">IRRIGATION EFFICIENCY</span>
+        </span>
+        <span class="flex items-center gap-1.5 flex-shrink-0">
+          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
+        </span>
+      </button>
+      <div class="cat-body">
+        <div class="p-3 pt-2">
+          <div class="cat-chart mb-2" data-mod-chart></div>
+          <div class="space-y-0.5" data-mod-legend></div>
+          <p class="text-[10px] text-gray-400 mt-2">IER score per farm — colours the farm boundaries.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mod-panel glass-panel" data-mod-panel="yield">
+      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
+        <span class="flex items-center gap-2 min-w-0">
+          <span class="material-symbols-outlined text-brand-600 flex-shrink-0" style="font-size:16px;">agriculture</span>
+          <span class="font-label-caps text-gray-900 whitespace-nowrap">YIELD FORECAST</span>
+        </span>
+        <span class="flex items-center gap-1.5 flex-shrink-0">
+          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
+        </span>
+      </button>
+      <div class="cat-body">
+        <div class="p-3 pt-2">
+          <div class="cat-chart mb-2" data-mod-chart></div>
+          <div class="space-y-0.5" data-mod-legend></div>
+          <p class="text-[10px] text-gray-400 mt-2">Deviation vs. the farm's sub-zone average.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mod-panel glass-panel" data-mod-panel="water">
+      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
+        <span class="flex items-center gap-2 min-w-0">
+          <span class="material-symbols-outlined text-brand-600 flex-shrink-0" style="font-size:16px;">opacity</span>
+          <span class="font-label-caps text-gray-900 whitespace-nowrap">CROP WATER ALLOCATION</span>
+        </span>
+        <span class="flex items-center gap-1.5 flex-shrink-0">
+          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
+        </span>
+      </button>
+      <div class="cat-body">
+        <div class="p-3 pt-2">
+          <div class="cat-chart mb-2" data-mod-chart></div>
+          <div class="space-y-0.5" data-mod-legend></div>
+          <p class="text-[10px] text-gray-400 mt-2">Water use vs. modelled demand.</p>
         </div>
       </div>
     </div>
@@ -344,8 +404,10 @@
 <script src="js/mock/news.js"></script>
 <script src="js/dashboard/taxonomy.js"></script>
 <script src="js/dashboard/state.js"></script>
+<script src="js/dashboard/modules.js"></script>
 <script src="js/dashboard/plotsLayer.js"></script>
 <script src="js/dashboard/viewportStats.js"></script>
+<script src="js/dashboard/modulesPanel.js"></script>
 <script src="js/dashboard/layersPanel.js"></script>
 <script src="js/dashboard/dataTable.js"></script>
 <script src="js/dashboard/farmTable.js"></script>

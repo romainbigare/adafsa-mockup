@@ -27,16 +27,44 @@
     while (feed.children.length > 20) feed.removeChild(feed.lastChild);
   }
 
-  // Keep the stacked left-hand panels from being hidden behind the (full-width)
-  // bottom sheet: cap the column's height at the sheet's top edge so it scrolls
-  // internally instead of disappearing underneath.
+  // Reconcile the stacked left-hand panel column with the bottom sheet so the
+  // panels are never hidden behind it. Three cases, in order of preference:
+  //   1. The panels fit in the height above the sheet → leave the sheet full
+  //      width; keep the column's overflow visible so the drop-shadows aren't
+  //      clipped.
+  //   2. They don't fit above the sheet → step the sheet aside (inset its left
+  //      edge to the right of the column) so the column can use the full
+  //      viewport height. Overflow stays visible (shadows intact).
+  //   3. Even the full height isn't enough → keep the sheet inset and let the
+  //      column scroll internally (shadows clip while scrolling — acceptable).
   function syncLeftColumn() {
     var col = document.getElementById('left-panels');
     var bar = document.getElementById('live-bar');
     if (!col || !bar) return;
-    var barTop = bar.getBoundingClientRect().top;
-    var colTop = col.getBoundingClientRect().top;
-    col.style.maxHeight = Math.max(160, barTop - colTop - 8) + 'px';
+
+    var colRect = col.getBoundingClientRect();
+    var barRect = bar.getBoundingClientRect();
+    var mainLeft = (bar.offsetParent || document.body).getBoundingClientRect().left;
+
+    var roomAboveBar = barRect.top - colRect.top - 8;       // if the sheet stays full width
+    var roomFullHeight = window.innerHeight - colRect.top - 16; // if the sheet steps aside
+    var needed = col.scrollHeight;
+
+    if (needed <= roomAboveBar) {
+      bar.style.left = '';
+      col.style.overflowY = 'visible';
+      col.style.maxHeight = '';
+    } else {
+      // Inset the sheet just past the column (+ a little room for its shadow).
+      bar.style.left = (colRect.right - mainLeft + 16) + 'px';
+      if (needed <= roomFullHeight) {
+        col.style.overflowY = 'visible';
+        col.style.maxHeight = '';
+      } else {
+        col.style.overflowY = 'auto';
+        col.style.maxHeight = roomFullHeight + 'px';
+      }
+    }
   }
 
   function getActiveTab() { return activeTab; }
@@ -145,6 +173,11 @@
     }
 
     window.addEventListener('resize', syncLeftColumn);
+
+    // Expanding/collapsing a left panel changes the column's height (a max-height
+    // transition that bubbles up here), so re-reconcile once it settles.
+    var leftCol = document.getElementById('left-panels');
+    if (leftCol) leftCol.addEventListener('transitionend', syncLeftColumn);
 
     // Default to the Farms tab.
     setTab('farms');

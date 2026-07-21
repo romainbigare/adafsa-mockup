@@ -7,7 +7,7 @@
   // layers; lives in the shared kernel (js/lib/color.js).
   var TYPE_COLORS = W.color.TYPE_COLORS;
 
-  var CROP_COLORS = { 'Palm': '#00ff00', 'No Palm': '#a1d99b', 'No palm': '#a1d99b' };
+  var CROP_COLORS = { 'Palm': '#15803d', 'No Palm': '#a1d99b', 'No palm': '#a1d99b' };
 
   // Category -> list of types mapping (built from data)
   var CATEGORY_OF_TYPE = {

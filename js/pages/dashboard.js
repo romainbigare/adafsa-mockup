@@ -36,6 +36,8 @@
   W.dashboard.viewportStats.wirePanels(state);
   W.dashboard.viewportStats.wireSelectAll(state);
   W.dashboard.viewportStats.initCategoryBadges();
+  W.dashboard.modulesPanel.build();
+  W.dashboard.modulesPanel.wire(state);
 
   // Update on map move/zoom
   state.map.on('moveend', function () { W.dashboard.viewportStats.update(state); });

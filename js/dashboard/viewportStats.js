@@ -144,6 +144,9 @@
     renderTree(state, 'vp-landuse', tax.LAND_USE_TREE, 'No land use in view');
     renderTree(state, 'vp-crops', tax.CROPS_TREE, 'No crops in view');
     renderTree(state, 'vp-trees', tax.TREES_TREE, 'No trees in view');
+
+    // Farm-boundary band modules (Irrigation Efficiency / Yield / Water).
+    if (W.dashboard.modulesPanel) W.dashboard.modulesPanel.update(state);
   }
 
   // Small stacked-bar chart of the major-category shares (top of each panel).
@@ -204,6 +207,8 @@
     var target = document.querySelector('.cat-panel[data-cat-panel="' + key + '"]');
     if (target) target.classList.add('open');
     state.activeCategory = key;
+    // A category browser and a farm-boundary band module can't both own the map.
+    if (W.dashboard.modulesPanel) W.dashboard.modulesPanel.deactivate(state);
     W.dashboard.plotsLayer.loadDataset(state, datasetFor(key));
     W.dashboard.liveBar.setTab(key);
     update(state);
