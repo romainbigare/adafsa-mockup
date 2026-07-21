@@ -231,6 +231,44 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
 .cat-chart-seg { height: 100%; }
 .cat-chart-seg + .cat-chart-seg { box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.7); }
 
+/* --------------------------------------------------------------------------
+   Proposal A — module-hub SPA: route show/hide + KPI strip + tabs
+   -------------------------------------------------------------------------- */
+.route-hidden { display: none !important; }
+
+/* KPI strip across the top of every module page. */
+.kpi-strip {
+  position: absolute; top: 12px; left: 20px; right: 68px; z-index: 20;
+  display: flex; gap: 8px; align-items: stretch;
+  overflow-x: auto; padding: 8px; border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #e5e7eb;
+  filter: drop-shadow(0 6px 16px rgba(15, 23, 42, 0.16));
+}
+.kpi-name {
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  flex: none; padding-right: 10px; margin-right: 2px; border-right: 1px solid #e5e7eb;
+  font-weight: 700; color: #111827; font-size: 13px; white-space: nowrap;
+}
+.kpi-name .material-symbols-outlined { vertical-align: -3px; margin-right: 4px; }
+.kpi-name .kpi-fee { font: 500 10px/1 "JetBrains Mono", monospace; color: #9ca3af; text-transform: uppercase; letter-spacing: .05em; }
+.kpi-tile {
+  flex: 1 1 0; min-width: 96px; display: flex; flex-direction: column; gap: 2px;
+  padding: 4px 10px; border-radius: 6px; background: #f8fafc; border: 1px solid #eef2f7;
+}
+.kpi-tile.warn { background: #fff7ed; border-color: #fed7aa; }
+.kpi-label { font: 600 9px/1.2 "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: #6b7280; }
+.kpi-value { font-size: 16px; font-weight: 700; color: #111827; font-variant-numeric: tabular-nums; }
+.kpi-tile.warn .kpi-value { color: #c2410c; }
+
+/* Module-page bottom sheet reuses the .live-bar / .lb-panel machinery. */
+.mp-tab { border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.mp-tab.active { color: #111827; border-bottom-color: #16a34a; }
+
+/* Scorecard cards (F3) hover affordance. */
+.scorecard-card { text-decoration: none; }
+
 /* Per-category subcategory list — collapsed by default, expanded by
    clicking the category row (independent of the outer cat-panel accordion). */
 .subcat-toggle:hover { background-color: #f9fafb; }

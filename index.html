@@ -20,16 +20,15 @@
 </head>
 <body class="antialiased h-screen overflow-hidden flex flex-col font-sans bg-gray-50">
 
-<!-- Main Workspace -->
 <div class="flex-1 flex overflow-hidden w-full relative min-h-0">
 
-  <!-- Side Nav -->
-  <aside id="sidebar" data-page="dashboard" class="hidden md:flex flex-col bg-gray-50 border-r border-gray-200 w-60 py-6 flex-none"></aside>
+  <!-- Side Nav: Overview + the six contract modules + Farm Analysis -->
+  <aside id="sidebar" data-page="overview" class="hidden md:flex flex-col bg-gray-50 border-r border-gray-200 w-60 py-6 flex-none"></aside>
 
   <!-- Main Content -->
   <main class="flex-1 relative overflow-hidden h-full">
 
-    <!-- Map -->
+    <!-- The single, persistent Leaflet map (shown only on module routes) -->
     <div id="map" class="absolute inset-0 z-0 h-full w-full"></div>
 
     <!-- Loading overlay -->
@@ -40,417 +39,71 @@
       </div>
     </div>
 
-    <!-- Floating UI Layer -->
-    <div class="relative z-10 w-full h-full pointer-events-none">
+    <!-- ===================== MODULE CHROME (module routes) ==================== -->
+    <div id="module-chrome" class="route-hidden absolute inset-0 z-10 pointer-events-none">
 
-    <!-- Left panels container (overview + category browsers stacked) -->
-    <div id="left-panels" class="absolute left-5 top-4 z-20 flex flex-col gap-2 pointer-events-auto scroll-thin" style="width:260px">
+      <!-- KPI strip -->
+      <div id="kpi-strip" class="kpi-strip pointer-events-auto"></div>
 
-    <!-- Overview Box (always farm-based metrics) -->
-    <div id="viewport-stats" class="glass-panel viewport-stats">
-      <div class="px-3 py-2 border-b border-gray-200 flex items-center gap-2 bg-gray-50/80 rounded-t-lg">
-        <span class="material-symbols-outlined text-brand-600" style="font-size:16px;">agriculture</span>
-        <span class="font-label-caps text-gray-900">FARMS</span>
+      <!-- Legend (left) -->
+      <div id="module-legend" class="glass-panel pointer-events-auto absolute left-5 z-20" style="top:84px;width:250px"></div>
+
+      <!-- Map controls (right) -->
+      <div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 hidden md:flex pointer-events-auto">
+        <button id="zoom-in" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Zoom in"><span class="material-symbols-outlined">add</span></button>
+        <button id="zoom-out" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Zoom out"><span class="material-symbols-outlined">remove</span></button>
+        <button id="locate-me" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 mt-4" title="Recenter"><span class="material-symbols-outlined">my_location</span></button>
+        <button id="toggle-basemap" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Switch basemap"><span class="material-symbols-outlined">satellite_alt</span></button>
       </div>
-      <div class="p-3">
-        <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-          <div>
-            <p class="text-xs text-gray-500">Farms</p>
-            <p class="text-base font-semibold text-gray-900" id="vp-farms">494</p>
-          </div>
-          <div>
-            <p class="text-xs text-gray-500">Area</p>
-            <p class="text-base font-semibold text-gray-900" id="vp-area">0 <span class="text-xs font-normal text-gray-500">dun</span></p>
-          </div>
-        </div>
-        <!-- System status -->
-        <div class="mt-2 pt-2 border-t border-gray-200 space-y-1">
-          <div class="flex items-center justify-between gap-2">
-            <span class="flex items-center gap-1.5 text-xs text-gray-500">
-              <span class="material-symbols-outlined" style="font-size:14px;">satellite_alt</span>
-              <span>Last scan</span>
-            </span>
-            <span class="text-xs font-medium text-gray-900" id="last-scan">—</span>
-          </div>
-          <div class="flex items-center justify-between gap-2">
-            <span class="flex items-center gap-1.5 text-xs text-gray-500">
-              <span class="material-symbols-outlined" style="font-size:14px;">psychology</span>
-              <span>Last AI update</span>
-            </span>
-            <span class="text-xs font-medium text-gray-900" id="last-ai-update">—</span>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Category browsers — detached, collapsed by default (accordion) -->
-    <div class="cat-panel glass-panel" data-cat-panel="landuse">
-      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
-        <span class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-brand-600" style="font-size:16px;">terrain</span>
-          <span class="font-label-caps text-gray-900">LAND USE</span>
-        </span>
-        <span class="flex items-center gap-1.5">
-          <span class="text-xs text-gray-400" data-cat-count>0</span>
-          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
-        </span>
-      </button>
-      <div class="cat-body">
-        <div class="p-3 pt-2">
-          <div class="cat-chart mb-2" data-cat-chart></div>
-          <div class="flex gap-2 mb-1.5">
-            <button class="vp-select-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Select all</button>
-            <span class="text-gray-300">·</span>
-            <button class="vp-unselect-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Unselect all</button>
-          </div>
-          <div class="space-y-0.5 max-h-56 overflow-y-auto scroll-thin" id="vp-landuse"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cat-panel glass-panel" data-cat-panel="crops">
-      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
-        <span class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-brand-600" style="font-size:16px;">grass</span>
-          <span class="font-label-caps text-gray-900">CROPS</span>
-        </span>
-        <span class="flex items-center gap-1.5">
-          <span class="text-xs text-gray-400" data-cat-count>0</span>
-          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
-        </span>
-      </button>
-      <div class="cat-body">
-        <div class="p-3 pt-2">
-          <div class="cat-chart mb-2" data-cat-chart></div>
-          <div class="flex gap-2 mb-1.5">
-            <button class="vp-select-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Select all</button>
-            <span class="text-gray-300">·</span>
-            <button class="vp-unselect-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Unselect all</button>
-          </div>
-          <div class="space-y-0.5 max-h-56 overflow-y-auto scroll-thin" id="vp-crops"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cat-panel glass-panel" data-cat-panel="trees">
-      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
-        <span class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-brand-600" style="font-size:16px;">park</span>
-          <span class="font-label-caps text-gray-900">TREES</span>
-        </span>
-        <span class="flex items-center gap-1.5">
-          <span class="text-xs text-gray-400" data-cat-count>0</span>
-          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
-        </span>
-      </button>
-      <div class="cat-body">
-        <div class="p-3 pt-2">
-          <div class="cat-chart mb-2" data-cat-chart></div>
-          <div class="flex gap-2 mb-1.5">
-            <button class="vp-select-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Select all</button>
-            <span class="text-gray-300">·</span>
-            <button class="vp-unselect-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Unselect all</button>
-          </div>
-          <div class="space-y-0.5 max-h-56 overflow-y-auto scroll-thin" id="vp-trees"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Farm-boundary band modules — collapsed by default; opening one colours
-         the farm boundaries by its band (mutually exclusive with the browsers
-         above). Legend rows + counts are injected by modulesPanel.js. -->
-    <div class="mod-panel glass-panel" data-mod-panel="ier">
-      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
-        <span class="flex items-center gap-2 min-w-0">
-          <span class="material-symbols-outlined text-brand-600 flex-shrink-0" style="font-size:16px;">water_drop</span>
-          <span class="font-label-caps text-gray-900 whitespace-nowrap">IRRIGATION EFFICIENCY</span>
-        </span>
-        <span class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
-        </span>
-      </button>
-      <div class="cat-body">
-        <div class="p-3 pt-2">
-          <div class="cat-chart mb-2" data-mod-chart></div>
-          <div class="space-y-0.5" data-mod-legend></div>
-          <p class="text-[10px] text-gray-400 mt-2">IER score per farm — colours the farm boundaries.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="mod-panel glass-panel" data-mod-panel="yield">
-      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
-        <span class="flex items-center gap-2 min-w-0">
-          <span class="material-symbols-outlined text-brand-600 flex-shrink-0" style="font-size:16px;">agriculture</span>
-          <span class="font-label-caps text-gray-900 whitespace-nowrap">YIELD FORECAST</span>
-        </span>
-        <span class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
-        </span>
-      </button>
-      <div class="cat-body">
-        <div class="p-3 pt-2">
-          <div class="cat-chart mb-2" data-mod-chart></div>
-          <div class="space-y-0.5" data-mod-legend></div>
-          <p class="text-[10px] text-gray-400 mt-2">Deviation vs. the farm's sub-zone average.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="mod-panel glass-panel" data-mod-panel="water">
-      <button class="cat-head w-full px-3 py-2 flex items-center justify-between bg-gray-50/80">
-        <span class="flex items-center gap-2 min-w-0">
-          <span class="material-symbols-outlined text-brand-600 flex-shrink-0" style="font-size:16px;">opacity</span>
-          <span class="font-label-caps text-gray-900 whitespace-nowrap">CROP WATER ALLOCATION</span>
-        </span>
-        <span class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="cat-toggle" aria-hidden="true"><span class="cat-toggle-thumb"></span></span>
-        </span>
-      </button>
-      <div class="cat-body">
-        <div class="p-3 pt-2">
-          <div class="cat-chart mb-2" data-mod-chart></div>
-          <div class="space-y-0.5" data-mod-legend></div>
-          <p class="text-[10px] text-gray-400 mt-2">Water use vs. modelled demand.</p>
-        </div>
-      </div>
-    </div>
-
-    </div><!-- end left panels container -->
-
-    <!-- Map Controls (right side) -->
-    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 hidden md:flex">
-      <button id="zoom-in" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Zoom in">
-        <span class="material-symbols-outlined">add</span>
-      </button>
-      <button id="zoom-out" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Zoom out">
-        <span class="material-symbols-outlined">remove</span>
-      </button>
-      <button id="locate-me" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 mt-4" title="Recenter">
-        <span class="material-symbols-outlined">my_location</span>
-      </button>
-      <button id="toggle-layers" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Layers">
-        <span class="material-symbols-outlined">layers</span>
-      </button>
-      <button id="toggle-basemap" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Switch basemap">
-        <span class="material-symbols-outlined">satellite_alt</span>
-      </button>
-    </div>
-
-    </div>
-
-    <!-- Layers Panel (slide-in) -->
-    <div id="layers-panel" class="absolute left-4 top-20 bottom-20 w-72 glass-panel flex flex-col z-30 transform -translate-x-[110%] transition-transform duration-300 overflow-hidden">
-      <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/80">
-        <h3 class="font-label-caps text-gray-900">MAP LAYERS</h3>
-        <button id="close-layers" class="text-gray-400 hover:text-gray-700 transition-colors">
-          <span class="material-symbols-outlined" style="font-size:18px;">close</span>
-        </button>
-      </div>
-      <div class="flex-1 overflow-y-auto scroll-thin p-2" id="layers-content"></div>
-      <div class="border-t border-gray-200 p-3 flex gap-2 bg-gray-50/80">
-        <button id="clear-all" class="flex-1 border border-gray-300 rounded-lg py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors">Clear All</button>
-        <button id="fit-selection" class="flex-1 bg-brand-600 text-white rounded-lg py-2 text-xs font-medium hover:bg-brand-700 transition-colors">Fit to Selection</button>
-      </div>
-    </div>
-
-    <!-- Bottom Info Panel (tabbed: Farms / Land Use / Crops / Trees tables + News feed) -->
-    <div id="live-bar" class="live-bar absolute bottom-3 left-3 right-3 z-30 glass-panel pointer-events-auto rounded-lg flex flex-col">
-      <!-- Drag handle — resizes the panel body -->
-      <div id="live-bar-resize" class="lb-resize-handle rounded-t-lg" title="Drag to resize">
-        <span class="lb-resize-grip"></span>
-      </div>
-      <!-- Header row: tabs (left) + contextual controls (right) -->
-      <div class="flex items-center justify-between pl-2 pr-3 border-b border-gray-200">
-        <!-- Tabs -->
-        <div class="flex items-center overflow-x-auto overflow-y-hidden scroll-thin">
-          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="farms">
-            <span class="material-symbols-outlined" style="font-size:16px;">table_chart</span>
-            <span>FARMS</span>
-          </button>
-          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="landuse">
-            <span class="material-symbols-outlined" style="font-size:16px;">terrain</span>
-            <span>LAND USE</span>
-          </button>
-          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="crops">
-            <span class="material-symbols-outlined" style="font-size:16px;">grass</span>
-            <span>CROPS</span>
-          </button>
-          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="trees">
-            <span class="material-symbols-outlined" style="font-size:16px;">park</span>
-            <span>TREES</span>
-          </button>
-          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="ier">
-            <span class="material-symbols-outlined" style="font-size:16px;">water_drop</span>
-            <span>IRRIGATION</span>
-          </button>
-          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="yield">
-            <span class="material-symbols-outlined" style="font-size:16px;">agriculture</span>
-            <span>YIELD</span>
-          </button>
-          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="water">
-            <span class="material-symbols-outlined" style="font-size:16px;">opacity</span>
-            <span>WATER</span>
-          </button>
-          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="news">
-            <span class="flex h-2 w-2 relative">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-            </span>
-            <span>NEWS</span>
-          </button>
-        </div>
-        <!-- Right-side contextual controls -->
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <div class="lb-ctx lb-ctx-farms flex items-center gap-2">
-            <div class="relative">
-              <button id="farm-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
-                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
-                <span class="hidden sm:inline">Columns</span>
-              </button>
-              <div id="farm-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
-            </div>
-            <button id="farm-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
-              <span class="hidden sm:inline">Export CSV</span>
+      <!-- Bottom sheet — Attention list + Band summary -->
+      <div id="module-bar" class="live-bar absolute bottom-3 left-3 right-3 z-30 glass-panel pointer-events-auto rounded-lg flex flex-col">
+        <div class="flex items-center justify-between pl-2 pr-3 border-b border-gray-200">
+          <div class="flex items-center overflow-x-auto overflow-y-hidden scroll-thin">
+            <button class="mp-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-mp-tab="attention">
+              <span class="material-symbols-outlined" style="font-size:16px;">priority_high</span><span>ATTENTION LIST</span>
+            </button>
+            <button class="mp-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-mp-tab="summary">
+              <span class="material-symbols-outlined" style="font-size:16px;">insights</span><span>BAND SUMMARY</span>
             </button>
           </div>
-          <div class="lb-ctx lb-ctx-landuse hidden flex items-center gap-2">
-            <div class="relative">
-              <button id="landuse-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
-                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
-                <span class="hidden sm:inline">Columns</span>
-              </button>
-              <div id="landuse-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="mp-ctx-attention flex items-center gap-2">
+              <div class="relative">
+                <button id="mp-att-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700"><span class="material-symbols-outlined" style="font-size:15px;">view_column</span><span class="hidden sm:inline">Columns</span></button>
+                <div id="mp-att-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
+              </div>
+              <button id="mp-att-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"><span class="material-symbols-outlined" style="font-size:15px;">download</span><span class="hidden sm:inline">Export CSV</span></button>
             </div>
-            <button id="landuse-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
-              <span class="hidden sm:inline">Export CSV</span>
-            </button>
-          </div>
-          <div class="lb-ctx lb-ctx-crops hidden flex items-center gap-2">
-            <div class="relative">
-              <button id="crops-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
-                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
-                <span class="hidden sm:inline">Columns</span>
-              </button>
-              <div id="crops-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
+            <div class="mp-ctx-summary hidden flex items-center gap-2">
+              <div class="relative">
+                <button id="mp-sum-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700"><span class="material-symbols-outlined" style="font-size:15px;">view_column</span><span class="hidden sm:inline">Columns</span></button>
+                <div id="mp-sum-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
+              </div>
+              <button id="mp-sum-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"><span class="material-symbols-outlined" style="font-size:15px;">download</span><span class="hidden sm:inline">Export CSV</span></button>
             </div>
-            <button id="crops-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
-              <span class="hidden sm:inline">Export CSV</span>
-            </button>
+            <button id="module-bar-collapse" class="text-gray-400 hover:text-gray-700 pl-1" title="Collapse"><span class="material-symbols-outlined" id="module-bar-chevron" style="font-size:18px;">expand_more</span></button>
           </div>
-          <div class="lb-ctx lb-ctx-trees hidden flex items-center gap-2">
-            <div class="relative">
-              <button id="trees-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
-                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
-                <span class="hidden sm:inline">Columns</span>
-              </button>
-              <div id="trees-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
-            </div>
-            <button id="trees-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
-              <span class="hidden sm:inline">Export CSV</span>
-            </button>
-          </div>
-          <div class="lb-ctx lb-ctx-ier hidden flex items-center gap-2">
-            <div class="relative">
-              <button id="ier-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
-                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
-                <span class="hidden sm:inline">Columns</span>
-              </button>
-              <div id="ier-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
-            </div>
-            <button id="ier-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
-              <span class="hidden sm:inline">Export CSV</span>
-            </button>
-          </div>
-          <div class="lb-ctx lb-ctx-yield hidden flex items-center gap-2">
-            <div class="relative">
-              <button id="yield-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
-                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
-                <span class="hidden sm:inline">Columns</span>
-              </button>
-              <div id="yield-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
-            </div>
-            <button id="yield-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
-              <span class="hidden sm:inline">Export CSV</span>
-            </button>
-          </div>
-          <div class="lb-ctx lb-ctx-water hidden flex items-center gap-2">
-            <div class="relative">
-              <button id="water-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
-                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
-                <span class="hidden sm:inline">Columns</span>
-              </button>
-              <div id="water-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
-            </div>
-            <button id="water-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
-              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
-              <span class="hidden sm:inline">Export CSV</span>
-            </button>
-          </div>
-          <!-- Collapse / expand -->
-          <button id="live-bar-collapse" class="text-gray-400 hover:text-gray-700 pl-1" title="Collapse">
-            <span class="material-symbols-outlined" id="live-bar-chevron" style="font-size:18px;">expand_more</span>
-          </button>
+        </div>
+        <div class="mp-panel lb-panel overflow-auto scroll-thin rounded-b-lg" data-mp-panel="attention">
+          <table class="farm-table w-full text-left border-collapse"><thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="mp-att-thead"></tr></thead><tbody id="mp-att-tbody"></tbody></table>
+        </div>
+        <div class="mp-panel lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-mp-panel="summary">
+          <table class="farm-table w-full text-left border-collapse"><thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="mp-sum-thead"></tr></thead><tbody id="mp-sum-tbody"></tbody></table>
         </div>
       </div>
-      <!-- Farms tab body -->
-      <div class="lb-panel overflow-auto scroll-thin rounded-b-lg" data-lb-panel="farms">
-        <table class="farm-table w-full text-left border-collapse" id="farm-table">
-          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="farm-thead-row"></tr></thead>
-          <tbody id="farm-tbody"></tbody>
-        </table>
-      </div>
-      <!-- Land Use tab body -->
-      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="landuse">
-        <table class="farm-table w-full text-left border-collapse" id="landuse-table">
-          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="landuse-thead-row"></tr></thead>
-          <tbody id="landuse-tbody"></tbody>
-        </table>
-      </div>
-      <!-- Crops tab body -->
-      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="crops">
-        <table class="farm-table w-full text-left border-collapse" id="crops-table">
-          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="crops-thead-row"></tr></thead>
-          <tbody id="crops-tbody"></tbody>
-        </table>
-      </div>
-      <!-- Trees tab body -->
-      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="trees">
-        <table class="farm-table w-full text-left border-collapse" id="trees-table">
-          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="trees-thead-row"></tr></thead>
-          <tbody id="trees-tbody"></tbody>
-        </table>
-      </div>
-      <!-- Irrigation Efficiency tab body -->
-      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="ier">
-        <table class="farm-table w-full text-left border-collapse" id="ier-table">
-          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="ier-thead-row"></tr></thead>
-          <tbody id="ier-tbody"></tbody>
-        </table>
-      </div>
-      <!-- Yield Forecast tab body -->
-      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="yield">
-        <table class="farm-table w-full text-left border-collapse" id="yield-table">
-          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="yield-thead-row"></tr></thead>
-          <tbody id="yield-tbody"></tbody>
-        </table>
-      </div>
-      <!-- Crop Water Allocation tab body -->
-      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="water">
-        <table class="farm-table w-full text-left border-collapse" id="water-table">
-          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="water-thead-row"></tr></thead>
-          <tbody id="water-tbody"></tbody>
-        </table>
-      </div>
-      <!-- News tab body -->
-      <div class="lb-panel hidden px-4 py-2 overflow-y-auto scroll-thin rounded-b-lg" data-lb-panel="news" id="news-feed"></div>
     </div>
+
+    <!-- ===================== HOME SCORECARD (overview route) ================== -->
+    <div id="route-overview" class="route-hidden absolute inset-0 z-20 bg-gray-50 overflow-y-auto scroll-thin">
+      <div class="max-w-6xl mx-auto px-8 py-8">
+        <h1 class="text-2xl font-bold text-gray-900">Region scorecard</h1>
+        <p id="overview-meta" class="text-sm text-gray-500 mt-1 font-mono">—</p>
+        <div id="overview-cards" class="grid gap-4 mt-6" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))"></div>
+        <p class="text-xs text-gray-400 mt-6">Each card: headline number · status · band mix. Click a card to open that module's map, legend and attention list.</p>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -466,25 +119,18 @@
 <script src="js/ui/sidebar.js"></script>
 <script src="js/ui/mapControls.js"></script>
 <script src="data/plots.js"></script>
-<script src="data/crops.js"></script>
-<script src="data/landuse.js"></script>
 <script src="js/mock/metrics.js"></script>
-<script src="js/mock/news.js"></script>
 <script src="js/dashboard/taxonomy.js"></script>
 <script src="js/dashboard/state.js"></script>
 <script src="js/dashboard/modules.js"></script>
 <script src="js/dashboard/moduleRegistry.js"></script>
 <script src="js/dashboard/plotsLayer.js"></script>
-<script src="js/dashboard/viewportStats.js"></script>
-<script src="js/dashboard/modulesPanel.js"></script>
-<script src="js/dashboard/layersPanel.js"></script>
 <script src="js/dashboard/dataTable.js"></script>
-<script src="js/dashboard/farmTable.js"></script>
-<script src="js/dashboard/categoryTables.js"></script>
-<script src="js/dashboard/moduleTables.js"></script>
-<script src="js/dashboard/scorecard.js"></script>
 <script src="js/dashboard/attentionList.js"></script>
-<script src="js/dashboard/liveBar.js"></script>
+<script src="js/dashboard/scorecard.js"></script>
+<script src="js/dashboard/modulePage.js"></script>
+<script src="js/pages/overview.js"></script>
+<script src="js/dashboard/router.js"></script>
 <script src="js/pages/dashboard.js"></script>
 </body>
 </html>

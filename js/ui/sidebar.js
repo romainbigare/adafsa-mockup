@@ -33,9 +33,11 @@
 
     cfg.nav.groups.forEach(function (group, i) {
       var padTop = i === 0 ? 'pt-2' : 'pt-4';
-      html += '<div class="px-6 ' + padTop + ' pb-1">';
-      html += '  <span class="font-label-caps text-gray-400">' + group.label + '</span>';
-      html += '</div>';
+      if (group.label) {
+        html += '<div class="px-6 ' + padTop + ' pb-1">';
+        html += '  <span class="font-label-caps text-gray-400">' + group.label + '</span>';
+        html += '</div>';
+      }
 
       group.links.forEach(function (link) {
         var isActive = link.id === active;

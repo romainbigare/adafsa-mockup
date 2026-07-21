@@ -16,19 +16,32 @@
       },
       defaults: { center: [23.85, 53.78], zoom: 10 }
     },
+    // Proposal A — the nav sells the six contract modules by name. Module links
+    // point at hash routes on index.html (the SPA shell); the router marks the
+    // active one. Overview is the Home scorecard; Farm Analysis is the drill-down.
     nav: {
       groups: [
         {
-          label: "FOR GOVERNMENT",
+          label: "",
           links: [
-            { id: "dashboard", label: "Farms Overview", icon: "dashboard", href: "index.html" },
-            { id: "farm-analysis", label: "Farm Analysis", icon: "analytics", href: "farm-analysis.html" }
+            { id: "overview", label: "Overview", icon: "dashboard", href: "index.html#/overview" }
           ]
         },
         {
-          label: "FOR FARMERS",
+          label: "MODULES",
           links: [
-            { id: "my-farm", label: "My Farm", icon: "agriculture", href: "farm-analysis.html" }
+            { id: "crop", label: "Crop Monitoring", icon: "grass", href: "index.html#/m/crop" },
+            { id: "palms", label: "Palms & Fruit Trees", icon: "park", href: "index.html#/m/palms" },
+            { id: "structures", label: "Structures", icon: "home_work", href: "index.html#/m/structures" },
+            { id: "ier", label: "Irrigation Efficiency", icon: "water_drop", href: "index.html#/m/ier" },
+            { id: "yield", label: "Yield Forecast", icon: "agriculture", href: "index.html#/m/yield" },
+            { id: "water", label: "Water Allocation", icon: "opacity", href: "index.html#/m/water" }
+          ]
+        },
+        {
+          label: "DRILL-DOWN",
+          links: [
+            { id: "farm-analysis", label: "Farm Analysis", icon: "analytics", href: "farm-analysis.html" }
           ]
         }
       ],
