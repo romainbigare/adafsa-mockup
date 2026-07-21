@@ -12,6 +12,9 @@
   W.dashboard.landUseTable.init();
   W.dashboard.cropsTable.init();
   W.dashboard.treesTable.init();
+  W.dashboard.ierTable.init();
+  W.dashboard.yieldTable.init();
+  W.dashboard.waterTable.init();
 
   // ---- Controls ----
   W.ui.wireZoom(state.map, { inId: 'zoom-in', outId: 'zoom-out' });

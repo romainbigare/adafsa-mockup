@@ -35,8 +35,8 @@
   function createTable(cfg) {
     var COLUMNS = cfg.columns;
     var rows = [];
-    var sortKey = COLUMNS[0].key;
-    var sortDir = 'asc';    // 'asc' | 'desc'
+    var sortKey = cfg.initialSortKey || COLUMNS[0].key;
+    var sortDir = cfg.initialSortDir || 'asc';    // 'asc' | 'desc'
     var active = false;     // is this tab currently visible?
     var dragKey = null;
     var currentState = null;

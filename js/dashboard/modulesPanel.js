@@ -101,12 +101,21 @@
     if (wasCategory) {
       // Coming back from a landuse/crops dataset: reload the farm boundaries.
       // The stream + finishLoading path recolours by band and refreshes counts.
-      W.dashboard.liveBar.setTab('farms');
       W.dashboard.plotsLayer.loadDataset(state, 'plots');
     } else {
       W.dashboard.plotsLayer.applyColoring(state);
       W.dashboard.viewportStats.update(state);
     }
+    // Keep the bottom sheet in sync — show this module's summary tab.
+    W.dashboard.liveBar.setTab(key);
+  }
+
+  // Clicking a module tab in the bottom sheet: activate the module (which also
+  // colours the map + opens its left panel) if it isn't already; otherwise just
+  // re-reveal the tab. Mirrors viewportStats.selectCategoryTab.
+  function selectModuleTab(state, key) {
+    if (state.activeModule !== key) activate(state, key);
+    else W.dashboard.liveBar.setTab(key);
   }
 
   // Clears module selection + panel UI only. The caller is responsible for the
@@ -127,6 +136,7 @@
           deactivate(state);
           W.dashboard.plotsLayer.applyColoring(state);
           W.dashboard.viewportStats.update(state);
+          if (W.dashboard.liveBar.getActiveTab() === key) W.dashboard.liveBar.setTab('farms');
         } else {
           activate(state, key);
         }
@@ -139,7 +149,8 @@
     wire: wire,
     update: update,
     activate: activate,
-    deactivate: deactivate
+    deactivate: deactivate,
+    selectModuleTab: selectModuleTab
   };
 
 })(window.Wafra);

@@ -90,7 +90,11 @@
         // Colour the cluster bubble by the majority value of its members.
         var bgColor = majorityColor(state, markers);
 
-        return L.divIcon({ html: '<div class="cluster-icon ' + cls + '" style="background:' + bgColor + '">' + count + '</div>', className: '', iconSize: [40, 40] });
+        // Ghost a cluster whose members are all outside the current selection.
+        var ghost = state.ghostSet;
+        var ghostCls = (ghost && !markers.some(function (m) { return m._featureRef && ghost.has(m._featureRef); })) ? ' cluster-ghosted' : '';
+
+        return L.divIcon({ html: '<div class="cluster-icon ' + cls + ghostCls + '" style="background:' + bgColor + '">' + count + '</div>', className: '', iconSize: [40, 40] });
       }
     });
     state.clusterActive = false;
@@ -132,6 +136,26 @@
 
   function clearSelection(state) {
     if (state.highlightLayer) state.highlightLayer.clearLayers();
+  }
+
+  // Fit the map to a group of features (e.g. all farms in a band, or all
+  // parcels of a land-use type) and ghost every shape outside the group —
+  // used when a summary-table row is clicked.
+  function selectGroup(state, members) {
+    if (!members || !members.length) return;
+    setGhost(state, members);
+    var pts = [];
+    for (var i = 0; i < members.length; i++) {
+      if (members[i].centroid) pts.push(members[i].centroid);
+    }
+    if (!pts.length) return;
+    var bar = document.getElementById('live-bar');
+    var bottomPad = (bar && !bar.classList.contains('collapsed')) ? bar.offsetHeight + 24 : 40;
+    state.map.fitBounds(L.latLngBounds(pts), {
+      maxZoom: 15,
+      paddingTopLeft: [40, 40],
+      paddingBottomRight: [40, bottomPad]
+    });
   }
 
   function clearAllFeatures(state) {
@@ -305,18 +329,53 @@
       })(type);
     }
 
-    // Force complete cluster rebuild by removing and re-adding the cluster
-    // group so iconCreateFunction runs fresh with the current dataset colours.
-    if (state.clusterActive) {
-      state.map.removeLayer(state.clusterGroup);
-      state.clusterGroup.clearLayers();
-      for (var t in state.markersByType) {
-        if (state.layerVisibility[t]) {
-          state.markersByType[t].forEach(function (m) { state.clusterGroup.addLayer(m); });
-        }
+    // Force a full cluster rebuild so iconCreateFunction reruns with the
+    // current colours (and ghost state).
+    rebuildClusters(state);
+  }
+
+  // Remove + re-add the cluster group so its iconCreateFunction reruns fresh —
+  // the only way to restyle existing cluster bubbles (colour / ghost).
+  function rebuildClusters(state) {
+    if (!state.clusterActive) return;
+    state.map.removeLayer(state.clusterGroup);
+    state.clusterGroup.clearLayers();
+    for (var t in state.markersByType) {
+      if (state.layerVisibility[t]) {
+        state.markersByType[t].forEach(function (m) { state.clusterGroup.addLayer(m); });
       }
-      state.map.addLayer(state.clusterGroup);
     }
+    state.map.addLayer(state.clusterGroup);
+  }
+
+  // ---- Ghosting -------------------------------------------------------------
+  // Dim every shape/cluster not in the current selection. Driven by
+  // state.ghostSet (a Set of selected featureData) — see setGhost/clearGhost.
+  var POLY_OPACITY = 0.8, POLY_FILL = 0.35;
+  var GHOST_OPACITY = 0.12, GHOST_FILL = 0.03;
+
+  function applyGhost(state) {
+    var ghost = state.ghostSet;
+    for (var type in state.layerGroups) {
+      state.layerGroups[type].eachLayer(function (poly) {
+        if (!poly._featureRef) return;
+        var dim = ghost && !ghost.has(poly._featureRef);
+        poly.setStyle({ opacity: dim ? GHOST_OPACITY : POLY_OPACITY, fillOpacity: dim ? GHOST_FILL : POLY_FILL });
+      });
+    }
+    rebuildClusters(state);
+  }
+
+  // Ghost everything except `members`. Empty/falsy members clears ghosting.
+  function setGhost(state, members) {
+    state.ghostSet = (members && members.length) ? new Set(members) : null;
+    applyGhost(state);
+  }
+
+  function clearGhost(state) {
+    if (!state.ghostSet) return;      // nothing to restore — avoid needless rebuilds
+    state.ghostSet = null;
+    applyGhost(state);
   }
 
   function finishLoading(state, total) {
@@ -362,6 +421,9 @@
     loadDataset: loadDataset,
     updateLayerMode: updateLayerMode,
     selectFarm: selectFarm,
+    selectGroup: selectGroup,
+    setGhost: setGhost,
+    clearGhost: clearGhost,
     clearSelection: clearSelection
   };
 

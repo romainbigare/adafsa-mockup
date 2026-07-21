@@ -39,6 +39,10 @@
       // selected-farm highlight layer (created by Wafra.dashboard.plotsLayer.init)
       highlightLayer: null,
 
+      // Ghosting: when a summary-table row is selected, this holds the Set of
+      // selected featureData; every other shape/cluster is dimmed. null = off.
+      ghostSet: null,
+
       // viewport stats (recomputed by Wafra.dashboard.viewportStats.update)
       vpTypes: {},
       vpCats: {},

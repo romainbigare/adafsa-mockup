@@ -154,6 +154,39 @@
     return counts;
   }
 
+  // One summary row per band: farm count, total area, area share (%), the mean
+  // metric value, and the member features (for a zoom-to-group interaction).
+  // Returned in band order. Powers the module summary tables in the bottom sheet.
+  function bandSummary(module, features) {
+    var total = 0;
+    var byLabel = {};
+    module.bands.forEach(function (b) {
+      byLabel[b.label] = { count: 0, area: 0, sumVal: 0, members: [] };
+    });
+    for (var i = 0; i < features.length; i++) {
+      var f = features[i];
+      var area = f.area || 0;
+      total += area;
+      var band = bandOf(module, f);
+      if (!band) continue;
+      var g = byLabel[band.label];
+      g.count++;
+      g.area += area;
+      g.sumVal += module.valueOf(f);
+      g.members.push(f);
+    }
+    return module.bands.map(function (b) {
+      var g = byLabel[b.label];
+      return {
+        label: b.label, range: b.range, color: b.color,
+        count: g.count, area: g.area,
+        avg: g.count ? g.sumVal / g.count : 0,
+        share: total ? g.area / total * 100 : 0,
+        members: g.members
+      };
+    });
+  }
+
   W.dashboard.modules = {
     MODULES: MODULES,
     UNKNOWN_COLOR: UNKNOWN_COLOR,
@@ -162,6 +195,7 @@
     colorOf: colorOf,
     prepare: prepare,
     bandCounts: bandCounts,
+    bandSummary: bandSummary,
     subzoneKey: subzoneKey
   };
 

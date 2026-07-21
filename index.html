@@ -267,22 +267,30 @@
           <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="farms">
             <span class="material-symbols-outlined" style="font-size:16px;">table_chart</span>
             <span>FARMS</span>
-            <span class="font-data-sm text-gray-400" id="farm-table-count">0</span>
           </button>
           <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="landuse">
             <span class="material-symbols-outlined" style="font-size:16px;">terrain</span>
             <span>LAND USE</span>
-            <span class="font-data-sm text-gray-400" id="landuse-table-count">0</span>
           </button>
           <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="crops">
             <span class="material-symbols-outlined" style="font-size:16px;">grass</span>
             <span>CROPS</span>
-            <span class="font-data-sm text-gray-400" id="crops-table-count">0</span>
           </button>
           <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="trees">
             <span class="material-symbols-outlined" style="font-size:16px;">park</span>
             <span>TREES</span>
-            <span class="font-data-sm text-gray-400" id="trees-table-count">0</span>
+          </button>
+          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="ier">
+            <span class="material-symbols-outlined" style="font-size:16px;">water_drop</span>
+            <span>IRRIGATION</span>
+          </button>
+          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="yield">
+            <span class="material-symbols-outlined" style="font-size:16px;">agriculture</span>
+            <span>YIELD</span>
+          </button>
+          <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="water">
+            <span class="material-symbols-outlined" style="font-size:16px;">opacity</span>
+            <span>WATER</span>
           </button>
           <button class="lb-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-lb-tab="news">
             <span class="flex h-2 w-2 relative">
@@ -346,6 +354,45 @@
               <span class="hidden sm:inline">Export CSV</span>
             </button>
           </div>
+          <div class="lb-ctx lb-ctx-ier hidden flex items-center gap-2">
+            <div class="relative">
+              <button id="ier-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
+                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
+                <span class="hidden sm:inline">Columns</span>
+              </button>
+              <div id="ier-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
+            </div>
+            <button id="ier-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
+              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
+              <span class="hidden sm:inline">Export CSV</span>
+            </button>
+          </div>
+          <div class="lb-ctx lb-ctx-yield hidden flex items-center gap-2">
+            <div class="relative">
+              <button id="yield-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
+                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
+                <span class="hidden sm:inline">Columns</span>
+              </button>
+              <div id="yield-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
+            </div>
+            <button id="yield-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
+              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
+              <span class="hidden sm:inline">Export CSV</span>
+            </button>
+          </div>
+          <div class="lb-ctx lb-ctx-water hidden flex items-center gap-2">
+            <div class="relative">
+              <button id="water-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700">
+                <span class="material-symbols-outlined" style="font-size:15px;">view_column</span>
+                <span class="hidden sm:inline">Columns</span>
+              </button>
+              <div id="water-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
+            </div>
+            <button id="water-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
+              <span class="material-symbols-outlined" style="font-size:15px;">download</span>
+              <span class="hidden sm:inline">Export CSV</span>
+            </button>
+          </div>
           <!-- Collapse / expand -->
           <button id="live-bar-collapse" class="text-gray-400 hover:text-gray-700 pl-1" title="Collapse">
             <span class="material-symbols-outlined" id="live-bar-chevron" style="font-size:18px;">expand_more</span>
@@ -380,6 +427,27 @@
           <tbody id="trees-tbody"></tbody>
         </table>
       </div>
+      <!-- Irrigation Efficiency tab body -->
+      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="ier">
+        <table class="farm-table w-full text-left border-collapse" id="ier-table">
+          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="ier-thead-row"></tr></thead>
+          <tbody id="ier-tbody"></tbody>
+        </table>
+      </div>
+      <!-- Yield Forecast tab body -->
+      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="yield">
+        <table class="farm-table w-full text-left border-collapse" id="yield-table">
+          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="yield-thead-row"></tr></thead>
+          <tbody id="yield-tbody"></tbody>
+        </table>
+      </div>
+      <!-- Crop Water Allocation tab body -->
+      <div class="lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-lb-panel="water">
+        <table class="farm-table w-full text-left border-collapse" id="water-table">
+          <thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="water-thead-row"></tr></thead>
+          <tbody id="water-tbody"></tbody>
+        </table>
+      </div>
       <!-- News tab body -->
       <div class="lb-panel hidden px-4 py-2 overflow-y-auto scroll-thin rounded-b-lg" data-lb-panel="news" id="news-feed"></div>
     </div>
@@ -412,6 +480,7 @@
 <script src="js/dashboard/dataTable.js"></script>
 <script src="js/dashboard/farmTable.js"></script>
 <script src="js/dashboard/categoryTables.js"></script>
+<script src="js/dashboard/moduleTables.js"></script>
 <script src="js/dashboard/liveBar.js"></script>
 <script src="js/pages/dashboard.js"></script>
 </body>

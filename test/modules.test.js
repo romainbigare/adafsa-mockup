@@ -40,6 +40,12 @@ function farmWith(mod, v) {
   f._mod[key] = v;
   return f;
 }
+// Same, but with an area (for the summary aggregation tests).
+function farmArea(mod, v, area) {
+  var f = farmWith(mod, v);
+  f.area = area;
+  return f;
+}
 function labelAt(modKey, v) {
   var m = modules.byKey(modKey);
   var b = modules.bandOf(m, farmWith(m, v));
@@ -177,6 +183,43 @@ check("bandCounts tallies a mixed set correctly", function () {
   assert.strictEqual(counts.Acceptable, 1);
   assert.strictEqual(counts.Poor, 1);
   assert.strictEqual(counts.Critical, 1);
+});
+
+console.log("bandSummary() — per-band aggregation for the summary tables");
+check("aggregates count / area / share / avg per band, in band order", function () {
+  var m = modules.byKey("ier");
+  // areas chosen so shares are easy to reason about (total = 100).
+  var farms = [
+    farmArea(m, 95, 10), // Excellent
+    farmArea(m, 92, 30), // Excellent
+    farmArea(m, 70, 20), // Acceptable
+    farmArea(m, 40, 40)  // Critical
+  ];
+  var rows = modules.bandSummary(m, farms);
+  // Returned in band order: Excellent, Good, Acceptable, Poor, Critical.
+  assert.strictEqual(rows.map(function (r) { return r.label; }).join(","),
+    "Excellent,Good,Acceptable,Poor,Critical");
+  var byLabel = {};
+  rows.forEach(function (r) { byLabel[r.label] = r; });
+  assert.strictEqual(byLabel.Excellent.count, 2);
+  assert.strictEqual(byLabel.Excellent.area, 40);
+  assert.strictEqual(byLabel.Excellent.avg, (95 + 92) / 2);
+  assert.strictEqual(Math.round(byLabel.Excellent.share), 40); // 40 of 100
+  assert.strictEqual(byLabel.Good.count, 0);
+  assert.strictEqual(byLabel.Good.avg, 0);       // empty band → 0 (rendered as "—")
+  assert.strictEqual(byLabel.Critical.count, 1);
+  assert.strictEqual(byLabel.Critical.area, 40);
+  assert.strictEqual(byLabel.Acceptable.members.length, 1);
+});
+check("empty input → all bands zeroed, no shares", function () {
+  var m = modules.byKey("water");
+  var rows = modules.bandSummary(m, []);
+  assert.strictEqual(rows.length, m.bands.length);
+  rows.forEach(function (r) {
+    assert.strictEqual(r.count, 0);
+    assert.strictEqual(r.area, 0);
+    assert.strictEqual(r.share, 0);
+  });
 });
 
 console.log("\nAll " + passed + " checks passed.");

@@ -6,11 +6,16 @@
   // Tabs backed by a Wafra.dashboard.dataTable instance (each with its own
   // Columns/Export header controls, toggled via .lb-ctx-<name>). 'news' is
   // the only tab without one.
-  var DATA_TABS = ['farms', 'landuse', 'crops', 'trees'];
-  var TABLE_FOR_TAB = { farms: 'farmTable', landuse: 'landUseTable', crops: 'cropsTable', trees: 'treesTable' };
+  var DATA_TABS = ['farms', 'landuse', 'crops', 'trees', 'ier', 'yield', 'water'];
+  var TABLE_FOR_TAB = {
+    farms: 'farmTable', landuse: 'landUseTable', crops: 'cropsTable', trees: 'treesTable',
+    ier: 'ierTable', yield: 'yieldTable', water: 'waterTable'
+  };
   var CATEGORY_TABS = ['landuse', 'crops', 'trees'];
+  var MODULE_TABS = ['ier', 'yield', 'water'];
 
   var activeTab = 'farms';
+  var boundState = null; // set in init(); used to reset ghosting on tab change
 
   function addNewsItem() {
     var feed = document.getElementById('news-feed');
@@ -74,6 +79,8 @@
   // data table's contextual header controls, and which table is "active"
   // (so it renders/re-renders only while actually visible).
   function setTab(name) {
+    // Leaving a tab resets any row-selection ghosting on the map.
+    if (name !== activeTab && boundState) W.dashboard.plotsLayer.clearGhost(boundState);
     activeTab = name;
     document.querySelectorAll('.lb-tab').forEach(function (t) {
       t.classList.toggle('active', t.dataset.lbTab === name);
@@ -141,6 +148,7 @@
 
   // Called once, after the first dataset finishes loading.
   function init(state) {
+    boundState = state;
     // Seed news feed
     for (var i = 0; i < 8; i++) addNewsItem();
     // Add new items periodically
@@ -152,6 +160,7 @@
       tab.addEventListener('click', function () {
         var name = tab.dataset.lbTab;
         if (CATEGORY_TABS.indexOf(name) !== -1) W.dashboard.viewportStats.selectCategoryTab(state, name);
+        else if (MODULE_TABS.indexOf(name) !== -1) W.dashboard.modulesPanel.selectModuleTab(state, name);
         else setTab(name);
       });
     });
