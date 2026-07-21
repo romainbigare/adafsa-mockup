@@ -2,7 +2,7 @@
 
 A static, **buildless** front-end mockup for a farm-monitoring platform (Abu Dhabi / Al Ain region). Two pages backed by placeholder data, served entirely from static files — no server, no build step, no npm.
 
-- **Farms Overview** (`index.html`) — **Proposal A, "module hub".** The nav lists the six contract modules by name; a hash router (`#/overview`, `#/m/<key>`) drives a single-page shell. **Overview** is a Home scorecard (six F3 cards from the region rollups, no map). Each **module page** reuses one template — a KPI strip, the map coloured by that module only, one legend, and a ranked **attention list** (worst farms first) + band summary. The single Leaflet map is created once and shown/hidden per route.
+- **Farms Overview** (`index.html`) — **Proposal A2, "map-led hub".** Everything in Proposal A (nav sells the six modules; a hash router drives module pages built from one template: KPI strip + module-coloured map + legend + ranked attention list), **plus** the Home page leads with the region map (all farm boundaries, framed) and a "Colour by" control, with the six modules as a mini launch strip beneath it. The **same** single Leaflet map is framed on Home and full-height on a module route.
 - **Farm Analysis** (`farm-analysis.html`) — per-farm view with a canvas heatmap (growth / irrigation / phenology / density), weather, soil, growth-phase, water-scheduler and advisory panels.
 
 > The data is **placeholder**. See [Data & the mock boundary](#data--the-mock-boundary).
@@ -80,8 +80,8 @@ warfa-dashboard/
 │   ├── farmAnalysis/heatmap.js  # Farm Analysis canvas heatmap overlay + colour scales
 │   │
 │   └── pages/                   # one entry point per page — bootstraps + wires everything
-│       ├── dashboard.js         #   A — creates the map once, wires chrome, hands off to the router
-│       ├── overview.js          #   A — Home scorecard (six F3 cards)
+│       ├── dashboard.js         #   A2 — creates the map once, wires chrome, hands off to the router
+│       ├── overview.js          #   A2 — Home: framed region map + colour-by + six mini F3 tiles
 │       └── farmAnalysis.js
 │
 ├── data/                        # placeholder GeoJSON, wrapped as window.WafraData globals

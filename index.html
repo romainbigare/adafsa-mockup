@@ -94,13 +94,28 @@
       </div>
     </div>
 
-    <!-- ===================== HOME SCORECARD (overview route) ================== -->
-    <div id="route-overview" class="route-hidden absolute inset-0 z-20 bg-gray-50 overflow-y-auto scroll-thin">
-      <div class="max-w-6xl mx-auto px-8 py-8">
-        <h1 class="text-2xl font-bold text-gray-900">Region scorecard</h1>
-        <p id="overview-meta" class="text-sm text-gray-500 mt-1 font-mono">—</p>
-        <div id="overview-cards" class="grid gap-4 mt-6" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))"></div>
-        <p class="text-xs text-gray-400 mt-6">Each card: headline number · status · band mix. Click a card to open that module's map, legend and attention list.</p>
+    <!-- ============ HOME: MAP-LED (overview route) ============ -->
+    <!-- Transparent overlay: the framed region map (#map, .map-framed) shows
+         through the top; the launch strip sits below. -->
+    <div id="route-overview" class="route-hidden absolute inset-0 z-20 pointer-events-none">
+
+      <!-- Colour-by control, floating over the framed map -->
+      <div class="pointer-events-auto absolute left-6 z-30 flex items-center gap-2 glass-panel px-3 py-2" style="top:24px">
+        <span class="font-label-caps text-gray-900">REGION OVERVIEW</span>
+        <span class="text-[10px] text-gray-400" id="overview-meta">—</span>
+      </div>
+      <div class="pointer-events-auto absolute right-6 z-30 flex items-center gap-2 glass-panel px-3 py-1.5" style="top:24px">
+        <span class="text-xs text-gray-500">Colour by</span>
+        <select id="colour-by" class="text-xs font-medium text-gray-800 bg-transparent focus:outline-none cursor-pointer"></select>
+      </div>
+
+      <!-- Launch strip: the six module tiles below the map -->
+      <div id="overview-strip" class="pointer-events-auto absolute left-3 right-3 bottom-3 z-20 glass-panel p-3 overflow-y-auto scroll-thin" style="top:58%">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-label-caps text-gray-900">MODULES</span>
+          <span class="text-[10px] text-gray-400">Click a tile to open its full module page</span>
+        </div>
+        <div id="overview-cards" class="grid gap-2" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))"></div>
       </div>
     </div>
 

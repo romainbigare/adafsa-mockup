@@ -26,12 +26,24 @@
   function el(id) { return document.getElementById(id); }
   function show(id, on) { var e = el(id); if (e) e.classList.toggle('route-hidden', !on); }
 
+  // Fit the (framed) region map to every farm boundary.
+  function fitFarms(state) {
+    var farms = state.farmFeatures || [], pts = [];
+    for (var i = 0; i < farms.length; i++) if (farms[i].centroid) pts.push(farms[i].centroid);
+    if (pts.length) state.map.fitBounds(L.latLngBounds(pts), { padding: [30, 30] });
+  }
+
   function showOverview(state) {
     show('route-overview', true);
     show('module-chrome', false);
-    show('map', false);
+    // A2 — the map LEADS the Home page, framed at the top (not hidden).
+    show('map', true);
+    var map = el('map');
+    if (map) map.classList.add('map-framed');
     W.dashboard.overview.render(state);
     W.ui.renderSidebar({ active: 'overview' });
+    // The map box shrank to the frame — re-flow and re-fit to the region.
+    setTimeout(function () { state.map.invalidateSize(); fitFarms(state); }, 0);
   }
 
   function showModule(state, key) {
@@ -39,9 +51,10 @@
     show('route-overview', false);
     show('module-chrome', true);
     show('map', true);
+    var map = el('map');
+    if (map) map.classList.remove('map-framed'); // full-height on a module page
     W.dashboard.modulePage.show(state, key);
     W.ui.renderSidebar({ active: key });
-    // The map was display:none on Overview — re-flow it now.
     setTimeout(function () { state.map.invalidateSize(); }, 0);
   }
 

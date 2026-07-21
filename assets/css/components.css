@@ -269,6 +269,22 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
 /* Scorecard cards (F3) hover affordance. */
 .scorecard-card { text-decoration: none; }
 
+/* --------------------------------------------------------------------------
+   Proposal A2 — the region map framed at the top of Home (module routes use
+   the default full-bleed #map). !important beats Tailwind's inset-0/h-full.
+   -------------------------------------------------------------------------- */
+.map-framed {
+  top: 12px !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: auto !important;
+  height: 55% !important;
+  width: auto !important;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.16);
+}
+
 /* Per-category subcategory list — collapsed by default, expanded by
    clicking the category row (independent of the outer cat-panel accordion). */
 .subcat-toggle:hover { background-color: #f9fafb; }

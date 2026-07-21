@@ -3,27 +3,49 @@
 
   W.dashboard = W.dashboard || {};
 
-  // Proposal A — Home. Answers "how are we doing?" in one glance: six F3
-  // scorecards (one per contract module) built from the region rollups. No map.
-  // Each card links to its module route (#/m/<key>). The hero card (Palms,
-  // 31.6% of fee) is emphasised by the scorecard component itself.
+  // Proposal A2 — Home leads with the region map (all farm boundaries, framed
+  // by the router via .map-framed) and the six modules become a mini launch
+  // strip below it. A "Colour by" control recolours the shared map through the
+  // registry; clicking a tile routes to that module's full page (identical to A).
 
   var reg = W.dashboard.moduleRegistry;
 
+  var colourBy = 'structures'; // default: the land-use-tier module (region "land use" view)
+  var wired = false;
+
+  function applyColour(state) {
+    state.activeModule = colourBy || null;   // '' → None (plain boundaries)
+    W.dashboard.plotsLayer.applyColoring(state);
+  }
+
+  function wireColourBy(state) {
+    var sel = document.getElementById('colour-by');
+    if (!sel) return;
+    if (!sel.options.length) {
+      var opts = [{ v: '', l: 'None' }].concat(reg.MODULES.map(function (m) { return { v: m.key, l: m.label }; }));
+      sel.innerHTML = opts.map(function (o) { return '<option value="' + o.v + '">' + o.l + '</option>'; }).join('');
+      sel.value = colourBy;
+    }
+    if (!wired) {
+      sel.addEventListener('change', function () { colourBy = sel.value; applyColour(state); });
+      wired = true;
+    }
+  }
+
   function render(state) {
     var el = document.getElementById('overview-cards');
-    if (!el) return;
-    var farms = state.farmFeatures || [];
-    var models = reg.MODULES.map(function (m) { return reg.cardModel(m, farms); });
-    W.dashboard.scorecard.render(el, models, { size: 'big' });
-
+    if (el) {
+      var farms = state.farmFeatures || [];
+      var models = reg.MODULES.map(function (m) { return reg.cardModel(m, farms); });
+      W.dashboard.scorecard.render(el, models, { size: 'mini' });
+    }
     var meta = document.getElementById('overview-meta');
     if (meta) {
-      var scan = document.getElementById('last-scan');
-      var t = scan ? scan.textContent : '—';
       meta.textContent = (state.totalFarmCount || 0).toLocaleString() + ' farms · ' +
-        Math.round(state.totalArea || 0).toLocaleString() + ' dun monitored · last scan ' + t;
+        Math.round(state.totalArea || 0).toLocaleString() + ' dun';
     }
+    wireColourBy(state);
+    applyColour(state);
   }
 
   W.dashboard.overview = { render: render };
