@@ -1,0 +1,599 @@
+<meta charset="utf-8">
+<title>Wafra dashboard — layout review &amp; proposals</title>
+<style>
+  :root {
+    --paper: #F7F6F1;
+    --panel: #FFFFFF;
+    --ink: #20261E;
+    --mist: #6E7768;
+    --line: #DDDACD;
+    --moss: #257A3E;
+    --moss-soft: #E3EEE2;
+    --sand: #EAE4D2;
+    --sand-deep: #DDD3B8;
+    --clay: #B65C2E;
+    --wf-label: #857F6C;
+    --shadow: 0 1px 2px rgba(32,38,30,.06), 0 8px 24px rgba(32,38,30,.07);
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #14180F; --panel: #1E241A; --ink: #E8EAE1; --mist: #9BA391;
+      --line: #333B2C; --moss: #58B36C; --moss-soft: #24331F;
+      --sand: #2C3122; --sand-deep: #3A402C; --clay: #D08252; --wf-label: #8E8F79;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #14180F; --panel: #1E241A; --ink: #E8EAE1; --mist: #9BA391;
+    --line: #333B2C; --moss: #58B36C; --moss-soft: #24331F;
+    --sand: #2C3122; --sand-deep: #3A402C; --clay: #D08252; --wf-label: #8E8F79;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"] {
+    --paper: #F7F6F1; --panel: #FFFFFF; --ink: #20261E; --mist: #6E7768;
+    --line: #DDDACD; --moss: #257A3E; --moss-soft: #E3EEE2;
+    --sand: #EAE4D2; --sand-deep: #DDD3B8; --clay: #B65C2E; --wf-label: #857F6C;
+    --shadow: 0 1px 2px rgba(32,38,30,.06), 0 8px 24px rgba(32,38,30,.07);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font: 16px/1.6 var(--sans);
+    margin: 0; padding: 48px 24px 96px;
+  }
+  main { max-width: 1060px; margin: 0 auto; }
+
+  h1 {
+    font-size: 30px; line-height: 1.2; font-weight: 750; letter-spacing: -.02em;
+    text-wrap: balance; margin: 0 0 8px;
+  }
+  .sub { color: var(--mist); max-width: 62ch; margin: 0 0 8px; }
+  h2 {
+    font-size: 21px; font-weight: 700; letter-spacing: -.01em; text-wrap: balance;
+    margin: 64px 0 4px;
+  }
+  h2 .tag {
+    font: 600 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+    color: var(--moss); background: var(--moss-soft); border-radius: 99px;
+    padding: 5px 10px; vertical-align: 3px; margin-left: 10px; white-space: nowrap;
+  }
+  .h2sub { color: var(--mist); margin: 0 0 20px; max-width: 70ch; }
+  p { max-width: 70ch; }
+
+  /* ---- wireframe scaffolding ---- */
+  .wf-wrap { overflow-x: auto; }
+  .wf {
+    min-width: 720px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: var(--shadow); overflow: hidden;
+    font: 500 11px/1.35 var(--mono); color: var(--wf-label);
+    display: flex; height: 430px;
+  }
+  .wf.tall { height: auto; }
+  .wf-nav {
+    width: 148px; flex: none; border-right: 1px solid var(--line);
+    padding: 12px 10px; display: flex; flex-direction: column; gap: 6px;
+    background: color-mix(in srgb, var(--panel) 88%, var(--sand));
+  }
+  .wf-nav .logo { font-weight: 700; color: var(--moss); margin-bottom: 8px; letter-spacing: .04em; }
+  .wf-nav .item { padding: 5px 7px; border-radius: 6px; }
+  .wf-nav .item.on { background: var(--moss-soft); color: var(--moss); font-weight: 700; }
+  .wf-nav .group { margin-top: 8px; font-size: 9px; letter-spacing: .12em; opacity: .7; }
+  .wf-nav .spacer { flex: 1; }
+
+  .wf-main { flex: 1; position: relative; display: flex; flex-direction: column; min-width: 0; }
+  .wf-map {
+    flex: 1; position: relative;
+    background:
+      radial-gradient(closest-side at 72% 30%, color-mix(in srgb, var(--moss) 16%, var(--sand)) 0 18%, transparent 19%),
+      radial-gradient(closest-side at 58% 62%, color-mix(in srgb, var(--moss) 12%, var(--sand)) 0 12%, transparent 13%),
+      linear-gradient(135deg, var(--sand) 0 55%, var(--sand-deep) 55% 56%, var(--sand) 56%);
+  }
+  .wf-map .maplbl {
+    position: absolute; right: 10px; top: 8px; font-size: 9px; letter-spacing: .12em;
+  }
+  .panelbox {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 7px;
+    box-shadow: var(--shadow); padding: 7px 9px;
+  }
+  .stack { position: absolute; left: 10px; top: 10px; width: 168px; display: flex; flex-direction: column; gap: 5px; }
+  .stack .panelbox { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .stack .panelbox b { color: var(--ink); font-weight: 600; font-size: 10px; letter-spacing: .05em; }
+  .pill { font-size: 9px; border: 1px solid var(--line); border-radius: 99px; padding: 1px 6px; }
+
+  /* Proposal B — VIEW selector: one row, equal-width pills */
+  .viewsel {
+    position: absolute; left: 50%; transform: translateX(-50%); top: 10px;
+    display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  }
+  .viewsel > b { color: var(--ink); font-weight: 600; font-size: 10px; letter-spacing: .05em; }
+  .viewsel-pills { display: grid; grid-template-columns: repeat(7, 60px); gap: 4px; }
+  .viewsel-pills .pill {
+    font-size: 9px; padding: 3px 0; text-align: center; white-space: nowrap; overflow: hidden;
+  }
+  .viewsel-pills .pill.on { background: var(--moss-soft); color: var(--moss); border-color: var(--moss); }
+  .sheet {
+    border-top: 1px solid var(--line); background: var(--panel);
+    padding: 8px 10px 10px; flex: none;
+  }
+  .tabs { display: flex; gap: 2px; flex-wrap: wrap; margin-bottom: 7px; }
+  .tab { padding: 3px 8px; border-radius: 5px 5px 0 0; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .tab.on { color: var(--moss); font-weight: 700; border-bottom-color: var(--moss); }
+  .rows { display: flex; flex-direction: column; gap: 4px; }
+  .row { height: 12px; border-radius: 3px; background: color-mix(in srgb, var(--line) 55%, transparent); }
+  .row.head { background: color-mix(in srgb, var(--line) 90%, transparent); }
+
+  .dot {
+    display: inline-flex; width: 17px; height: 17px; border-radius: 50%;
+    background: var(--clay); color: #fff; font: 700 10px/1 var(--mono);
+    align-items: center; justify-content: center; flex: none;
+  }
+  .dot.abs { position: absolute; z-index: 3; box-shadow: 0 0 0 3px color-mix(in srgb, var(--clay) 25%, transparent); }
+
+  .legendlist { display: flex; flex-direction: column; gap: 10px; margin: 14px 0 0; padding: 0; list-style: none; }
+  .legendlist li { display: flex; gap: 10px; align-items: baseline; max-width: 76ch; }
+  .legendlist .dot { transform: translateY(3px); }
+  .legendlist b { font-weight: 650; }
+  .legendlist span.txt { color: var(--mist); }
+
+  /* band strip used in module wireframes */
+  .bands { display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
+  .bands i { display: block; height: 100%; }
+
+  /* KPI strip + cards */
+  .kpis { display: flex; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .kpi { flex: 1; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; min-width: 0; }
+  .kpi b { display: block; color: var(--ink); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .kpi.warn b { color: var(--clay); }
+
+  .cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
+  .mcard { border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: var(--panel); box-shadow: var(--shadow); }
+  .mcard .name { color: var(--ink); font-weight: 700; font-size: 11px; letter-spacing: .03em; }
+  .mcard .fee { float: right; color: var(--mist); font-size: 9px; }
+  .mcard b.big { display: block; font-size: 17px; color: var(--ink); margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+  .mcard .status { font-size: 9px; border-radius: 99px; padding: 2px 7px; font-weight: 700; letter-spacing: .06em; }
+  .st-ok { background: var(--moss-soft); color: var(--moss); }
+  .st-warn { background: color-mix(in srgb, var(--clay) 16%, transparent); color: var(--clay); }
+  .mcard .foot { margin-top: 8px; color: var(--mist); font-size: 9px; }
+
+  /* Proposal A2 — compact module tiles sitting under the overview map */
+  .cardrow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 10px 12px 12px; }
+  .mcard.mini { padding: 8px 9px; }
+  .mcard.mini .name { font-size: 8.5px; letter-spacing: .02em; }
+  .mcard.mini .fee { font-size: 8px; }
+  .mcard.mini b.big { font-size: 13px; margin: 5px 0 5px; }
+  .mcard.mini .status { font-size: 8px; padding: 1px 5px; }
+  .a2map { position: relative; height: 236px; margin: 12px 12px 0; border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(closest-side at 30% 42%, color-mix(in srgb, var(--moss) 14%, var(--sand)) 0 16%, transparent 17%),
+      radial-gradient(closest-side at 68% 30%, color-mix(in srgb, var(--moss) 12%, var(--sand)) 0 11%, transparent 12%),
+      radial-gradient(closest-side at 78% 66%, color-mix(in srgb, var(--moss) 13%, var(--sand)) 0 13%, transparent 14%),
+      linear-gradient(120deg, var(--sand) 0 60%, var(--sand-deep) 60% 61%, var(--sand) 61%);
+  }
+  .a2map .maplbl { position: absolute; left: 12px; top: 10px; font-size: 9px; letter-spacing: .1em; color: var(--wf-label); }
+  .a2map .colorby { position: absolute; right: 10px; top: 10px; display: flex; gap: 5px; align-items: center; }
+  .a2map .ctrls { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
+  .a2map .ctrls span { width: 20px; height: 20px; border-radius: 5px; background: var(--panel); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--ink); box-shadow: var(--shadow); }
+
+  .side-r {
+    position: absolute; right: 10px; top: 10px; width: 168px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+
+  .caption { color: var(--mist); font-size: 13px; margin: 10px 2px 0; max-width: 80ch; }
+
+  table.cmp { border-collapse: collapse; width: 100%; margin-top: 16px; font-size: 14px; }
+  .cmp th, .cmp td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .cmp th { font: 600 11px/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--mist); }
+  .cmp td:first-child { font-weight: 650; white-space: nowrap; }
+  .good { color: var(--moss); font-weight: 650; }
+  .meh { color: var(--clay); font-weight: 650; }
+
+  .verdict {
+    margin-top: 56px; border: 1px solid var(--line); border-left: 4px solid var(--moss);
+    border-radius: 8px; background: var(--panel); box-shadow: var(--shadow);
+    padding: 18px 22px;
+  }
+  .verdict h2 { margin: 0 0 6px; font-size: 18px; }
+  .verdict p { margin: 8px 0 0; }
+
+  /* ---- Live production app wireframe (page-scroll, not full-bleed map) ---- */
+  .wf.prod { height: auto; }
+  .wf.prod .wf-nav { width: 132px; font-size: 10px; }
+  .wf.prod .wf-nav .group { margin-top: 10px; }
+  .wf.prod .wf-main { padding: 12px; gap: 12px; background: var(--panel); overflow: visible; }
+  .prod-title { color: var(--ink); font-weight: 700; font-size: 13px; }
+  .prod-mapcard {
+    display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; height: 204px;
+  }
+  .prod-layers {
+    width: 150px; flex: none; border-right: 1px solid var(--line);
+    background: color-mix(in srgb, var(--panel) 88%, var(--sand)); padding: 6px 0;
+  }
+  .prod-layers .lh { padding: 4px 9px 6px; color: var(--ink); font-weight: 600; border-bottom: 1px solid var(--line); }
+  .prod-layers .lrow { display: flex; align-items: center; justify-content: space-between; padding: 4px 9px; }
+  .prod-layers .lrow b { color: var(--ink); font-weight: 500; }
+  .toggle { width: 22px; height: 11px; border-radius: 99px; background: color-mix(in srgb, var(--line) 80%, transparent); position: relative; flex: none; }
+  .toggle i { position: absolute; top: 1px; left: 1px; width: 9px; height: 9px; border-radius: 50%; background: #fff; }
+  .toggle.on { background: var(--moss); }
+  .toggle.on i { left: 12px; }
+  .prod-map {
+    flex: 1; position: relative;
+    background:
+      radial-gradient(closest-side at 60% 40%, color-mix(in srgb, var(--moss) 15%, var(--sand)) 0 15%, transparent 16%),
+      linear-gradient(120deg, var(--sand), var(--sand-deep));
+  }
+  .prod-map .ctrls { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .prod-map .ctrls span { width: 18px; height: 18px; border-radius: 4px; background: #1c1c1c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+  .prod-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .prod-stat { border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; background: var(--panel); box-shadow: var(--shadow); }
+  .prod-stat .lbl { color: var(--mist); font-size: 9px; }
+  .prod-stat b { display: block; color: var(--ink); font-size: 18px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .prod-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .prod-table { border: 1px solid var(--line); border-radius: 8px; padding: 9px; background: var(--panel); box-shadow: var(--shadow); }
+  .prod-table .tt { color: var(--ink); font-weight: 700; font-size: 11px; margin-bottom: 6px; }
+  .ptbl { width: 100%; border-collapse: collapse; font-size: 9px; }
+  .ptbl th { color: var(--mist); text-align: right; padding: 3px 4px; border-bottom: 1px solid var(--line); font-weight: 600; }
+  .ptbl th:first-child, .ptbl td:first-child { text-align: left; }
+  .ptbl td { color: var(--ink); text-align: right; padding: 3px 4px; border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent); font-variant-numeric: tabular-nums; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main>
+  <h1>Wafra dashboard — layout proposals</h1>
+  <p class="sub">Three ways to organise the six contract modules for a non-technical government audience. Companion to the written review; wireframes are schematic, not pixel specs.</p>
+  <p class="sub" style="font-size:13px">Context: 25,000 farms · 6 modules (Crop Monitoring 14.9% · Palms &amp; Fruit Trees 31.6% · Structures 21.0% · Irrigation 10.5% · Yield 12.6% · Water 9.4%) · GITEX demo gate on the palms module.</p>
+
+  <!-- ============ LIVE PRODUCTION APP ============ -->
+  <h2>Your live production app today <span class="tag">in production</span></h2>
+  <p class="h2sub">The deployed Farms page (mapmycrop.in). Numbers-first and page-scrolled: the map is a fixed card up top, then stat tiles, then two data tables. Clean and calm — but it surfaces only land-use and tree distribution; none of the six contract modules exist here yet, and the map is a passive picture rather than the workspace.</p>
+
+  <div class="wf-wrap"><div class="wf prod">
+    <div class="wf-nav">
+      <div class="logo">map my crop</div>
+      <div class="group">FARM MANAGEMENT</div>
+      <div class="item on">Farms</div>
+      <div class="item">Farm Monitoring</div>
+      <div class="item">Enterprise Information</div>
+      <div class="group">ANALYTICS &amp; INSIGHTS</div>
+      <div class="item">Violations</div>
+      <div class="group">SUPPORT</div>
+      <div class="item">Raise Ticket · FAQ</div>
+      <div class="item">Status · Contact</div>
+      <div class="group">SETTINGS</div>
+      <div class="item">Account · Logout</div>
+    </div>
+    <div class="wf-main">
+      <div class="prod-title">Farms Overview</div>
+      <div class="prod-mapcard">
+        <div class="prod-layers">
+          <div class="lh">Map Layers</div>
+          <div class="lrow"><b>High Res Image</b><span class="toggle on"><i></i></span></div>
+          <div class="lrow"><b>Land Use</b><span class="toggle"><i></i></span></div>
+          <div class="lrow"><b>Crop Type</b><span class="toggle"><i></i></span></div>
+          <div class="lrow"><b>Tree Type</b><span class="toggle"><i></i></span></div>
+          <div class="lrow"><b>Single Farm Land Use</b><span class="toggle"><i></i></span></div>
+          <div class="lrow"><b>Single Farm Tree Type</b><span class="toggle"><i></i></span></div>
+        </div>
+        <div class="prod-map">
+          <div class="ctrls"><span>⤢</span><span>◎</span><span>+</span><span>−</span><span>◈</span></div>
+        </div>
+      </div>
+      <div class="prod-stats">
+        <div class="prod-stat"><span class="lbl">No. of Farms</span><b>494</b></div>
+        <div class="prod-stat"><span class="lbl">No. of Fields</span><b>3,331</b></div>
+        <div class="prod-stat"><span class="lbl">Area</span><b>17,236 <span style="font-size:11px;color:var(--mist)">dunums</span></b></div>
+      </div>
+      <div class="prod-tables">
+        <div class="prod-table">
+          <div class="tt">Area Distribution by Land Use</div>
+          <table class="ptbl">
+            <tr><th>Class</th><th>Farms</th><th>Area (dun)</th><th>%</th></tr>
+            <tr><td>Open Agriculture</td><td>490</td><td>12,295.1</td><td>71.3%</td></tr>
+            <tr><td>Barren Land</td><td>396</td><td>3,412.4</td><td>19.8%</td></tr>
+            <tr><td>Protected Agriculture</td><td>458</td><td>982.8</td><td>5.7%</td></tr>
+            <tr><td>Structures</td><td>150</td><td>518.5</td><td>3%</td></tr>
+          </table>
+        </div>
+        <div class="prod-table">
+          <div class="tt">Tree Distribution</div>
+          <table class="ptbl">
+            <tr><th>Tree Type</th><th>Trees</th><th>Area (dun)</th><th>%</th></tr>
+            <tr><td>Date Palm</td><td>137,812</td><td>2,822.1</td><td>16.1%</td></tr>
+            <tr><td>Fruit Trees</td><td>462</td><td>23.9</td><td>0.1%</td></tr>
+            <tr><td>Forest Trees</td><td>9,905</td><td>372.2</td><td>2.1%</td></tr>
+            <tr><td>Olive</td><td>941</td><td>26.8</td><td>0.1%</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <p class="caption">Notably, production is already close in spirit to <b>Proposal C</b> (numbers first, map as a card). The gap isn't the layout philosophy — it's that the six paid-for modules and the drill-down have no home here yet.</p>
+
+  <!-- ============ CURRENT ============ -->
+  <h2>The mockup you built <span class="tag">your redesign</span></h2>
+  <p class="h2sub">One map page carrying every module at once. Solid components — the problem is that three separate control surfaces (left stack, bottom tabs, layers panel) drive one hidden state machine.</p>
+
+  <div class="wf-wrap"><div class="wf">
+    <div class="wf-nav">
+      <div class="logo">map my crop</div>
+      <div class="group">FOR GOVERNMENT</div>
+      <div class="item on">Farms Overview</div>
+      <div class="item">Farm Analysis</div>
+      <div class="group">FOR FARMERS</div>
+      <div class="item">My Farm</div>
+      <div class="spacer"></div>
+      <div class="item">Support · Logout</div>
+    </div>
+    <div class="wf-main">
+      <div class="wf-map">
+        <span class="maplbl">SATELLITE MAP · CLUSTERS ↔ POLYGONS AT Z13</span>
+        <div class="stack">
+          <div class="panelbox"><b>FARMS</b><span>500 · 17,597 dun</span></div>
+          <div class="panelbox"><b>LAND USE</b><span class="pill">19 ▾</span></div>
+          <div class="panelbox"><b>CROPS</b><span class="pill">26 ▾</span></div>
+          <div class="panelbox"><b>TREES</b><span class="pill">15 ▾</span></div>
+          <div class="panelbox"><b>IRRIGATION EFF.</b><span class="pill">▾</span></div>
+          <div class="panelbox"><b>YIELD FORECAST</b><span class="pill">▾</span></div>
+          <div class="panelbox"><b>CROP WATER</b><span class="pill">▾</span></div>
+        </div>
+        <span class="dot abs" style="left:185px; top:120px;">1</span>
+        <span class="dot abs" style="right:130px; top:150px;">3</span>
+        <div class="side-r" style="top:auto; bottom:12px; width:34px; gap:4px;">
+          <div class="panelbox" style="text-align:center">+</div>
+          <div class="panelbox" style="text-align:center">−</div>
+          <div class="panelbox" style="text-align:center">◎</div>
+          <div class="panelbox" style="text-align:center">▤</div>
+        </div>
+      </div>
+      <div class="sheet" style="position:relative">
+        <span class="dot abs" style="left:340px; top:-9px;">2</span>
+        <div class="tabs">
+          <span class="tab on">FARMS</span><span class="tab">LAND USE</span><span class="tab">CROPS</span>
+          <span class="tab">TREES</span><span class="tab">IRRIGATION</span><span class="tab">YIELD</span>
+          <span class="tab">WATER</span><span class="tab">● NEWS</span>
+          <span style="margin-left:auto" class="pill">Columns · Export CSV ▾</span>
+        </div>
+        <div class="rows"><div class="row head"></div><div class="row"></div><div class="row"></div><div class="row"></div></div>
+      </div>
+    </div>
+  </div></div>
+
+  <ul class="legendlist">
+    <li><span class="dot">1</span><span class="txt"><b>Seven look-alike panels, two different behaviours.</b> Three are taxonomy browsers that swap the map dataset; three are farm scorers that recolour boundaries; they silently close each other. Same visual, different contract.</span></li>
+    <li><span class="dot">2</span><span class="txt"><b>Eight bottom tabs mirror the left stack.</b> The same six concepts are operated from two places (three counting the layers panel), and clicking a tab also drives the map — hidden side effects.</span></li>
+    <li><span class="dot">3</span><span class="txt"><b>The map answers many questions at once.</b> Majority-coloured clusters hide minorities (the critical farms), and the biggest module — palms &amp; fruit trees, 31.6% of fee — is just another accordion with no tree counts, cultivars, or canopy health.</span></li>
+  </ul>
+
+  <!-- ============ PROPOSAL A ============ -->
+  <h2>Proposal A — Module-first hub <span class="tag">recommended</span></h2>
+  <p class="h2sub">The nav sells what the client bought: six modules by name. A Home scorecard answers “how are we doing?” in one glance; each module page owns the map with exactly one colouring, one legend, one table. No mutual exclusivity left to explain — it became navigation.</p>
+
+  <div class="wf-wrap"><div class="wf tall" style="height:auto">
+    <div class="wf-nav">
+      <div class="logo">map my crop</div>
+      <div class="item on">⌂ Overview</div>
+      <div class="group">MODULES</div>
+      <div class="item">Crop Monitoring</div>
+      <div class="item">Palms &amp; Fruit Trees</div>
+      <div class="item">Structures</div>
+      <div class="item">Irrigation Efficiency</div>
+      <div class="item">Yield Forecast</div>
+      <div class="item">Water Allocation</div>
+      <div class="group">DRILL-DOWN</div>
+      <div class="item">Farm Analysis</div>
+      <div class="spacer"></div>
+      <div class="item">Support · Logout</div>
+    </div>
+    <div class="wf-main">
+      <div style="padding:12px 12px 0; font-size:10px; letter-spacing:.08em;">HOME — REGION SCORECARD · 24,912 FARMS · LAST SCAN 10:11</div>
+      <div class="cardgrid">
+        <div class="mcard"><span class="fee">14.9%</span><span class="name">CROP MONITORING</span><b class="big">7,918 dun cultivated</b><span class="status st-ok">ON TRACK</span><div class="foot">fallow 12% · sparkline ▁▂▃▃▅</div></div>
+        <div class="mcard" style="border-color: var(--moss); border-width:2px;"><span class="fee">31.6%</span><span class="name">PALMS &amp; FRUIT TREES</span><b class="big">1.24 M trees</b><span class="status st-warn">3.1% CANOPY STRESS</span><div class="foot">top cultivar: Khalas · map ➜</div></div>
+        <div class="mcard"><span class="fee">21.0%</span><span class="name">STRUCTURES</span><b class="big">18,204 detected</b><span class="status st-ok">3 TIERS</span><div class="foot">open · protected · structures</div></div>
+        <div class="mcard"><span class="fee">10.5%</span><span class="name">IRRIGATION EFFICIENCY</span><b class="big">105 farms critical</b><span class="status st-warn">NEEDS REVIEW</span><div class="foot"><span class="bands" style="margin-top:4px"><i style="width:24%;background:#1a9850"></i><i style="width:25%;background:#91cf60"></i><i style="width:26%;background:#fee08b"></i><i style="width:18%;background:#fc8d59"></i><i style="width:7%;background:#d73027"></i></span></div></div>
+        <div class="mcard"><span class="fee">12.6%</span><span class="name">YIELD FORECAST</span><b class="big">baseline period</b><span class="status st-ok">COUNTS FROM M6</span><div class="foot">model training on cycle 1</div></div>
+        <div class="mcard"><span class="fee">9.4%</span><span class="name">WATER ALLOCATION</span><b class="big">312 over-allocated</b><span class="status st-warn">FLAGS</span><div class="foot">monthly demand vs. use</div></div>
+      </div>
+      <div class="caption" style="padding:0 12px 12px; margin:0;">Every card: headline number · status chip · one micro-chart · click ➜ its module page.</div>
+    </div>
+  </div></div>
+  <p class="caption">Home — the boomer test: six cards, six numbers, six statuses. The AED weights justify why palms get the hero card.</p>
+
+  <div class="wf-wrap" style="margin-top:18px"><div class="wf">
+    <div class="wf-nav">
+      <div class="logo">map my crop</div>
+      <div class="item">⌂ Overview</div>
+      <div class="group">MODULES</div>
+      <div class="item">Crop Monitoring</div>
+      <div class="item on">Palms &amp; Fruit Trees</div>
+      <div class="item">Structures</div>
+      <div class="item">Irrigation Efficiency</div>
+      <div class="item">Yield Forecast</div>
+      <div class="item">Water Allocation</div>
+      <div class="group">DRILL-DOWN</div>
+      <div class="item">Farm Analysis</div>
+      <div class="spacer"></div>
+    </div>
+    <div class="wf-main">
+      <div class="kpis">
+        <div class="kpi">TREES COUNTED<b>1,238,410</b></div>
+        <div class="kpi">DATE PALMS<b>1,062,300</b></div>
+        <div class="kpi">CULTIVARS ID’D<b>20</b></div>
+        <div class="kpi warn">CANOPY STRESS<b>3.1%</b></div>
+        <div class="kpi">AVG HEALTH<b>0.82 NDVI</b></div>
+      </div>
+      <div class="wf-map">
+        <span class="maplbl">MAP COLOURED BY THIS MODULE ONLY · REGION ➜ FARM DRILL</span>
+        <div class="side-r">
+          <div class="panelbox" style="display:block">
+            <b style="color:var(--ink)">CANOPY HEALTH</b>
+            <div class="bands" style="margin:6px 0 4px"><i style="width:55%;background:#1a9850"></i><i style="width:27%;background:#91cf60"></i><i style="width:13%;background:#fee08b"></i><i style="width:5%;background:#d73027"></i></div>
+            <div>view filter: ☑ all bands</div>
+          </div>
+          <div class="panelbox" style="display:block">
+            <b style="color:var(--ink)">CULTIVARS · TOP 20</b>
+            <div class="rows" style="margin-top:6px"><div class="row"></div><div class="row"></div><div class="row"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="sheet">
+        <div class="tabs">
+          <span class="tab on">ATTENTION LIST — 50 MOST STRESSED FARMS</span>
+          <span class="tab">BAND SUMMARY</span>
+          <span style="margin-left:auto" class="pill">🔍 farm / owner · Export</span>
+        </div>
+        <div class="rows"><div class="row head"></div><div class="row"></div><div class="row"></div></div>
+      </div>
+    </div>
+  </div></div>
+  <p class="caption">Module page template (palms shown) — KPI strip · map owned by one colouring · one legend panel · a ranked “attention list” instead of a 25k-row dump. A farm row click ➜ Farm Analysis. All six modules reuse this exact template, so you build it once.</p>
+
+  <!-- ============ PROPOSAL A2 ============ -->
+  <h2>Proposal A2 — Map-led hub <span class="tag">A + overview map</span></h2>
+  <p class="h2sub">Everything in A, but the Overview leads with the region map — all 25k farm boundaries in one glance — and the six module tiles sit underneath as a launch strip. You keep the satellite “wow” on the landing page (good for GITEX) without giving up the scorecard. Clicking a tile still opens that module’s full page.</p>
+
+  <div class="wf-wrap"><div class="wf tall" style="height:auto">
+    <div class="wf-nav">
+      <div class="logo">map my crop</div>
+      <div class="item on">⌂ Overview</div>
+      <div class="group">MODULES</div>
+      <div class="item">Crop Monitoring</div>
+      <div class="item">Palms &amp; Fruit Trees</div>
+      <div class="item">Structures</div>
+      <div class="item">Irrigation Efficiency</div>
+      <div class="item">Yield Forecast</div>
+      <div class="item">Water Allocation</div>
+      <div class="group">DRILL-DOWN</div>
+      <div class="item">Farm Analysis</div>
+      <div class="spacer"></div>
+      <div class="item">Support · Logout</div>
+    </div>
+    <div class="wf-main">
+      <div style="padding:12px 12px 0; font-size:10px; letter-spacing:.08em;">HOME — REGION OVERVIEW · 24,912 FARMS · 812K DUN · LAST SCAN 10:11</div>
+      <div class="a2map">
+        <span class="maplbl">ALL FARM BOUNDARIES · REGION VIEW</span>
+        <div class="colorby">
+          <span class="pill">Colour by ▾</span>
+          <span class="pill on" style="background:var(--moss-soft); color:var(--moss); border-color:var(--moss)">Land use</span>
+        </div>
+        <span class="dot abs" style="left:120px; top:70px; background:#41ab5d;">312</span>
+        <span class="dot abs" style="left:250px; top:150px; background:#78c679;">64</span>
+        <span class="dot abs" style="left:430px; top:95px; background:#f0e68c; color:#5c5320;">120</span>
+        <span class="dot abs" style="left:600px; top:170px; background:#41ab5d;">58</span>
+        <span class="dot abs" style="right:150px; top:80px; background:#78c679;">210</span>
+        <span class="dot abs" style="right:70px; bottom:70px; background:#fc8d59;">40</span>
+        <div class="ctrls"><span>+</span><span>−</span><span>◎</span></div>
+      </div>
+      <div class="cardrow">
+        <div class="mcard mini"><span class="fee">14.9%</span><span class="name">CROP MON.</span><b class="big">7,918 dun</b><span class="status st-ok">ON TRACK</span></div>
+        <div class="mcard mini" style="border-color:var(--moss); border-width:2px;"><span class="fee">31.6%</span><span class="name">PALMS/TREES</span><b class="big">1.24M</b><span class="status st-warn">3.1% STRESS</span></div>
+        <div class="mcard mini"><span class="fee">21.0%</span><span class="name">STRUCTURES</span><b class="big">18,204</b><span class="status st-ok">3 TIERS</span></div>
+        <div class="mcard mini"><span class="fee">10.5%</span><span class="name">IRRIGATION</span><b class="big">105 crit.</b><span class="status st-warn">REVIEW</span></div>
+        <div class="mcard mini"><span class="fee">12.6%</span><span class="name">YIELD</span><b class="big">baseline</b><span class="status st-ok">FROM M6</span></div>
+        <div class="mcard mini"><span class="fee">9.4%</span><span class="name">WATER</span><b class="big">312 over</b><span class="status st-warn">FLAGS</span></div>
+      </div>
+    </div>
+  </div></div>
+  <p class="caption">A2 Overview — the map is the hero (default colour-by land use, switchable), the six module tiles launch below it. Module pages are identical to A. Costs one extra map instance on Home vs. A; everything else is shared.</p>
+
+  <!-- ============ PROPOSAL B ============ -->
+  <h2>Proposal B — One map, one dial <span class="tag">minimal change</span></h2>
+  <p class="h2sub">Keep the single-workspace GIS feel, but merge the three control surfaces into one visible “View” selector. The map answers exactly one question at a time and the whole UI follows that one dial.</p>
+
+  <div class="wf-wrap"><div class="wf">
+    <div class="wf-nav">
+      <div class="logo">map my crop</div>
+      <div class="group">FOR GOVERNMENT</div>
+      <div class="item on">Farms Overview</div>
+      <div class="item">Farm Analysis</div>
+      <div class="group">FOR FARMERS</div>
+      <div class="item">My Farm</div>
+      <div class="spacer"></div>
+    </div>
+    <div class="wf-main">
+      <div class="wf-map">
+        <div class="panelbox viewsel">
+          <b>VIEW</b>
+          <div class="viewsel-pills">
+            <span class="pill">Farms</span>
+            <span class="pill">Land use</span>
+            <span class="pill">Crops</span>
+            <span class="pill">Trees</span>
+            <span class="pill on">Irrigation</span>
+            <span class="pill">Yield</span>
+            <span class="pill">Water</span>
+          </div>
+        </div>
+        <span class="maplbl" style="top:52px">MAP = THE ACTIVE VIEW, NOTHING ELSE</span>
+        <div class="stack" style="top:52px">
+          <div class="panelbox" style="display:block">
+            <b style="color:var(--ink)">IRRIGATION EFFICIENCY</b>
+            <div class="bands" style="margin:6px 0 4px"><i style="width:24%;background:#1a9850"></i><i style="width:25%;background:#91cf60"></i><i style="width:26%;background:#fee08b"></i><i style="width:18%;background:#fc8d59"></i><i style="width:7%;background:#d73027"></i></div>
+            <div>Excellent 12% · Good 12%<br>Acceptable 35% · Poor 41%<br>Critical 0% <em>(in view)</em></div>
+          </div>
+          <div class="panelbox"><b>FARMS IN VIEW</b><span>494 · 17.6k dun</span></div>
+        </div>
+      </div>
+      <div class="sheet">
+        <div class="tabs">
+          <span class="tab on">SUMMARY — IRRIGATION</span>
+          <span class="tab">FARMS (RANKED)</span>
+          <span style="margin-left:auto" class="pill">🔍 search · Columns · Export</span>
+        </div>
+        <div class="rows"><div class="row head"></div><div class="row"></div><div class="row"></div></div>
+      </div>
+    </div>
+  </div></div>
+  <p class="caption">One selector, one legend, two bottom tabs (context summary + ranked farms). News becomes a bell icon. Least rework: mostly deleting duplicate surfaces you already built.</p>
+
+  <!-- ============ PROPOSAL C ============ -->
+  <h2>Proposal C — Numbers first, map on demand <span class="tag">most conservative</span></h2>
+  <p class="h2sub">Inverts the philosophy: home is a scrolling executive dashboard of cards and charts; every card has a “show on map” action that opens the map explorer pre-filtered to that exact story.</p>
+
+  <div class="wf-wrap"><div class="wf" style="height:390px">
+    <div class="wf-nav">
+      <div class="logo">map my crop</div>
+      <div class="item on">Overview</div>
+      <div class="item">Map Explorer</div>
+      <div class="item">Farm Analysis</div>
+      <div class="item">Reports</div>
+      <div class="spacer"></div>
+    </div>
+    <div class="wf-main" style="overflow:hidden">
+      <div style="padding:12px 12px 4px; font-size:10px; letter-spacing:.08em;">EXECUTIVE OVERVIEW — SCROLLS ↓ · NO MAP ON THIS PAGE</div>
+      <div class="cardgrid" style="grid-template-columns: 2fr 1fr 1fr;">
+        <div class="mcard"><span class="name">REGION HEADLINES</span><b class="big">24,912 farms · 812k dun monitored</b><div class="foot">big-number strip · month-over-month deltas</div></div>
+        <div class="mcard"><span class="name">IRRIGATION</span><b class="big">105 critical</b><span class="status st-warn">SHOW ON MAP ➜</span></div>
+        <div class="mcard"><span class="name">WATER FLAGS</span><b class="big">312 over-alloc.</b><span class="status st-warn">SHOW ON MAP ➜</span></div>
+        <div class="mcard"><span class="name">PALMS &amp; FRUIT TREES</span><b class="big">1.24M trees · cultivar bar chart</b><div class="foot">▇▆▅▃▂ Khalas · Lulu · Fard …</div></div>
+        <div class="mcard"><span class="name">CROPS</span><b class="big">area by type</b><div class="foot">stacked bar</div></div>
+        <div class="mcard"><span class="name">STRUCTURES</span><b class="big">3-tier donut</b><div class="foot">open / protected / structures</div></div>
+      </div>
+      <div class="caption" style="padding:0 12px; margin:0;">Map Explorer = your current page, reached with a filter already applied (“over-allocated farms only”).</div>
+    </div>
+  </div></div>
+  <p class="caption">Safest for a non-technical audience, weakest for the GITEX “wow” — the satellite map is the demo’s emotional core and here it’s a click away.</p>
+
+  <!-- ============ COMPARISON ============ -->
+  <h2>Side by side</h2>
+  <div class="wf-wrap"><table class="cmp">
+    <tr><th></th><th>A · Module hub</th><th>A2 · Map-led hub</th><th>B · One dial</th><th>C · Numbers first</th></tr>
+    <tr><td>Matches the 6-module contract</td><td class="good">1:1, in the nav</td><td class="good">1:1, in the nav</td><td class="meh">implicit</td><td class="good">1:1, as cards</td></tr>
+    <tr><td>Non-technical clarity</td><td class="good">high</td><td class="good">high</td><td class="meh">medium</td><td class="good">highest</td></tr>
+    <tr><td>GITEX demo impact</td><td class="good">high</td><td class="good">highest — map lands first</td><td class="good">high</td><td class="meh">lower — map hidden</td></tr>
+    <tr><td>Rework from current code</td><td class="meh">medium</td><td class="meh">medium + 1 map</td><td class="good">small — mostly deletion</td><td class="meh">medium</td></tr>
+    <tr><td>Scales to 25k farms</td><td class="good">aggregates by default</td><td class="meh">home map must render all</td><td class="meh">still one heavy map</td><td class="good">aggregates by default</td></tr>
+    <tr><td>Palms module (31.6%) gets its due</td><td class="good">own hero page</td><td class="good">own hero page</td><td class="meh">one dial position</td><td class="meh">one card</td></tr>
+  </table></div>
+
+  <div class="verdict">
+    <h2>Recommendation</h2>
+    <p><b>Build A2 if the Overview map performs; keep A as the fallback.</b> A2 is A plus a region map on the landing page — the same six module pages, the same reused components, only one extra map instance on Home. It lands the satellite “wow” first, which is exactly what a GITEX room wants, so it’s the stronger demo. The single risk is that one Home map has to draw all 25k boundaries at once; the moment that feels heavy, A2 degrades gracefully to A (drop the map, keep the cards) with zero wasted work. Either way the module switcher moves from seven stacked accordions into the left nav and each module page owns its map outright. If the clock runs out before GITEX, ship B first — it’s mostly deleting duplicate surfaces you already built — and grow it into A/A2 after.</p>
+  </div>
+</main>

@@ -61,13 +61,17 @@ warfa-dashboard/
 │   │   └── mapControls.js       # Wafra.ui.wireZoom / wireBasemap
 │   │
 │   ├── mock/                    # ALL placeholder/generated data — isolated (swap for a real API)
-│   │   ├── metrics.js           #   dashboard per-feature metric values + colour scales
+│   │   ├── metrics.js           #   dashboard per-feature metric values + colour scales + per-farm module metrics (prepareFarmMetrics)
 │   │   ├── news.js              #   dashboard live-feed items
 │   │   └── farmAnalysis.js      #   farm RNG + heat-field noise + panel demo values
 │   │
 │   ├── dashboard/               # Farms Overview feature modules (share one state object)
 │   │   ├── taxonomy.js          #   land-use / crop trees + palettes
 │   │   ├── state.js             #   createState() — the single shared mutable state
+│   │   ├── modules.js           #   3 banded farm modules (IER / Yield / Water) + generic band helpers
+│   │   ├── moduleRegistry.js    #   F1 — the SIX contract modules as one model (wraps modules.js + mock metrics)
+│   │   ├── scorecard.js         #   F3 — reusable module scorecard card (big / mini)
+│   │   ├── attentionList.js     #   F4 — ranked per-module farm table (built on dataTable.js)
 │   │   ├── plotsLayer.js        #   streaming render, clustering, taxonomy colouring (shape = own value, cluster = majority value)
 │   │   ├── viewportStats.js     #   Overview / Land Use / Crops / Trees panels
 │   │   ├── layersPanel.js       #   layers panel + fit/clear controls

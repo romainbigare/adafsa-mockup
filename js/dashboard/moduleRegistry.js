@@ -1,0 +1,289 @@
+(function (W) {
+  "use strict";
+
+  W.dashboard = W.dashboard || {};
+
+  // ============================================================================
+  // F1 — Module registry: the single source of truth for the SIX contract
+  // modules. Nav (Proposals A / A2) and the View dial (Proposal B) both read
+  // from this, so "six modules" is one data model instead of a mix of band
+  // modules (modules.js) and taxonomy browsers (viewportStats.js).
+  //
+  // Every module is expressed the same way: it maps a FARM (a plots feature)
+  // to a value -> band -> colour. Three modules wrap the existing banded
+  // modules in modules.js (Irrigation / Yield / Water); three are new
+  // descriptors reading the mock per-farm metrics (`_farm`) stashed by
+  // Wafra.mock.metrics.prepareFarmMetrics (Palms / Crop Monitoring / Structures).
+  //
+  // The band machinery (bandOf / colorOf / bandSummary / bandCounts) lives in
+  // modules.js and is module-agnostic — it works on any object with `.bands`
+  // and `.valueOf`, so all six modules reuse it unchanged.
+  //
+  // Pure logic, no DOM — unit-tested in test/moduleRegistry.test.js.
+  // ============================================================================
+
+  var M = W.dashboard.modules;         // band helpers + IER/Yield/Water cores
+  var UNKNOWN = M.UNKNOWN_COLOR;
+
+  // ---- New banded cores (same shape as modules.js MODULES entries) ----------
+  // Each carries { key, label, icon, bands, valueOf(f), format(v) } so the
+  // generic modules.js helpers accept them directly.
+
+  // Crop Monitoring — cultivated fraction of the farm (0..100%).
+  var CROP_BANDS = [
+    { label: 'Cultivated',        range: '≥ 66%',   color: '#1a9850', min: 66,        contains: function (v) { return v >= 66; } },
+    { label: 'Partially Fallow',  range: '33–66%',  color: '#fee08b', min: 33,        contains: function (v) { return v >= 33 && v < 66; } },
+    { label: 'Fallow',            range: '< 33%',   color: '#d9a441', min: -Infinity, contains: function (v) { return v < 33; } }
+  ];
+
+  // Palms & Fruit Trees — canopy-health index (NDVI-like, 0..100).
+  var CANOPY_BANDS = [
+    { label: 'Healthy',        range: '≥ 80',  color: '#1a9850', min: 80,        contains: function (v) { return v >= 80; } },
+    { label: 'Fair',           range: '65–79', color: '#91cf60', min: 65,        contains: function (v) { return v >= 65 && v < 80; } },
+    { label: 'Stressed',       range: '50–64', color: '#fee08b', min: 50,        contains: function (v) { return v >= 50 && v < 65; } },
+    { label: 'Severe Stress',  range: '< 50',  color: '#d73027', min: -Infinity, contains: function (v) { return v < 50; } }
+  ];
+
+  // Structures — land-use tier (categorical; value is the tier index 0..3).
+  var TIER_BANDS = [
+    { label: 'Open Agriculture', range: 'open',       color: '#78c679', min: 0, contains: function (v) { return v === 0; } },
+    { label: 'Barren Land',      range: 'barren',     color: '#f0e68c', min: 1, contains: function (v) { return v === 1; } },
+    { label: 'Protected',        range: 'protected',  color: '#41ab5d', min: 2, contains: function (v) { return v === 2; } },
+    { label: 'Structures',       range: 'structures', color: '#fc8d59', min: 3, contains: function (v) { return v === 3; } }
+  ];
+
+  var cropCore = {
+    key: 'crop', label: 'Crop Monitoring', icon: 'grass', bands: CROP_BANDS,
+    valueOf: function (f) { return f._farm ? f._farm.cultivatedFrac * 100 : null; },
+    format: function (v) { return Math.round(v) + '%'; }
+  };
+  var palmsCore = {
+    key: 'palms', label: 'Palms & Fruit Trees', icon: 'park', bands: CANOPY_BANDS,
+    // Only farms that actually carry trees get a canopy score.
+    valueOf: function (f) { return (f._farm && f._farm.trees > 0 && f._farm.canopy != null) ? f._farm.canopy * 100 : null; },
+    format: function (v) { return (v / 100).toFixed(2); }
+  };
+  var structuresCore = {
+    key: 'structures', label: 'Structures', icon: 'home_work', bands: TIER_BANDS,
+    valueOf: function (f) { return f._farm ? f._farm.tierIdx : null; },
+    format: function (v) { var b = TIER_BANDS[Math.round(v)]; return b ? b.label : '—'; }
+  };
+
+  // ---- Aggregation helpers ---------------------------------------------------
+  function values(module, features) {
+    var out = [];
+    for (var i = 0; i < features.length; i++) {
+      var v = module.valueOf(features[i]);
+      if (v != null && !isNaN(v)) out.push(v);
+    }
+    return out;
+  }
+  function mean(arr) { if (!arr.length) return 0; var s = 0; for (var i = 0; i < arr.length; i++) s += arr[i]; return s / arr.length; }
+  function sum(features, fn) { var s = 0; for (var i = 0; i < features.length; i++) s += (fn(features[i]) || 0); return s; }
+  function countBand(module, features, label) {
+    return M.bandCounts(module, features)[label] || 0;
+  }
+  function fmtInt(n) { return Math.round(n).toLocaleString(); }
+  function fmtCompact(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'k';
+    return String(Math.round(n));
+  }
+
+  // Per-band area share (%), in band order — powers scorecard micro-charts and
+  // module legends. Reuses modules.bandSummary so shares match the tables.
+  function bandShares(module, features) {
+    return M.bandSummary(module, features).map(function (r) {
+      return { label: r.label, color: r.color, range: r.range, share: r.share, count: r.count };
+    });
+  }
+
+  // ---- Per-module product metadata ------------------------------------------
+  // Each descriptor enriches a banded core with: feePct, a short label, the
+  // severity() used to rank the attention list (higher = needs attention), the
+  // KPI strip, and the scorecard rollup/headline. Kept declarative so a module
+  // page (A/A2) and the dial (B) render identically from data.
+
+  function kpi(label, value, warn) { return { label: label, value: value, warn: !!warn }; }
+
+  var DESCRIPTORS = [
+    {
+      core: cropCore, feePct: 14.9, short: 'Crop Mon.',
+      // More fallow -> more attention.
+      severity: function (f) { var v = cropCore.valueOf(f); return v == null ? -1 : 100 - v; },
+      kpis: function (fs) {
+        var cultivated = sum(fs, function (f) { return f._farm ? f.area * f._farm.cultivatedFrac : 0; });
+        var fallow = countBand(cropCore, fs, 'Fallow');
+        return [
+          kpi('Cultivated', fmtInt(cultivated) + ' dun'),
+          kpi('Farms Monitored', fmtInt(values(cropCore, fs).length)),
+          kpi('Avg Cultivated', Math.round(mean(values(cropCore, fs))) + '%'),
+          kpi('Fully Fallow', fmtInt(fallow), fallow > 0)
+        ];
+      },
+      rollup: function (fs) {
+        var cultivated = sum(fs, function (f) { return f._farm ? f.area * f._farm.cultivatedFrac : 0; });
+        var fallow = countBand(cropCore, fs, 'Fallow');
+        return { headline: fmtInt(cultivated) + ' dun cultivated',
+          status: fallow > 0 ? { label: fallow + ' fallow', kind: 'warn' } : { label: 'On Track', kind: 'ok' } };
+      }
+    },
+    {
+      core: palmsCore, feePct: 31.6, short: 'Palms/Trees', hero: true,
+      severity: function (f) { var v = palmsCore.valueOf(f); return v == null ? -1 : 100 - v; },
+      kpis: function (fs) {
+        var trees = sum(fs, function (f) { return f._farm ? f._farm.trees : 0; });
+        var palms = sum(fs, function (f) { return f._farm ? f._farm.datePalms : 0; });
+        var scored = values(palmsCore, fs);
+        var stress = countBand(palmsCore, fs, 'Stressed') + countBand(palmsCore, fs, 'Severe Stress');
+        var stressPct = scored.length ? (stress / scored.length * 100) : 0;
+        var cultivars = {};
+        fs.forEach(function (f) { if (f._farm && f._farm.cultivar) cultivars[f._farm.cultivar] = 1; });
+        return [
+          kpi('Trees Counted', fmtInt(trees)),
+          kpi('Date Palms', fmtInt(palms)),
+          kpi("Cultivars ID'd", String(Object.keys(cultivars).length)),
+          kpi('Canopy Stress', stressPct.toFixed(1) + '%', stressPct > 0),
+          kpi('Avg Health', mean(scored) ? (mean(scored) / 100).toFixed(2) : '—')
+        ];
+      },
+      rollup: function (fs) {
+        var trees = sum(fs, function (f) { return f._farm ? f._farm.trees : 0; });
+        var scored = values(palmsCore, fs);
+        var stress = countBand(palmsCore, fs, 'Stressed') + countBand(palmsCore, fs, 'Severe Stress');
+        var stressPct = scored.length ? (stress / scored.length * 100) : 0;
+        return { headline: fmtCompact(trees) + ' trees',
+          status: stressPct > 0 ? { label: stressPct.toFixed(1) + '% canopy stress', kind: 'warn' } : { label: 'Healthy', kind: 'ok' } };
+      }
+    },
+    {
+      core: structuresCore, feePct: 21.0, short: 'Structures',
+      severity: function (f) { return f.area || 0; }, // no risk axis — rank by size
+      kpis: function (fs) {
+        return [
+          kpi('Structures', fmtInt(countBand(structuresCore, fs, 'Structures'))),
+          kpi('Protected', fmtInt(countBand(structuresCore, fs, 'Protected'))),
+          kpi('Open Agriculture', fmtInt(countBand(structuresCore, fs, 'Open Agriculture'))),
+          kpi('Barren', fmtInt(countBand(structuresCore, fs, 'Barren Land')))
+        ];
+      },
+      rollup: function (fs) {
+        var detected = countBand(structuresCore, fs, 'Structures') + countBand(structuresCore, fs, 'Protected');
+        return { headline: fmtInt(detected) + ' built', status: { label: '4 tiers', kind: 'ok' } };
+      }
+    },
+    {
+      core: M.byKey('ier'), feePct: 10.5, short: 'Irrigation',
+      severity: function (f) { var v = M.byKey('ier').valueOf(f); return v == null ? -1 : 100 - v; },
+      kpis: function (fs) {
+        var m = M.byKey('ier'); var scored = values(m, fs);
+        var critical = countBand(m, fs, 'Critical');
+        return [
+          kpi('Farms Scored', fmtInt(scored.length)),
+          kpi('Critical', fmtInt(critical), critical > 0),
+          kpi('Avg IER', Math.round(mean(scored)) || '—'),
+          kpi('Poor or Worse', fmtInt(critical + countBand(m, fs, 'Poor')), true)
+        ];
+      },
+      rollup: function (fs) {
+        var m = M.byKey('ier'); var critical = countBand(m, fs, 'Critical') + countBand(m, fs, 'Poor');
+        return { headline: fmtInt(critical) + ' farms critical',
+          status: critical > 0 ? { label: 'Needs review', kind: 'warn' } : { label: 'On Track', kind: 'ok' } };
+      }
+    },
+    {
+      core: M.byKey('yield'), feePct: 12.6, short: 'Yield',
+      severity: function (f) { var v = M.byKey('yield').valueOf(f); return v == null ? -999 : -v; },
+      kpis: function (fs) {
+        var m = M.byKey('yield'); var scored = values(m, fs);
+        var under = countBand(m, fs, 'Significantly Underperforming');
+        return [
+          kpi('Farms Scored', fmtInt(scored.length)),
+          kpi('Avg Deviation', (mean(scored) >= 0 ? '+' : '') + Math.round(mean(scored)) + '%'),
+          kpi('Underperforming', fmtInt(under), under > 0),
+          kpi('Above Expected', fmtInt(countBand(m, fs, 'Above Expected')))
+        ];
+      },
+      rollup: function () {
+        return { headline: 'baseline period', status: { label: 'Counts from M6', kind: 'ok' } };
+      }
+    },
+    {
+      core: M.byKey('water'), feePct: 9.4, short: 'Water',
+      severity: function (f) { var v = M.byKey('water').valueOf(f); return v == null ? -1 : v - 100; },
+      kpis: function (fs) {
+        var m = M.byKey('water'); var scored = values(m, fs);
+        var over = countBand(m, fs, 'Over-Allocated');
+        return [
+          kpi('Farms Scored', fmtInt(scored.length)),
+          kpi('Over-Allocated', fmtInt(over), over > 0),
+          kpi('Avg Use', Math.round(mean(scored)) + '%'),
+          kpi('Efficient', fmtInt(countBand(m, fs, 'Efficient')))
+        ];
+      },
+      rollup: function (fs) {
+        var m = M.byKey('water'); var over = countBand(m, fs, 'Over-Allocated');
+        return { headline: fmtInt(over) + ' over-allocated',
+          status: over > 0 ? { label: 'Flags', kind: 'warn' } : { label: 'Balanced', kind: 'ok' } };
+      }
+    }
+  ];
+
+  // ---- Assemble the public module objects -----------------------------------
+  // A registry module IS its banded core (so modules.js helpers accept it),
+  // plus the product metadata above.
+  var MODULES = DESCRIPTORS.map(function (d) {
+    var core = d.core;
+    return {
+      key: core.key, label: core.label, shortLabel: d.short, icon: core.icon,
+      feePct: d.feePct, hero: !!d.hero,
+      bands: core.bands, valueOf: core.valueOf, format: core.format,
+      severity: d.severity, kpis: d.kpis, rollup: d.rollup
+    };
+  });
+
+  var BY_KEY = {};
+  MODULES.forEach(function (m) { BY_KEY[m.key] = m; });
+
+  function byKey(k) { return BY_KEY[k] || null; }
+  function colourOf(module, feature) { return M.colorOf(module, feature); }
+  function bandOf(module, feature) { return M.bandOf(module, feature); }
+
+  // Full legend rows (label + colour + range) for a module.
+  function legend(module) {
+    return module.bands.map(function (b) { return { label: b.label, color: b.color, range: b.range }; });
+  }
+
+  // Scorecard view-model (consumed by scorecard.js). Pure data, no DOM.
+  function cardModel(module, features) {
+    var r = module.rollup(features);
+    return {
+      key: module.key, label: module.label, shortLabel: module.shortLabel,
+      icon: module.icon, feePct: module.feePct, hero: module.hero,
+      headline: r.headline,
+      statusLabel: r.status.label, statusKind: r.status.kind,
+      bands: bandShares(module, features)
+    };
+  }
+
+  // Region rollups for every module at once (the Home scorecard numbers).
+  function regionRollups(features) {
+    var out = {};
+    MODULES.forEach(function (m) { out[m.key] = cardModel(m, features); });
+    return out;
+  }
+
+  W.dashboard.moduleRegistry = {
+    MODULES: MODULES,
+    byKey: byKey,
+    colourOf: colourOf,
+    bandOf: bandOf,
+    legend: legend,
+    bandShares: bandShares,
+    cardModel: cardModel,
+    regionRollups: regionRollups,
+    // exposed for tests / reuse
+    cores: { crop: cropCore, palms: palmsCore, structures: structuresCore }
+  };
+
+})(window.Wafra);

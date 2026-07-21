@@ -99,6 +99,11 @@
     });
     state.clusterActive = false;
 
+    // Shared canvas renderer for the individual polygons. Canvas draws far
+    // cheaper than one SVG node per shape — the render half of F2's "25k farms
+    // without melting" (the other half is the bulk cluster add below).
+    state.canvasRenderer = L.canvas({ padding: 0.5 });
+
     // Dedicated top-most pane for the selected-farm highlight so its pulsing
     // outline always draws above the polygons / cluster markers.
     state.map.createPane('farm-highlight');
@@ -195,6 +200,7 @@
     var metrics = W.mock.metrics;
     var tax = W.dashboard.taxonomy;
     var rnd = W.random.seededRandom;
+    var batchMarkers = []; // collect this batch's markers → one bulk cluster add
 
     for (var i = index; i < end; i++) {
       var f = features[i];
@@ -242,6 +248,7 @@
       for (var r = 0; r < rings.length; r++) {
         var ring = rings[r];
         var poly = L.polygon(ring, {
+          renderer: state.canvasRenderer,
           color: featureColor(state, featureData), weight: 1, opacity: 0.8, fillOpacity: 0.35
         });
         poly._featureRef = featureData;
@@ -275,9 +282,13 @@
         marker.featureType = type;
         marker._featureRef = featureData;
         state.markersByType[type].push(marker);
-        state.clusterGroup.addLayer(marker);
+        batchMarkers.push(marker);
       }
     }
+
+    // Bulk-add the whole batch at once — markercluster's addLayers is far
+    // cheaper than repeated addLayer, the key win for large farm counts.
+    if (batchMarkers.length) state.clusterGroup.addLayers(batchMarkers);
 
     if (end < features.length) {
       requestAnimationFrame(function () { streamFeatures(state, features, end); });
@@ -395,6 +406,9 @@
       // Precompute the per-farm module values (IER / yield deviation / water)
       // once, on the same objects the map + module panels read from.
       W.dashboard.modules.prepare(state.farmFeatures);
+      // Precompute the six-module mock metrics (tree count, canopy health,
+      // cultivar, cultivated fraction, structure tier) behind the mock boundary.
+      if (W.mock.metrics.prepareFarmMetrics) W.mock.metrics.prepareFarmMetrics(state.farmFeatures);
     }
 
     W.dashboard.layersPanel.build(state);
