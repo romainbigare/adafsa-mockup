@@ -1,0 +1,175 @@
+/* ==========================================================================
+   Wafra shared component styles
+   Deduplicated CSS for components reused across index.html (dashboard),
+   farm-analysis.html, and violation-management.html. Not every rule is
+   used by every page — that's expected; this file is the single source
+   of truth so no page redefines a shared component's CSS locally.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Glass panel (floating UI surfaces)
+   Note: source pages disagreed slightly on alpha (0.85 dashboard/violation
+   vs 0.88 farm-analysis). Unified to 0.85 per refactor spec — imperceptible.
+   -------------------------------------------------------------------------- */
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+}
+
+/* --------------------------------------------------------------------------
+   Cluster markers — count bubbles
+   -------------------------------------------------------------------------- */
+.cluster-icon {
+  background: rgba(22, 163, 74, 0.85);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 600;
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.cluster-icon-small { width: 34px; height: 34px; font-size: 12px; }
+.cluster-icon-medium { width: 44px; height: 44px; font-size: 14px; }
+.cluster-icon-large { width: 54px; height: 54px; font-size: 16px; }
+
+/* --------------------------------------------------------------------------
+   Metric UI — dropdown selector, gradient legend
+   -------------------------------------------------------------------------- */
+.metric-selector {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+.gradient-bar {
+  height: 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+.legend-tick {
+  width: 1px;
+  height: 4px;
+  background: #9ca3af;
+}
+
+/* --------------------------------------------------------------------------
+   Viewport stats box (tabs)
+   -------------------------------------------------------------------------- */
+.viewport-stats { transition: opacity 0.2s ease; }
+.vp-tab.active { color: #111827; border-bottom: 2px solid #16a34a; }
+.vp-tab { border-bottom: 2px solid transparent; }
+
+/* --------------------------------------------------------------------------
+   Layer sections (collapsible layer panel groups)
+   -------------------------------------------------------------------------- */
+.layer-section-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.layer-section.open .layer-section-content { max-height: 600px; }
+.layer-section.open .chevron { transform: rotate(180deg); }
+.chevron { transition: transform 0.2s ease; }
+
+/* --------------------------------------------------------------------------
+   Violation markers — pulsing heartbeat (identical on dashboard + violation
+   pages)
+   -------------------------------------------------------------------------- */
+@keyframes violation-pulse {
+  0% { transform: scale(0.8); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.4; }
+  100% { transform: scale(0.8); opacity: 1; }
+}
+@keyframes violation-ping {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.violation-marker {
+  position: relative;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+.violation-marker .vm-core {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+}
+.violation-marker .vm-core .material-symbols-outlined {
+  font-size: 9px; color: #fff;
+}
+.violation-marker .vm-pulse {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  animation: violation-pulse 2s ease-in-out infinite;
+}
+.violation-marker .vm-ping {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  animation: violation-ping 2s ease-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   Live info bar (bottom floating bar + news feed)
+   -------------------------------------------------------------------------- */
+.live-bar { transition: transform 0.3s ease; }
+.live-bar.collapsed { transform: translateY(calc(100% - 38px)); }
+.news-item { animation: fadeInUp 0.4s ease; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --------------------------------------------------------------------------
+   Farm Analysis — heatmap toggle buttons, legend bar, collapsible panels
+   -------------------------------------------------------------------------- */
+.heatmap-btn { transition: all 0.2s ease; }
+.heatmap-btn.active { background-color: #16a34a; color: #fff; border-color: #16a34a; }
+.heatmap-btn.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20; }
+.legend-bar { height: 8px; border-radius: 4px; }
+
+.panel-collapse { transition: max-height 0.3s ease, opacity 0.2s ease; overflow: hidden; }
+.panel-collapsed .panel-body { max-height: 0 !important; opacity: 0; }
+.panel-collapsed .panel-chevron { transform: rotate(180deg); }
+.panel-chevron { transition: transform 0.2s ease; }
+
+.fade-in { animation: fadeInUp 0.3s ease; }
+
+.opacity-slider { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 3px; background: #d3d3d3; outline: none; }
+.opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #16a34a; cursor: pointer; }
+.opacity-slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #16a34a; cursor: pointer; border: none; }
+
+.leaflet-heatmap-canvas { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 450; }
+
+.edit-btn { display: none; }
+
+.low-confidence { position: relative; }
+.low-confidence::after {
+  content: '';
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245,158,11,0.2);
+}
+
+/* --------------------------------------------------------------------------
+   Violation Management — confidence bar, detail drawer, selected row
+   -------------------------------------------------------------------------- */
+.conf-bar { height: 6px; border-radius: 3px; background: #e5e7eb; overflow: hidden; }
+.conf-bar > span { display: block; height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+
+.detail-drawer { transition: transform 0.3s ease; }
+.detail-drawer.closed { transform: translateX(110%); }
+
+tr.vrow.selected { background-color: #f0fdf4; }
+tr.vrow.selected td { border-bottom-color: #86efac; }

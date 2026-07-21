@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Wafra base styles
+   Body defaults, shared typography utility classes, icon font settings,
+   and thin-scrollbar helper. Copied verbatim from the original mockups
+   (idx_style.txt / farm-analysis.html / violation-management.html — the
+   three pages were identical on these rules).
+   ========================================================================== */
+
+body { background-color: #f9fafb; color: #111827; }
+
+.font-label-caps { font-family: "Inter"; font-size: 11px; line-height: 16px; letter-spacing: 0.08em; font-weight: 700; }
+.font-data-sm { font-family: "JetBrains Mono"; font-size: 12px; line-height: 16px; }
+.font-data-lg { font-family: "JetBrains Mono"; font-size: 20px; line-height: 28px; font-weight: 500; }
+.font-headline-md { font-family: "Inter"; font-size: 24px; line-height: 32px; font-weight: 600; }
+
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+.scroll-thin::-webkit-scrollbar { width: 6px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+.scroll-thin::-webkit-scrollbar-thumb:hover { background: #9ca3af; }

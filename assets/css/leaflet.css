@@ -1,0 +1,22 @@
+/* ==========================================================================
+   Wafra Leaflet overrides
+   Copied verbatim from the original mockups. The z-index popup-pane rules
+   are from violation-management.html (needed there because of the detail
+   drawer layering); harmless on the other pages.
+   ========================================================================== */
+
+.leaflet-container { font-family: "Inter", sans-serif; background: #1f2937; }
+
+.leaflet-popup-content-wrapper {
+  background-color: rgba(255,255,255,0.95) !important;
+  backdrop-filter: blur(8px);
+  border-radius: 0.5rem !important;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important;
+  color: #111827 !important;
+}
+.leaflet-popup-tip { background-color: rgba(255,255,255,0.95) !important; }
+.leaflet-control-attribution { font-size: 10px; background: rgba(255,255,255,0.7) !important; }
+
+.leaflet-pane.leaflet-popup-pane { z-index: 1000 !important; }
+.leaflet-popup { z-index: 1000 !important; }

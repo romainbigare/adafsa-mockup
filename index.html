@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Map My Crop — Farms Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/tailwind-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" crossorigin=""/>
+<link rel="stylesheet" href="assets/css/tokens.css"/>
+<link rel="stylesheet" href="assets/css/base.css"/>
+<link rel="stylesheet" href="assets/css/components.css"/>
+<link rel="stylesheet" href="assets/css/leaflet.css"/>
+</head>
+<body class="antialiased h-screen overflow-hidden flex flex-col font-sans bg-gray-50">
+
+<!-- Main Workspace -->
+<div class="flex-1 flex overflow-hidden w-full relative min-h-0">
+
+  <!-- Side Nav -->
+  <aside id="sidebar" data-page="dashboard" class="hidden md:flex flex-col bg-gray-50 border-r border-gray-200 w-60 py-6 flex-none"></aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 relative overflow-hidden h-full">
+
+    <!-- Map -->
+    <div id="map" class="absolute inset-0 z-0 h-full w-full"></div>
+
+    <!-- Loading overlay -->
+    <div id="map-loader" class="absolute inset-0 z-[5] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm pointer-events-none">
+      <div class="glass-panel px-6 py-4 flex flex-col items-center gap-3">
+        <div class="w-8 h-8 border-3 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
+        <p class="font-data-sm text-gray-600">Loading farm features...</p>
+      </div>
+    </div>
+
+    <!-- Floating UI Layer -->
+    <div class="relative z-10 w-full h-full pointer-events-none">
+
+    <!-- Left panels container (overview + violations stacked) -->
+    <div class="absolute left-4 top-4 z-20 flex flex-col gap-2 pointer-events-auto" style="width:260px">
+
+    <!-- Viewport Stats Box -->
+    <div id="viewport-stats" class="glass-panel viewport-stats">
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-200">
+        <button class="vp-tab flex-1 px-2 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-tab="overview" style="font-size:10px">OVERVIEW</button>
+        <button class="vp-tab flex-1 px-2 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-tab="landuse" style="font-size:10px">LAND USE</button>
+        <button class="vp-tab flex-1 px-2 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-tab="trees" style="font-size:10px">CROPS &amp; TREES</button>
+      </div>
+      <div class="p-3">
+        <!-- Overview tab -->
+        <div class="vp-panel" data-panel="overview">
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1 mb-2">
+            <div>
+              <p class="font-data-sm text-gray-500">FARMS</p>
+              <p class="font-data-lg text-gray-900" id="vp-farms" style="font-size:16px">494</p>
+            </div>
+            <div>
+              <p class="font-data-sm text-gray-500">AREA</p>
+              <p class="font-data-lg text-gray-900" id="vp-area" style="font-size:16px">0 <span class="font-data-sm text-gray-500">dun</span></p>
+            </div>
+          </div>
+          <!-- Metric selector -->
+          <div class="pt-2 border-t border-gray-200">
+            <label class="font-label-caps text-gray-500" style="font-size:9px">COLOR BY</label>
+            <select id="metric-select" class="metric-selector w-full mt-1 px-2 py-1.5 text-xs bg-white border border-gray-200 rounded-md text-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-500">
+              <option value="growth">Average Weekly Growth</option>
+              <option value="grade">Average Grade</option>
+              <option value="irrigation">Irrigation State</option>
+              <option value="utilisation">Utilisation %</option>
+              <option value="area">Area (dunums)</option>
+            </select>
+            <!-- Gradient legend -->
+            <div id="metric-legend" class="mt-2 hidden">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-data-sm text-gray-500" id="legend-min">0</span>
+                <span class="font-data-sm text-gray-500" id="legend-max">100</span>
+              </div>
+              <div id="gradient-bar" class="gradient-bar w-full"></div>
+              <div class="flex justify-between mt-1">
+                <span class="legend-tick"></span>
+                <span class="legend-tick"></span>
+                <span class="legend-tick"></span>
+                <span class="legend-tick"></span>
+                <span class="legend-tick"></span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+        <!-- Land Use tab -->
+        <div class="vp-panel hidden" data-panel="landuse">
+          <div class="flex gap-2 mb-1.5">
+            <button class="vp-select-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Select all</button>
+            <span class="text-gray-300">·</span>
+            <button class="vp-unselect-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Unselect all</button>
+          </div>
+          <div class="space-y-0.5 max-h-56 overflow-y-auto scroll-thin" id="vp-landuse"></div>
+        </div>
+        <!-- Trees tab -->
+        <div class="vp-panel hidden" data-panel="trees">
+          <div class="flex gap-2 mb-1.5">
+            <button class="vp-select-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Select all</button>
+            <span class="text-gray-300">·</span>
+            <button class="vp-unselect-all text-[10px] text-gray-400 hover:text-gray-700 transition-colors">Unselect all</button>
+          </div>
+          <div class="space-y-0.5 max-h-56 overflow-y-auto scroll-thin" id="vp-trees"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Violations Panel (stacked below overview) -->
+    <div id="violations-panel" class="glass-panel">
+      <div class="px-3 py-2 border-b border-gray-200 flex items-center justify-between bg-gray-50/80 rounded-t-lg">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-red-500" style="font-size:16px;">warning</span>
+          <span class="font-label-caps text-gray-900">VIOLATIONS</span>
+        </div>
+        <span class="font-data-sm text-red-500 font-bold" id="violation-count">0</span>
+      </div>
+      <div class="p-2 space-y-1 max-h-56 overflow-y-auto scroll-thin" id="violations-list"></div>
+    </div>
+
+    </div><!-- end left panels container -->
+
+    <!-- Map Controls (right side) -->
+    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 hidden md:flex">
+      <button id="zoom-in" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Zoom in">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+      <button id="zoom-out" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Zoom out">
+        <span class="material-symbols-outlined">remove</span>
+      </button>
+      <button id="locate-me" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 mt-4" title="Recenter">
+        <span class="material-symbols-outlined">my_location</span>
+      </button>
+      <button id="toggle-layers" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Layers">
+        <span class="material-symbols-outlined">layers</span>
+      </button>
+      <button id="toggle-basemap" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Switch basemap">
+        <span class="material-symbols-outlined">satellite_alt</span>
+      </button>
+    </div>
+
+    </div>
+
+    <!-- Layers Panel (slide-in) -->
+    <div id="layers-panel" class="absolute left-4 top-20 bottom-20 w-72 glass-panel flex flex-col z-30 transform -translate-x-[110%] transition-transform duration-300 overflow-hidden">
+      <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/80">
+        <h3 class="font-label-caps text-gray-900">MAP LAYERS</h3>
+        <button id="close-layers" class="text-gray-400 hover:text-gray-700 transition-colors">
+          <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto scroll-thin p-2" id="layers-content"></div>
+      <div class="border-t border-gray-200 p-3 flex gap-2 bg-gray-50/80">
+        <button id="clear-all" class="flex-1 border border-gray-300 rounded-lg py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors">Clear All</button>
+        <button id="fit-selection" class="flex-1 bg-brand-600 text-white rounded-lg py-2 text-xs font-medium hover:bg-brand-700 transition-colors">Fit to Selection</button>
+      </div>
+    </div>
+
+    <!-- Live Info Bar (bottom floating) -->
+    <div id="live-bar" class="live-bar absolute bottom-3 left-3 right-3 z-20 glass-panel pointer-events-auto rounded-lg">
+      <!-- Header row -->
+      <div class="flex items-center justify-between px-4 py-2 border-b border-gray-200 cursor-pointer rounded-t-lg" id="live-bar-header">
+        <div class="flex items-center gap-4 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </span>
+            <span class="font-label-caps text-gray-900">LIVE FEED</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-gray-400" style="font-size:14px;">satellite_alt</span>
+            <span class="font-data-sm text-gray-500">Last scan:</span>
+            <span class="font-data-sm text-gray-900" id="last-scan">—</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-gray-400" style="font-size:14px;">agriculture</span>
+            <span class="font-data-sm text-gray-500">Farms:</span>
+            <span class="font-data-sm text-gray-900" id="live-farm-count">494</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-gray-400" style="font-size:14px;">warning</span>
+            <span class="font-data-sm text-gray-500">Active violations:</span>
+            <span class="font-data-sm text-red-500 font-bold" id="live-violation-count">0</span>
+          </div>
+        </div>
+        <button class="text-gray-400 hover:text-gray-700">
+          <span class="material-symbols-outlined" id="live-bar-chevron" style="font-size:18px;">expand_more</span>
+        </button>
+      </div>
+      <!-- News feed -->
+      <div class="px-4 py-2 max-h-44 overflow-y-auto scroll-thin" id="news-feed">
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- System Ticker -->
+<div id="ticker" class="flex-none w-full h-9 bg-white border-t border-gray-200 flex items-center px-4 justify-between z-50"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
+<script src="js/namespace.js"></script>
+<script src="js/config.js"></script>
+<script src="js/lib/geo.js"></script>
+<script src="js/lib/color.js"></script>
+<script src="js/lib/random.js"></script>
+<script src="js/data/loader.js"></script>
+<script src="js/map/createMap.js"></script>
+<script src="js/ui/sidebar.js"></script>
+<script src="js/ui/ticker.js"></script>
+<script src="js/ui/mapControls.js"></script>
+<script src="data/plots.js"></script>
+<script src="data/crops.js"></script>
+<script src="data/landuse.js"></script>
+<script src="js/mock/metrics.js"></script>
+<script src="js/mock/violations.js"></script>
+<script src="js/mock/news.js"></script>
+<script src="js/dashboard/taxonomy.js"></script>
+<script src="js/dashboard/state.js"></script>
+<script src="js/dashboard/plotsLayer.js"></script>
+<script src="js/dashboard/metricSelector.js"></script>
+<script src="js/dashboard/viewportStats.js"></script>
+<script src="js/dashboard/layersPanel.js"></script>
+<script src="js/dashboard/violationsPanel.js"></script>
+<script src="js/dashboard/liveBar.js"></script>
+<script src="js/pages/dashboard.js"></script>
+</body>
+</html>

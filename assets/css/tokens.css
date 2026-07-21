@@ -1,0 +1,30 @@
+/* ==========================================================================
+   Wafra design tokens
+   CSS custom properties mirroring the Tailwind brand palette + shared
+   surface colors used across the dashboard, farm-analysis, and
+   violation-management pages. Keep values in sync with
+   assets/tailwind-config.js — do not diverge.
+   ========================================================================== */
+
+:root {
+  /* Brand palette (green), 50 (lightest) -> 900 (darkest) */
+  --brand-50:  #f0fdf4;
+  --brand-100: #dcfce7;
+  --brand-200: #bbf7d0;
+  --brand-300: #86efac;
+  --brand-400: #4ade80;
+  --brand-500: #22c55e;
+  --brand-600: #16a34a;
+  --brand-700: #15803d;
+  --brand-800: #166534;
+  --brand-900: #14532d;
+
+  /* Typography */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Surfaces */
+  --panel-bg: rgba(255, 255, 255, 0.85);
+  --page-bg: #f9fafb;
+  --text-primary: #111827;
+}
