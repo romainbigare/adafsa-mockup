@@ -414,17 +414,23 @@
       if (W.mock.metrics.prepareFarmMetrics) W.mock.metrics.prepareFarmMetrics(state.farmFeatures);
     }
 
-    W.dashboard.layersPanel.build(state);
+    // Optional panels (present on the classic Overview page, absent on the
+    // proposal layouts) are guarded; each page wires the rest via the
+    // state.onFirstLoad / state.onRefresh hooks so plotsLayer stays layout-agnostic.
+    var D = W.dashboard;
+    if (D.layersPanel) D.layersPanel.build(state);
     if (state.isFirstLoad) {
-      W.dashboard.viewportStats.initStatusBadges();
-      W.dashboard.liveBar.init(state);
+      if (D.viewportStats) D.viewportStats.initStatusBadges();
+      if (D.liveBar) D.liveBar.init(state);
+      if (state.onFirstLoad) state.onFirstLoad(state);
       state.isFirstLoad = false;
     }
     updateLayerMode(state);
     applyColoring(state);
-    W.dashboard.dataTable.rebuildAll(state);
-    W.dashboard.viewportStats.update(state);
-    if (W.dashboard.liveBar.syncLeftColumn) W.dashboard.liveBar.syncLeftColumn();
+    D.dataTable.rebuildAll(state);
+    if (D.viewportStats) D.viewportStats.update(state);
+    if (state.onRefresh) state.onRefresh(state);
+    if (D.liveBar && D.liveBar.syncLeftColumn) D.liveBar.syncLeftColumn();
     var loader = document.getElementById('map-loader');
     if (loader) loader.style.display = 'none';
   }
