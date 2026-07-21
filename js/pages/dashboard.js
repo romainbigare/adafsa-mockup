@@ -2,13 +2,16 @@
   "use strict";
 
   W.ui.renderSidebar({ active: 'dashboard' });
-  W.ui.renderTicker();
 
   var mapCtx = W.map.create('map');
   var state = W.dashboard.state.create(mapCtx.map, mapCtx);
+  window.__debugState = state;
 
   W.dashboard.plotsLayer.init(state);
-  W.dashboard.violationsPanel.init(state);
+  W.dashboard.farmTable.init();
+  W.dashboard.landUseTable.init();
+  W.dashboard.cropsTable.init();
+  W.dashboard.treesTable.init();
 
   // ---- Controls ----
   W.ui.wireZoom(state.map, { inId: 'zoom-in', outId: 'zoom-out' });
@@ -30,9 +33,9 @@
   });
 
   W.dashboard.layersPanel.wireControls(state);
-  W.dashboard.viewportStats.wireTabs(state);
+  W.dashboard.viewportStats.wirePanels(state);
   W.dashboard.viewportStats.wireSelectAll(state);
-  W.dashboard.metricSelector.init(state);
+  W.dashboard.viewportStats.initCategoryBadges();
 
   // Update on map move/zoom
   state.map.on('moveend', function () { W.dashboard.viewportStats.update(state); });

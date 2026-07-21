@@ -1,15 +1,15 @@
 /* ==========================================================================
    Wafra shared component styles
-   Deduplicated CSS for components reused across index.html (dashboard),
-   farm-analysis.html, and violation-management.html. Not every rule is
-   used by every page — that's expected; this file is the single source
-   of truth so no page redefines a shared component's CSS locally.
+   Deduplicated CSS for components reused across index.html (dashboard)
+   and farm-analysis.html. Not every rule is used by every page — that's
+   expected; this file is the single source of truth so no page redefines
+   a shared component's CSS locally.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
    Glass panel (floating UI surfaces)
-   Note: source pages disagreed slightly on alpha (0.85 dashboard/violation
-   vs 0.88 farm-analysis). Unified to 0.85 per refactor spec — imperceptible.
+   Note: source pages disagreed slightly on alpha (0.85 dashboard vs 0.88
+   farm-analysis). Unified to 0.85 per refactor spec — imperceptible.
    -------------------------------------------------------------------------- */
 .glass-panel {
   background-color: rgba(255, 255, 255, 0.85);
@@ -40,32 +40,9 @@
 .cluster-icon-large { width: 54px; height: 54px; font-size: 16px; }
 
 /* --------------------------------------------------------------------------
-   Metric UI — dropdown selector, gradient legend
-   -------------------------------------------------------------------------- */
-.metric-selector {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  padding-right: 28px;
-}
-.gradient-bar {
-  height: 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(0,0,0,0.1);
-}
-.legend-tick {
-  width: 1px;
-  height: 4px;
-  background: #9ca3af;
-}
-
-/* --------------------------------------------------------------------------
-   Viewport stats box (tabs)
+   Overview stats box
    -------------------------------------------------------------------------- */
 .viewport-stats { transition: opacity 0.2s ease; }
-.vp-tab.active { color: #111827; border-bottom: 2px solid #16a34a; }
-.vp-tab { border-bottom: 2px solid transparent; }
 
 /* --------------------------------------------------------------------------
    Layer sections (collapsible layer panel groups)
@@ -76,52 +53,10 @@
 .chevron { transition: transform 0.2s ease; }
 
 /* --------------------------------------------------------------------------
-   Violation markers — pulsing heartbeat (identical on dashboard + violation
-   pages)
-   -------------------------------------------------------------------------- */
-@keyframes violation-pulse {
-  0% { transform: scale(0.8); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.4; }
-  100% { transform: scale(0.8); opacity: 1; }
-}
-@keyframes violation-ping {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(2.5); opacity: 0; }
-}
-.violation-marker {
-  position: relative;
-  width: 28px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-}
-.violation-marker .vm-core {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-  z-index: 2;
-  display: flex; align-items: center; justify-content: center;
-}
-.violation-marker .vm-core .material-symbols-outlined {
-  font-size: 9px; color: #fff;
-}
-.violation-marker .vm-pulse {
-  position: absolute;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  animation: violation-pulse 2s ease-in-out infinite;
-}
-.violation-marker .vm-ping {
-  position: absolute;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  animation: violation-ping 2s ease-out infinite;
-}
-
-/* --------------------------------------------------------------------------
    Live info bar (bottom floating bar + news feed)
    -------------------------------------------------------------------------- */
 .live-bar { transition: transform 0.3s ease; }
-.live-bar.collapsed { transform: translateY(calc(100% - 38px)); }
+.live-bar.collapsed { transform: translateY(calc(100% - 52px)); }
 .news-item { animation: fadeInUp 0.4s ease; }
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(8px); }
@@ -163,13 +98,140 @@
 }
 
 /* --------------------------------------------------------------------------
-   Violation Management — confidence bar, detail drawer, selected row
+   Bottom info panel — tabs (Farms table / News feed) + resizable body
    -------------------------------------------------------------------------- */
-.conf-bar { height: 6px; border-radius: 3px; background: #e5e7eb; overflow: hidden; }
-.conf-bar > span { display: block; height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.lb-tab {
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.lb-tab.active { color: #111827; border-bottom-color: #16a34a; }
 
-.detail-drawer { transition: transform 0.3s ease; }
-.detail-drawer.closed { transform: translateX(110%); }
+/* Shared height for both tab bodies, dragged via .lb-resize-handle. */
+.lb-panel { max-height: var(--lb-body-height, 260px); }
 
-tr.vrow.selected { background-color: #f0fdf4; }
-tr.vrow.selected td { border-bottom-color: #86efac; }
+.lb-resize-handle {
+  height: 14px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ns-resize;
+  touch-action: none;
+}
+.lb-resize-grip {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: #d1d5db;
+  transition: background-color 0.15s ease;
+}
+.lb-resize-handle:hover .lb-resize-grip { background: #9ca3af; }
+body.lb-resizing { cursor: ns-resize; user-select: none; }
+body.lb-resizing .lb-resize-grip { background: #16a34a; }
+
+/* --------------------------------------------------------------------------
+   Farms table (sortable / reorderable / customisable columns)
+   -------------------------------------------------------------------------- */
+.farm-table th.farm-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  position: relative;
+}
+.farm-table th.farm-th:hover { background-color: rgba(22, 163, 74, 0.06); }
+.farm-table th.farm-th .sort-ind {
+  font-size: 14px;
+  vertical-align: middle;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.farm-table th.farm-th.sorted .sort-ind { opacity: 1; color: #16a34a; }
+.farm-table th.farm-th.drag-over { box-shadow: inset 2px 0 0 #16a34a; }
+.farm-table th.farm-th.dragging { opacity: 0.4; }
+.farm-table tbody tr:hover { background-color: #f9fafb; }
+.farm-table td, .farm-table th { padding: 6px 12px; }
+.farm-table thead th { border-bottom: 1px solid #e5e7eb; }
+.farm-table tbody td { border-bottom: 1px solid #f1f3f5; }
+
+.farm-col-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #374151;
+}
+.farm-col-toggle:hover { background-color: #f3f4f6; }
+
+/* Selected farm row (clicked to zoom the map to it). */
+.farm-table tbody tr.farm-row { cursor: pointer; }
+.farm-table tbody tr.farm-row.selected { background-color: #ecfdf5; }
+.farm-table tbody tr.farm-row.selected td:first-child { box-shadow: inset 3px 0 0 #16a34a; }
+
+/* --------------------------------------------------------------------------
+   Category browser panels (Land Use / Crops / Trees) — collapsible accordion
+   -------------------------------------------------------------------------- */
+.cat-panel { overflow: hidden; }
+.cat-head { cursor: pointer; }
+.cat-head:hover { background-color: #f3f4f6; }
+.cat-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.cat-panel.open .cat-body { max-height: 340px; }
+
+/* Expand/collapse toggle switch (replaces the old chevron indicator). */
+.cat-toggle {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 30px;
+  height: 17px;
+  border-radius: 999px;
+  background: #d1d5db;
+  transition: background-color 0.2s ease;
+}
+.cat-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+.cat-panel.open .cat-toggle { background: #16a34a; }
+.cat-panel.open .cat-toggle-thumb { transform: translateX(13px); }
+
+/* Subtle stacked-bar summary of the major-category shares. */
+.cat-chart-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f1f3f5;
+}
+.cat-chart-seg { height: 100%; }
+.cat-chart-seg + .cat-chart-seg { box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.7); }
+
+/* Per-category subcategory list — collapsed by default, expanded by
+   clicking the category row (independent of the outer cat-panel accordion). */
+.subcat-toggle:hover { background-color: #f9fafb; }
+.subcat-chevron { transition: transform 0.15s ease; }
+.subcat-item.open .subcat-chevron { transform: rotate(90deg); }
+.subcat-body { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+.subcat-item.open .subcat-body { max-height: 400px; }
+
+/* --------------------------------------------------------------------------
+   Selected-farm map highlight — pulsing outline drawn on the top pane
+   -------------------------------------------------------------------------- */
+@keyframes farm-highlight-pulse {
+  0%   { stroke-width: 2; stroke-opacity: 0.9; }
+  50%  { stroke-width: 7; stroke-opacity: 0.35; }
+  100% { stroke-width: 2; stroke-opacity: 0.9; }
+}
+.farm-highlight-pulse {
+  animation: farm-highlight-pulse 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.85));
+}

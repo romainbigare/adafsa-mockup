@@ -2,8 +2,8 @@
    Wafra base styles
    Body defaults, shared typography utility classes, icon font settings,
    and thin-scrollbar helper. Copied verbatim from the original mockups
-   (idx_style.txt / farm-analysis.html / violation-management.html — the
-   three pages were identical on these rules).
+   (idx_style.txt / farm-analysis.html — the pages were identical on
+   these rules).
    ========================================================================== */
 
 body { background-color: #f9fafb; color: #111827; }

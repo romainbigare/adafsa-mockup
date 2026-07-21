@@ -7,8 +7,12 @@
   // Zoom-based layer switching: clusters when far, polygons when close.
   var CLUSTER_THRESHOLD = 13; // zoom levels below this use clusters
 
+  var NEUTRAL = 'rgba(22,163,74,0.85)';
+
   // colorFor(state,type) depends on currentDataset + CROP_COLORS /
-  // CROP_COLORS_BY_TYPE / TYPE_COLORS.
+  // CROP_COLORS_BY_TYPE / TYPE_COLORS. This is the single source of truth for
+  // "colour a shape by its value" — the value being the feature's type, drawn
+  // from whichever category (Land Use / Crops / Trees) is currently loaded.
   function colorFor(state, type) {
     var tax = W.dashboard.taxonomy;
     var c = state.currentDataset === 'plots' ? tax.CROP_COLORS[type]
@@ -17,9 +21,26 @@
     return c || '#999';
   }
 
+  // A cluster is coloured by the majority value (type) of the shapes it holds:
+  // tally the members' types, take the most common, and colour the bubble with
+  // that type's colour. Falls back to neutral green for an empty cluster.
+  function majorityColor(state, markers) {
+    var counts = {};
+    var best = null, bestN = 0;
+    for (var i = 0; i < markers.length; i++) {
+      var ref = markers[i]._featureRef;
+      if (!ref) continue;
+      var t = ref.type;
+      counts[t] = (counts[t] || 0) + 1;
+      if (counts[t] > bestN) { bestN = counts[t]; best = t; }
+    }
+    return best ? colorFor(state, best) : NEUTRAL;
+  }
+
   // Creates the cluster layer for the zoomed-out view (centroid markers with
-  // counts). Colors clusters by metric (overview tab) or dominant type
-  // (landuse/trees tabs) — reads activeTab/currentMetric from shared state.
+  // counts). Each cluster is coloured by the majority value of its members
+  // (see majorityColor) so the zoomed-out map reflects the same taxonomy
+  // colours as the individual shapes.
   function init(state) {
     state.clusterGroup = L.markerClusterGroup({
       showCoverageOnHover: false,
@@ -54,51 +75,51 @@
           }
         }
 
-        // Compute color based on active tab
-        var bgColor = 'rgba(22,163,74,0.85)';
-        var metrics = W.mock.metrics;
-        if (markers.length > 0) {
-          if (state.activeTab === 'overview') {
-            // On overview tab, color by selected metric
-            if (state.currentMetric === 'irrigation') {
-              var irrigationCounts = {};
-              for (var ii = 0; ii < markers.length; ii++) {
-                var val = metrics.getMetricValue(markers[ii]._featureRef, 'irrigation');
-                var idx = Math.round(val);
-                irrigationCounts[idx] = (irrigationCounts[idx] || 0) + 1;
-              }
-              var maxIdx = 0, maxCount = 0;
-              for (var key in irrigationCounts) {
-                if (irrigationCounts[key] > maxCount) { maxCount = irrigationCounts[key]; maxIdx = parseInt(key, 10); }
-              }
-              bgColor = metrics.IRRIGATION_COLORS[maxIdx] || bgColor;
-            } else {
-              var sum = 0;
-              for (var si = 0; si < markers.length; si++) {
-                sum += metrics.getMetricValue(markers[si]._featureRef, state.currentMetric);
-              }
-              var avg = sum / markers.length;
-              bgColor = metrics.getMetricColor(avg, state.currentMetric);
-            }
-          } else {
-            // On landuse/trees tabs, color by dominant type
-            var typeCounts = {};
-            for (var ti = 0; ti < markers.length; ti++) {
-              var fr = markers[ti]._featureRef;
-              if (fr) typeCounts[fr.type] = (typeCounts[fr.type] || 0) + 1;
-            }
-            var dominantType = null, maxC = 0;
-            for (var t in typeCounts) {
-              if (typeCounts[t] > maxC) { maxC = typeCounts[t]; dominantType = t; }
-            }
-            if (dominantType) bgColor = colorFor(state, dominantType);
-          }
-        }
+        // Colour the cluster bubble by the majority value of its members.
+        var bgColor = majorityColor(state, markers);
 
         return L.divIcon({ html: '<div class="cluster-icon ' + cls + '" style="background:' + bgColor + '">' + count + '</div>', className: '', iconSize: [40, 40] });
       }
     });
     state.clusterActive = false;
+
+    // Dedicated top-most pane for the selected-farm highlight so its pulsing
+    // outline always draws above the polygons / cluster markers.
+    state.map.createPane('farm-highlight');
+    state.map.getPane('farm-highlight').style.zIndex = 650;
+    state.highlightLayer = L.layerGroup().addTo(state.map);
+  }
+
+  // Zoom to a farm (from the farms table) and draw a pulsing highlight around
+  // its boundary. Padding keeps the farm clear of the bottom info panel.
+  function selectFarm(state, feature) {
+    if (!feature || !feature.rings || !feature.rings.length) return;
+    state.highlightLayer.clearLayers();
+
+    var polys = [];
+    feature.rings.forEach(function (ring) {
+      var poly = L.polygon(ring, {
+        pane: 'farm-highlight',
+        className: 'farm-highlight-pulse',
+        color: '#22d3ee', weight: 3, opacity: 1,
+        fillColor: '#22d3ee', fillOpacity: 0.15
+      });
+      state.highlightLayer.addLayer(poly);
+      polys.push(poly);
+    });
+
+    var bounds = L.featureGroup(polys).getBounds();
+    var bar = document.getElementById('live-bar');
+    var bottomPad = (bar && !bar.classList.contains('collapsed')) ? bar.offsetHeight + 24 : 40;
+    state.map.fitBounds(bounds, {
+      maxZoom: 17,
+      paddingTopLeft: [40, 40],
+      paddingBottomRight: [40, bottomPad]
+    });
+  }
+
+  function clearSelection(state) {
+    if (state.highlightLayer) state.highlightLayer.clearLayers();
   }
 
   function clearAllFeatures(state) {
@@ -114,13 +135,13 @@
     state.totalFarms = 0;
     state.totalArea = 0;
     state.clusterActive = false;
+    if (state.highlightLayer) state.highlightLayer.clearLayers();
   }
 
   function loadDataset(state, name) {
     if (state.currentDataset === name && state.allFeatures.length > 0) return;
     state.currentDataset = name;
     clearAllFeatures(state);
-    W.dashboard.violationsPanel.clear(state);
 
     var features = W.data.features(name);
     var loader = document.getElementById('map-loader');
@@ -171,7 +192,7 @@
       if (!rings.length) continue;
       state.totalArea += area;
 
-      // Store for viewport stats
+      // Store for viewport stats + farm table
       var centroid = geo.featureCentroid(f);
       var featureData = { type: type, category: category, owner: owner, fid: fid, area: area, centroid: centroid, rings: rings };
       state.allFeatures.push(featureData);
@@ -253,25 +274,22 @@
     }
   }
 
-  // Apply metric coloring to all layers
-  function applyMetricColoring(state) {
-    var metric = state.currentMetric;
-    var metrics = W.mock.metrics;
-
+  // Recolour every layer from the taxonomy: shapes by their own type value,
+  // clusters by their members' majority value. Colours follow whichever
+  // category dataset (Land Use / Crops / Trees / plots) is currently loaded.
+  function applyColoring(state) {
     // Update polygon colors
     for (var type in state.layerGroups) {
-      state.layerGroups[type].eachLayer(function (poly) {
-        var feature = poly._featureRef;
-        if (feature) {
-          var val = metrics.getMetricValue(feature, metric);
-          var c = metrics.getMetricColor(val, metric);
-          poly.setStyle({ color: c, fillColor: c });
-        }
-      });
+      (function (type) {
+        var typeColor = colorFor(state, type);
+        state.layerGroups[type].eachLayer(function (poly) {
+          if (poly._featureRef) poly.setStyle({ color: typeColor, fillColor: typeColor });
+        });
+      })(type);
     }
 
     // Force complete cluster rebuild by removing and re-adding the cluster
-    // group so iconCreateFunction is called fresh with the updated metric.
+    // group so iconCreateFunction runs fresh with the current dataset colours.
     if (state.clusterActive) {
       state.map.removeLayer(state.clusterGroup);
       state.clusterGroup.clearLayers();
@@ -293,14 +311,24 @@
       var group = L.featureGroup(allLayers);
       state.map.fitBounds(group.getBounds(), { padding: [40, 40] });
     }
+    // Snapshot the farm (plots) dataset so the Overview panel keeps reporting
+    // farm metrics even when a landuse/crops category dataset is loaded.
+    if (state.currentDataset === 'plots') {
+      state.farmFeatures = state.allFeatures.slice();
+      state.totalFarmCount = state.totalFarms;
+    }
+
     W.dashboard.layersPanel.build(state);
-    W.dashboard.violationsPanel.generate(state);
-    if (state.isFirstLoad) { W.dashboard.liveBar.init(state); state.isFirstLoad = false; }
+    if (state.isFirstLoad) {
+      W.dashboard.viewportStats.initStatusBadges();
+      W.dashboard.liveBar.init(state);
+      state.isFirstLoad = false;
+    }
     updateLayerMode(state);
-    applyMetricColoring(state);
+    applyColoring(state);
+    W.dashboard.dataTable.rebuildAll(state);
     W.dashboard.viewportStats.update(state);
-    var fcEl = document.getElementById('live-farm-count');
-    if (fcEl) fcEl.textContent = state.totalFarms;
+    if (W.dashboard.liveBar.syncLeftColumn) W.dashboard.liveBar.syncLeftColumn();
     var loader = document.getElementById('map-loader');
     if (loader) loader.style.display = 'none';
   }
@@ -311,7 +339,9 @@
     clearAllFeatures: clearAllFeatures,
     loadDataset: loadDataset,
     updateLayerMode: updateLayerMode,
-    applyMetricColoring: applyMetricColoring
+    applyColoring: applyColoring,
+    selectFarm: selectFarm,
+    clearSelection: clearSelection
   };
 
 })(window.Wafra);

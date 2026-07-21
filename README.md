@@ -1,10 +1,9 @@
 # Wafra Dashboard — Map My Crop (mockup)
 
-A static, **buildless** front-end mockup for a farm-monitoring platform (Abu Dhabi / Al Ain region). Three pages backed by placeholder data, served entirely from static files — no server, no build step, no npm.
+A static, **buildless** front-end mockup for a farm-monitoring platform (Abu Dhabi / Al Ain region). Two pages backed by placeholder data, served entirely from static files — no server, no build step, no npm.
 
-- **Live Dashboard** (`index.html`) — Leaflet map of all plots/crops/land-use, with clustering, per-metric colouring, a layers panel, viewport statistics, a live activity feed, and violation markers.
+- **Farms Overview** (`index.html`) — Leaflet map of all plots/crops/land-use, with clustering (shapes coloured by taxonomy value, clusters by majority value), a layers panel, viewport statistics, a live activity feed, and sortable/exportable Farms/Land Use/Crops/Trees tables (bottom sheet).
 - **Farm Analysis** (`farm-analysis.html`) — per-farm view with a canvas heatmap (growth / irrigation / phenology / density), weather, soil, growth-phase, water-scheduler and advisory panels.
-- **Violation Management** (`violation-management.html`) — violations table, filters, map markers, and a detail drawer explaining how each violation was detected.
 
 > The data is **placeholder**. See [Data & the mock boundary](#data--the-mock-boundary).
 
@@ -36,9 +35,8 @@ The datasets are likewise plain scripts that assign `window.WafraData.*` — so 
 
 ```
 warfa-dashboard/
-├── index.html                  # Live Dashboard — thin skeleton (mounts + ordered <script>s)
+├── index.html                  # Farms Overview — thin skeleton (mounts + ordered <script>s)
 ├── farm-analysis.html          # Farm Analysis — thin skeleton
-├── violation-management.html   # Violation Management — thin skeleton
 │
 ├── assets/
 │   ├── tailwind-config.js       # shared Tailwind config (brand palette, fonts)
@@ -64,27 +62,25 @@ warfa-dashboard/
 │   │
 │   ├── mock/                    # ALL placeholder/generated data — isolated (swap for a real API)
 │   │   ├── metrics.js           #   dashboard per-feature metric values + colour scales
-│   │   ├── violations.js        #   dashboard random violation records
 │   │   ├── news.js              #   dashboard live-feed items
-│   │   ├── farmAnalysis.js      #   farm RNG + heat-field noise + panel demo values
-│   │   └── violationsData.js    #   violation records + detection-method reference text
+│   │   └── farmAnalysis.js      #   farm RNG + heat-field noise + panel demo values
 │   │
-│   ├── dashboard/               # Live Dashboard feature modules (share one state object)
+│   ├── dashboard/               # Farms Overview feature modules (share one state object)
 │   │   ├── taxonomy.js          #   land-use / crop trees + palettes
 │   │   ├── state.js             #   createState() — the single shared mutable state
-│   │   ├── plotsLayer.js        #   streaming render, clustering, metric colouring
-│   │   ├── metricSelector.js    #   metric dropdown + legend
-│   │   ├── viewportStats.js     #   Overview / Land Use / Trees tabs
+│   │   ├── plotsLayer.js        #   streaming render, clustering, taxonomy colouring (shape = own value, cluster = majority value)
+│   │   ├── viewportStats.js     #   Overview / Land Use / Crops / Trees panels
 │   │   ├── layersPanel.js       #   layers panel + fit/clear controls
-│   │   ├── violationsPanel.js   #   violation markers + list
-│   │   └── liveBar.js           #   live feed + collapse
+│   │   ├── dataTable.js         #   shared sortable/reorderable/exportable table factory
+│   │   ├── farmTable.js         #   Farms tab (built on dataTable.js)
+│   │   ├── categoryTables.js    #   Land Use / Crops / Trees tabs (built on dataTable.js)
+│   │   └── liveBar.js           #   bottom-sheet tabs + live feed + collapse
 │   │
 │   ├── farmAnalysis/heatmap.js  # Farm Analysis canvas heatmap overlay + colour scales
 │   │
 │   └── pages/                   # one entry point per page — bootstraps + wires everything
 │       ├── dashboard.js
-│       ├── farmAnalysis.js
-│       └── violationMgmt.js
+│       └── farmAnalysis.js
 │
 ├── data/                        # placeholder GeoJSON, wrapped as window.WafraData globals
 │   ├── plots.js                 #   500 plot features
@@ -102,7 +98,7 @@ warfa-dashboard/
 
 ## Data & the mock boundary
 
-Everything under **`data/`** (geometry) and **`js/mock/`** (generated metrics, weather, violations, news, heat-fields) is placeholder. To wire up a real backend, replace those two locations:
+Everything under **`data/`** (geometry) and **`js/mock/`** (generated metrics, weather, per-farm timestamps, news, heat-fields) is placeholder. To wire up a real backend, replace those two locations:
 
 - Swap `data/*.js` for real data (either keep the `window.WafraData.* = {...}` global form, or reintroduce `fetch()` in `js/data/loader.js` if you no longer need `file://` support).
 - Replace the generators in `js/mock/*` with real API calls. The feature/page modules consume them through `Wafra.mock.*` / `Wafra.data.*`, so nothing else needs to change.

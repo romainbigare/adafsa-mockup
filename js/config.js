@@ -21,9 +21,8 @@
         {
           label: "FOR GOVERNMENT",
           links: [
-            { id: "dashboard", label: "Live Dashboard", icon: "dashboard", href: "index.html" },
-            { id: "farm-analysis", label: "Farm Analysis", icon: "analytics", href: "farm-analysis.html" },
-            { id: "violations", label: "Violation Management", icon: "gavel", href: "violation-management.html" }
+            { id: "dashboard", label: "Farms Overview", icon: "dashboard", href: "index.html" },
+            { id: "farm-analysis", label: "Farm Analysis", icon: "analytics", href: "farm-analysis.html" }
           ]
         },
         {

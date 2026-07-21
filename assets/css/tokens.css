@@ -1,9 +1,8 @@
 /* ==========================================================================
    Wafra design tokens
    CSS custom properties mirroring the Tailwind brand palette + shared
-   surface colors used across the dashboard, farm-analysis, and
-   violation-management pages. Keep values in sync with
-   assets/tailwind-config.js — do not diverge.
+   surface colors used across the dashboard and farm-analysis pages.
+   Keep values in sync with assets/tailwind-config.js — do not diverge.
    ========================================================================== */
 
 :root {

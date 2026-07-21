@@ -1,8 +1,7 @@
 /* ==========================================================================
    Wafra Leaflet overrides
    Copied verbatim from the original mockups. The z-index popup-pane rules
-   are from violation-management.html (needed there because of the detail
-   drawer layering); harmless on the other pages.
+   ensure popups layer above the floating UI panels; harmless elsewhere.
    ========================================================================== */
 
 .leaflet-container { font-family: "Inter", sans-serif; background: #1f2937; }

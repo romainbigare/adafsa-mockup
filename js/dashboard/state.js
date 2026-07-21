@@ -4,8 +4,8 @@
   W.dashboard = W.dashboard || {};
 
   // Creates the single shared mutable state/context object used by every
-  // dashboard module (plotsLayer, viewportStats, layersPanel, violationsPanel,
-  // liveBar, metricSelector). Nothing else on the page holds its own copy of
+  // dashboard module (plotsLayer, viewportStats, layersPanel,
+  // liveBar, farmTable). Nothing else on the page holds its own copy of
   // this data — everything reads/writes through this object.
   function createState(map, mapCtx) {
     return {
@@ -14,8 +14,7 @@
 
       // dataset / view mode
       currentDataset: 'plots',
-      currentMetric: 'growth',
-      activeTab: 'overview',
+      activeCategory: null,    // null (Overview) | 'landuse' | 'crops' | 'trees' — expanded category panel
       isFirstLoad: true,
 
       // feature/layer bookkeeping
@@ -23,24 +22,27 @@
       markersByType: {},    // type -> [markers] for cluster filtering
       typeCounts: {},        // type -> count
       layerVisibility: {},   // type -> bool (checkbox state)
-      allFeatures: [],        // processed features for viewport stats
+      allFeatures: [],        // processed features for the currently loaded dataset
       totalFarms: 0,
       totalArea: 0,
+
+      // Persistent farm (plots) snapshot — the Overview panel always reports
+      // these, regardless of which category dataset (landuse/crops) is loaded.
+      farmFeatures: [],
+      totalFarmCount: 0,
 
       // clustering (clusterGroup is created by Wafra.dashboard.plotsLayer.init)
       clusterGroup: null,
       clusterActive: false,
 
+      // selected-farm highlight layer (created by Wafra.dashboard.plotsLayer.init)
+      highlightLayer: null,
+
       // viewport stats (recomputed by Wafra.dashboard.viewportStats.update)
       vpTypes: {},
       vpCats: {},
       vpFarms: 0,
-      vpArea: 0,
-
-      // violations (violationLayer is created by Wafra.dashboard.violationsPanel.init)
-      violationLayer: null,
-      violationMarkers: [],
-      violationVisibility: {}
+      vpArea: 0
     };
   }
 

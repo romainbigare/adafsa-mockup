@@ -101,6 +101,12 @@
     ]}
   ];
 
+  // The Crops & Trees taxonomy split into two views: woody perennials ("Trees")
+  // vs everything else ("Crops"). Both are backed by the same `crops` dataset.
+  var TREE_CATEGORIES = ['Date Palm', 'Fruit Trees'];
+  var TREES_TREE = CROP_TREE.filter(function (c) { return TREE_CATEGORIES.indexOf(c.name) !== -1; });
+  var CROPS_TREE = CROP_TREE.filter(function (c) { return TREE_CATEGORIES.indexOf(c.name) === -1; });
+
   // Map crops.json level_3 values to CROP_TREE type names
   var CROP_NORMALIZE = {
     'Cantaloupe/Muskmelon': 'Muskmelon',
@@ -124,6 +130,8 @@
     CATEGORY_OF_TYPE: CATEGORY_OF_TYPE,
     LAND_USE_TREE: LAND_USE_TREE,
     CROP_TREE: CROP_TREE,
+    CROPS_TREE: CROPS_TREE,
+    TREES_TREE: TREES_TREE,
     CROP_NORMALIZE: CROP_NORMALIZE,
     CROP_COLORS_BY_TYPE: CROP_COLORS_BY_TYPE
   };
