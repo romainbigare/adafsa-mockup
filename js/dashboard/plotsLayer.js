@@ -27,8 +27,11 @@
   // used by both the polygon layers and the cluster majority tally.
   function featureColor(state, ref) {
     if (state.activeModule) {
-      var m = W.dashboard.modules.byKey(state.activeModule);
-      if (m) return W.dashboard.modules.colorOf(m, ref);
+      // Resolve through the six-module registry so every contract module
+      // (incl. Crop / Palms / Structures) can colour the farm boundaries.
+      var reg = W.dashboard.moduleRegistry;
+      var m = reg && reg.byKey(state.activeModule);
+      if (m) return reg.colourOf(m, ref);
     }
     return colorFor(state, ref.type);
   }
