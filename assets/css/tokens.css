@@ -18,9 +18,11 @@
   --brand-800: #166534;
   --brand-900: #14532d;
 
-  /* Typography */
+  /* Typography — one humanist sans everywhere. Numeric/label slots that used to
+     be monospace now reuse the sans stack (with tabular-nums where digits must
+     line up), so nothing reads as a "technical" console font. */
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-mono: var(--font-sans);
 
   /* Surfaces */
   --panel-bg: rgba(255, 255, 255, 0.85);

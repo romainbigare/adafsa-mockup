@@ -36,7 +36,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-sans); font-variant-numeric: tabular-nums;
   font-weight: 600;
   border: 2px solid rgba(255,255,255,0.9);
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -252,13 +252,13 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
   font-weight: 700; color: #111827; font-size: 13px; white-space: nowrap;
 }
 .kpi-name .material-symbols-outlined { vertical-align: -3px; margin-right: 4px; }
-.kpi-name .kpi-fee { font: 500 10px/1 "JetBrains Mono", monospace; color: #9ca3af; text-transform: uppercase; letter-spacing: .05em; }
+.kpi-name .kpi-fee { font: 500 10px/1 var(--font-sans); color: #9ca3af; text-transform: uppercase; letter-spacing: .05em; }
 .kpi-tile {
   flex: 1 1 0; min-width: 96px; display: flex; flex-direction: column; gap: 2px;
   padding: 4px 10px; border-radius: 6px; background: #f8fafc; border: 1px solid #eef2f7;
 }
 .kpi-tile.warn { background: #fff7ed; border-color: #fed7aa; }
-.kpi-label { font: 600 9px/1.2 "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: #6b7280; }
+.kpi-label { font: 600 9px/1.2 var(--font-sans); letter-spacing: .06em; text-transform: uppercase; color: #6b7280; }
 .kpi-value { font-size: 16px; font-weight: 700; color: #111827; font-variant-numeric: tabular-nums; }
 .kpi-tile.warn .kpi-value { color: #c2410c; }
 
@@ -289,7 +289,7 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
    "Switch to analysis" sits at the foot of the Map Layers panel (layers mode). */
 .legend-switch {
   display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
-  margin-top: 6px; padding: 8px 12px; cursor: pointer;
+  padding: 9px 12px; cursor: pointer; border-top: 1px solid #e5e7eb;
   color: var(--status-ok); font: 600 12px/1 var(--font-sans);
 }
 .legend-switch:hover { background: var(--status-ok-bg); }
@@ -403,7 +403,7 @@ body.layers-mode #module-bar { display: none; }
   position: absolute; top: -5px; inset-inline-end: -5px;
   min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px;
   background: var(--status-critical); color: #fff; border: 1.5px solid #fff;
-  font: 700 10px/13px "JetBrains Mono", monospace; text-align: center;
+  font: 700 10px/13px var(--font-sans); font-variant-numeric: tabular-nums; text-align: center;
   box-shadow: 0 1px 3px rgba(0,0,0,.35);
 }
 
@@ -428,7 +428,7 @@ body.layers-mode #module-bar { display: none; }
   display: flex; align-items: center; justify-content: center;
   min-width: 24px; height: 20px; padding: 0 6px; border-radius: 10px;
   background: rgba(255,255,255,0.82); color: #374151;
-  font: 600 11px/1 "JetBrains Mono", monospace;
+  font: 600 11px/1 var(--font-sans); font-variant-numeric: tabular-nums;
   border: 1px solid rgba(17,24,39,0.12); box-shadow: 0 1px 3px rgba(0,0,0,0.18);
   backdrop-filter: blur(2px);
 }

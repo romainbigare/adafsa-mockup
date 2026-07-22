@@ -11,7 +11,7 @@ tailwind.config = {
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"]
+        mono: ["Inter", "system-ui", "sans-serif"]
       }
     }
   }

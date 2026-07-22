@@ -228,7 +228,6 @@
             '<span class="text-xs text-gray-500 truncate">' + t.name + '</span>' +
           '</span>' +
           '<span class="flex items-center gap-1.5 flex-shrink-0 pl-1">' +
-            '<span class="font-data-sm text-gray-400">' + (td.count || 0).toLocaleString() + '</span>' +
             '<span class="text-[10px] text-gray-400 w-7 text-right">' + pct(td.area) + '</span>' +
             '<input type="checkbox" ' + (checked ? 'checked' : '') + ' class="cursor-pointer accent-brand-600 tax-type" data-type="' + esc(t.name) + '" style="width:12px;height:12px" ' + (!hasLayer ? 'disabled' : '') + '>' +
           '</span>' +
@@ -243,7 +242,6 @@
             '<span class="text-xs text-gray-700 font-semibold truncate">' + cat.name + '</span>' +
           '</span>' +
           '<span class="flex items-center gap-1.5 flex-shrink-0 pl-1">' +
-            '<span class="font-data-sm text-gray-400">' + (catData.count || 0).toLocaleString() + '</span>' +
             '<span class="text-xs text-gray-500 w-8 text-right">' + pct(catData.area) + '</span>' +
             '<input type="checkbox" ' + (allChecked ? 'checked' : '') + ' class="cursor-pointer accent-brand-600 tax-cat" data-cat="' + esc(cat.name) + '" style="width:12px;height:12px" ' + (!hasAnyLayer ? 'disabled' : '') + '>' +
           '</span>' +
@@ -276,7 +274,7 @@
         if (cat) cat.types.forEach(function (t) {
           if (state.layerGroups[t.name]) state.layerVisibility[t.name] = cb.checked;
         });
-        W.dashboard.plotsLayer.updateLayerMode(state);
+        applyLayerVisibility(state);
         buildTree(state);
       });
     });
@@ -284,7 +282,7 @@
     els.content.querySelectorAll('.tax-type').forEach(function (cb) {
       cb.addEventListener('change', function () {
         if (state.layerGroups[cb.dataset.type]) state.layerVisibility[cb.dataset.type] = cb.checked;
-        W.dashboard.plotsLayer.updateLayerMode(state);
+        applyLayerVisibility(state);
         buildTree(state);
       });
     });
@@ -310,12 +308,19 @@
   }
   function selectView(state, view) { if (view !== state.taxonomyView) enter(state, view); }
 
+  // Re-apply per-type visibility to the map: switch cluster/polygon layers AND
+  // refresh the layer-colour heat so a hidden type drops out of the heat too.
+  function applyLayerVisibility(state) {
+    W.dashboard.plotsLayer.updateLayerMode(state);
+    if (W.dashboard.heatLayer && W.dashboard.heatLayer.update) W.dashboard.heatLayer.update(state);
+  }
+
   function setAll(state, vis) {
     var view = state.taxonomyView;
     if (!view) return;
     var scope = (view === 'landuse') ? Object.keys(state.layerGroups) : ownTypes(view);
     scope.forEach(function (t) { if (state.layerGroups[t]) state.layerVisibility[t] = vis; });
-    W.dashboard.plotsLayer.updateLayerMode(state);
+    applyLayerVisibility(state);
     buildTree(state);
   }
 

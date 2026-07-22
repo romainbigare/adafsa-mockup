@@ -75,4 +75,17 @@ check("off-map farms contribute no heat point", function () {
   assert.strictEqual(heat.points(st).length, 1);
 });
 
+console.log("layer-colour parsing (hexToRgb)");
+check("parses #rrggbb and #rgb taxonomy swatches to [r,g,b]", function () {
+  // Arrays come from the vm realm, so compare by value (join), not deepStrictEqual.
+  assert.strictEqual(heat.hexToRgb("#16a34a").join(","), "22,163,74");
+  assert.strictEqual(heat.hexToRgb("16a34a").join(","), "22,163,74");
+  assert.strictEqual(heat.hexToRgb("#999").join(","), "153,153,153");
+});
+check("returns null for missing / unparseable colours (skipped in the field)", function () {
+  assert.strictEqual(heat.hexToRgb(null), null);
+  assert.strictEqual(heat.hexToRgb(""), null);
+  assert.strictEqual(heat.hexToRgb("#zz"), null);
+});
+
 console.log("\nAll " + passed + " checks passed.");
