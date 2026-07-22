@@ -26,4 +26,20 @@
   --panel-bg: rgba(255, 255, 255, 0.85);
   --page-bg: #f9fafb;
   --text-primary: #111827;
+
+  /* ------------------------------------------------------------------ */
+  /* Semantic status colours — the COLOUR CONTRACT.                     */
+  /* red = needs action · amber = watch · green = fine · grey = no data.*/
+  /* These are the ONLY meanings these hues carry anywhere in the app   */
+  /* (status chips, tiles, cluster badges, the verdict). Band palettes  */
+  /* follow the same direction; never reuse these hues decoratively.    */
+  /* ------------------------------------------------------------------ */
+  --status-ok:        #16a34a;   /* green  600 */
+  --status-ok-bg:     #dcfce7;   /* green  100 */
+  --status-warn:      #c2410c;   /* amber  700 (text on warn-bg)        */
+  --status-warn-bg:   #ffedd5;   /* amber  100 */
+  --status-critical:  #b91c1c;   /* red    700 */
+  --status-critical-bg: #fee2e2; /* red    100 */
+  --status-neutral:   #6b7280;   /* gray   500 */
+  --status-neutral-bg:#f3f4f6;   /* gray   100 */
 }

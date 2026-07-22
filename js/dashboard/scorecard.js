@@ -31,13 +31,13 @@
       'background:rgba(0,0,0,.06)">' + segs + '</span>';
   }
 
+  // Tri-state status chip (COLOUR CONTRACT): green ok · amber warn · red critical.
   function chip(vm) {
-    var warn = vm.statusKind === 'warn';
-    var cls = warn
-      ? 'bg-amber-100 text-amber-700'
-      : 'bg-brand-100 text-brand-700';
-    return '<span class="scorecard-chip inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide ' +
-      cls + '">' + esc(vm.statusLabel) + '</span>';
+    var cls = vm.statusKind === 'critical' ? 'scorecard-chip--critical'
+      : vm.statusKind === 'warn' ? 'scorecard-chip--warn'
+      : 'scorecard-chip--ok';
+    return '<span class="scorecard-chip ' + cls + ' inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide">' +
+      esc(vm.statusLabel) + '</span>';
   }
 
   // Full "big" card for the Home scorecard grid.

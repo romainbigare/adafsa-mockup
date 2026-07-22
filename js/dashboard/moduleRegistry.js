@@ -29,27 +29,30 @@
   // Each carries { key, label, icon, bands, valueOf(f), format(v) } so the
   // generic modules.js helpers accept them directly.
 
+  // `sev` (attention severity, 0=fine..worse) — see modules.js. Structures is
+  // categorical with no risk axis, so every tier is sev 0 (no "critical" state).
+
   // Crop Monitoring — cultivated fraction of the farm (0..100%).
   var CROP_BANDS = [
-    { label: 'Cultivated',        range: '≥ 66%',   color: '#1a9850', min: 66,        contains: function (v) { return v >= 66; } },
-    { label: 'Partially Fallow',  range: '33–66%',  color: '#fee08b', min: 33,        contains: function (v) { return v >= 33 && v < 66; } },
-    { label: 'Fallow',            range: '< 33%',   color: '#d9a441', min: -Infinity, contains: function (v) { return v < 33; } }
+    { label: 'Cultivated',        range: '≥ 66%',   color: '#1a9850', min: 66,        sev: 0, contains: function (v) { return v >= 66; } },
+    { label: 'Partially Fallow',  range: '33–66%',  color: '#fee08b', min: 33,        sev: 1, contains: function (v) { return v >= 33 && v < 66; } },
+    { label: 'Fallow',            range: '< 33%',   color: '#d9a441', min: -Infinity, sev: 2, contains: function (v) { return v < 33; } }
   ];
 
   // Palms & Fruit Trees — canopy-health index (NDVI-like, 0..100).
   var CANOPY_BANDS = [
-    { label: 'Healthy',        range: '≥ 80',  color: '#1a9850', min: 80,        contains: function (v) { return v >= 80; } },
-    { label: 'Fair',           range: '65–79', color: '#91cf60', min: 65,        contains: function (v) { return v >= 65 && v < 80; } },
-    { label: 'Stressed',       range: '50–64', color: '#fee08b', min: 50,        contains: function (v) { return v >= 50 && v < 65; } },
-    { label: 'Severe Stress',  range: '< 50',  color: '#d73027', min: -Infinity, contains: function (v) { return v < 50; } }
+    { label: 'Healthy',        range: '≥ 80',  color: '#1a9850', min: 80,        sev: 0, contains: function (v) { return v >= 80; } },
+    { label: 'Fair',           range: '65–79', color: '#91cf60', min: 65,        sev: 1, contains: function (v) { return v >= 65 && v < 80; } },
+    { label: 'Stressed',       range: '50–64', color: '#fee08b', min: 50,        sev: 2, contains: function (v) { return v >= 50 && v < 65; } },
+    { label: 'Severe Stress',  range: '< 50',  color: '#d73027', min: -Infinity, sev: 3, contains: function (v) { return v < 50; } }
   ];
 
   // Structures — land-use tier (categorical; value is the tier index 0..3).
   var TIER_BANDS = [
-    { label: 'Open Agriculture', range: 'open',       color: '#78c679', min: 0, contains: function (v) { return v === 0; } },
-    { label: 'Barren Land',      range: 'barren',     color: '#f0e68c', min: 1, contains: function (v) { return v === 1; } },
-    { label: 'Protected',        range: 'protected',  color: '#41ab5d', min: 2, contains: function (v) { return v === 2; } },
-    { label: 'Structures',       range: 'structures', color: '#fc8d59', min: 3, contains: function (v) { return v === 3; } }
+    { label: 'Open Agriculture', range: 'open',       color: '#78c679', min: 0, sev: 0, contains: function (v) { return v === 0; } },
+    { label: 'Barren Land',      range: 'barren',     color: '#f0e68c', min: 1, sev: 0, contains: function (v) { return v === 1; } },
+    { label: 'Protected',        range: 'protected',  color: '#41ab5d', min: 2, sev: 0, contains: function (v) { return v === 2; } },
+    { label: 'Structures',       range: 'structures', color: '#fc8d59', min: 3, sev: 0, contains: function (v) { return v === 3; } }
   ];
 
   var cropCore = {
@@ -61,7 +64,9 @@
     key: 'palms', label: 'Palms & Fruit Trees', icon: 'park', bands: CANOPY_BANDS,
     // Only farms that actually carry trees get a canopy score.
     valueOf: function (f) { return (f._farm && f._farm.trees > 0 && f._farm.canopy != null) ? f._farm.canopy * 100 : null; },
-    format: function (v) { return (v / 100).toFixed(2); }
+    // Canopy health is a 0–100 score — display it on that scale everywhere so a
+    // farm's value ("50") sits in the same space as its band range ("50–64").
+    format: function (v) { return String(Math.round(v)); }
   };
   var structuresCore = {
     key: 'structures', label: 'Structures', icon: 'home_work', bands: TIER_BANDS,
@@ -144,7 +149,7 @@
           kpi('Date Palms', fmtInt(palms)),
           kpi("Cultivars ID'd", String(Object.keys(cultivars).length)),
           kpi('Canopy Stress', stressPct.toFixed(1) + '%', stressPct > 0),
-          kpi('Avg Health', mean(scored) ? (mean(scored) / 100).toFixed(2) : '—')
+          kpi('Avg Health', mean(scored) ? String(Math.round(mean(scored))) : '—')
         ];
       },
       rollup: function (fs) {
@@ -186,9 +191,13 @@
         ];
       },
       rollup: function (fs) {
-        var m = M.byKey('ier'); var critical = countBand(m, fs, 'Critical') + countBand(m, fs, 'Poor');
-        return { headline: fmtInt(critical) + ' farms critical',
-          status: critical > 0 ? { label: 'Needs review', kind: 'warn' } : { label: 'On Track', kind: 'ok' } };
+        // The headline number and its label MUST describe the same set. This is
+        // "Poor + Critical", so it says "poor or worse" — never "critical" (the
+        // KPI strip keeps a separate, smaller Critical-only tile).
+        var m = M.byKey('ier');
+        var poorOrWorse = countBand(m, fs, 'Critical') + countBand(m, fs, 'Poor');
+        return { headline: fmtInt(poorOrWorse) + ' farms poor or worse',
+          status: poorOrWorse > 0 ? { label: 'Needs review', kind: 'warn' } : { label: 'On Track', kind: 'ok' } };
       }
     },
     {
@@ -234,11 +243,14 @@
   // plus the product metadata above.
   var MODULES = DESCRIPTORS.map(function (d) {
     var core = d.core;
+    var worstSev = 0;
+    core.bands.forEach(function (b) { if ((b.sev || 0) > worstSev) worstSev = b.sev || 0; });
     return {
       key: core.key, label: core.label, shortLabel: d.short, icon: core.icon,
       feePct: d.feePct, hero: !!d.hero,
       bands: core.bands, valueOf: core.valueOf, format: core.format,
-      severity: d.severity, kpis: d.kpis, rollup: d.rollup
+      severity: d.severity, kpis: d.kpis, rollup: d.rollup,
+      worstSev: worstSev
     };
   });
 
@@ -249,19 +261,57 @@
   function colourOf(module, feature) { return M.colorOf(module, feature); }
   function bandOf(module, feature) { return M.bandOf(module, feature); }
 
+  // ---- Region severity (the COLOUR CONTRACT, roll-up side) -------------------
+  // A module escalates from 'warn' to 'critical' when a meaningful share of its
+  // scored farms fall in its WORST band(s). Tunable single knob:
+  var CRITICAL_SHARE = 0.10;   // ≥10% of scored farms in the worst band -> critical
+
+  // Labels of the worst (highest-severity) band(s) of a module — the ones that
+  // count as "critical". Empty for categorical modules (worstSev === 0).
+  function worstBandLabels(module) {
+    if (!module || !module.worstSev) return [];
+    return module.bands.filter(function (b) { return (b.sev || 0) === module.worstSev; })
+      .map(function (b) { return b.label; });
+  }
+
+  // How many features sit in the module's worst band(s) — powers the red cluster
+  // badge and the region status. 0 for categorical modules.
+  function criticalCountOf(module, features) {
+    var labels = worstBandLabels(module);
+    if (!labels.length) return 0;
+    var counts = M.bandCounts(module, features);
+    var n = 0;
+    labels.forEach(function (l) { n += counts[l] || 0; });
+    return n;
+  }
+
+  // The tri-state region status kind for a module: 'ok' | 'warn' | 'critical'.
+  // Never downgrades a roll-up 'ok'; upgrades 'warn' to 'critical' when the
+  // worst band holds ≥ CRITICAL_SHARE of scored farms.
+  function statusKindOf(module, features) {
+    var base = module.rollup(features).status.kind;   // 'ok' | 'warn'
+    if (base === 'ok') return 'ok';
+    var scored = values(module, features).length;
+    var crit = criticalCountOf(module, features);
+    return (scored && crit / scored >= CRITICAL_SHARE) ? 'critical' : 'warn';
+  }
+
   // Full legend rows (label + colour + range) for a module.
   function legend(module) {
     return module.bands.map(function (b) { return { label: b.label, color: b.color, range: b.range }; });
   }
 
   // Scorecard view-model (consumed by scorecard.js). Pure data, no DOM.
+  // statusKind is the tri-state ('ok'|'warn'|'critical') so a calm Situation
+  // screen can make genuine problems glow; criticalCount feeds the verdict.
   function cardModel(module, features) {
     var r = module.rollup(features);
     return {
       key: module.key, label: module.label, shortLabel: module.shortLabel,
       icon: module.icon, feePct: module.feePct, hero: module.hero,
       headline: r.headline,
-      statusLabel: r.status.label, statusKind: r.status.kind,
+      statusLabel: r.status.label, statusKind: statusKindOf(module, features),
+      criticalCount: criticalCountOf(module, features),
       bands: bandShares(module, features)
     };
   }
@@ -282,6 +332,11 @@
     bandShares: bandShares,
     cardModel: cardModel,
     regionRollups: regionRollups,
+    // severity / colour-contract helpers
+    worstBandLabels: worstBandLabels,
+    criticalCountOf: criticalCountOf,
+    statusKindOf: statusKindOf,
+    CRITICAL_SHARE: CRITICAL_SHARE,
     // exposed for tests / reuse
     cores: { crop: cropCore, palms: palmsCore, structures: structuresCore }
   };

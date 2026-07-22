@@ -52,6 +52,30 @@
     return best || NEUTRAL;
   }
 
+  // How many members of a cluster are in the active module's WORST band —
+  // the "N need attention" count. 0 when no risk module is active (taxonomy
+  // views, categorical Structures). This is how problems survive aggregation:
+  // the bubble keeps its majority colour, a red badge carries the alarm.
+  function clusterCriticalCount(state, markers) {
+    if (!state.activeModule) return 0;
+    var reg = W.dashboard.moduleRegistry;
+    var m = reg && reg.byKey(state.activeModule);
+    if (!m || !reg.criticalCountOf) return 0;
+    var refs = [];
+    for (var i = 0; i < markers.length; i++) if (markers[i]._featureRef) refs.push(markers[i]._featureRef);
+    return reg.criticalCountOf(m, refs);
+  }
+
+  // Single-farm marker icon: a band-coloured dot in the cluster visual language
+  // (never Leaflet's default blue pin). Colour tracks the active module / taxonomy.
+  function dotIcon(color) {
+    return L.divIcon({
+      className: '',
+      html: '<div class="farm-dot" style="background:' + (color || NEUTRAL) + '"></div>',
+      iconSize: [14, 14], iconAnchor: [7, 7]
+    });
+  }
+
   // Creates the cluster layer for the zoomed-out view (centroid markers with
   // counts). Each cluster is coloured by the majority value of its members
   // (see majorityColor) so the zoomed-out map reflects the same taxonomy
@@ -93,11 +117,16 @@
         // Colour the cluster bubble by the majority value of its members.
         var bgColor = majorityColor(state, markers);
 
+        // Red "N need attention" badge — worst-band members surface through the
+        // majority colour so problems are never hidden by aggregation.
+        var crit = clusterCriticalCount(state, markers);
+        var badge = crit > 0 ? '<span class="cluster-badge">' + crit + '</span>' : '';
+
         // Ghost a cluster whose members are all outside the current selection.
         var ghost = state.ghostSet;
         var ghostCls = (ghost && !markers.some(function (m) { return m._featureRef && ghost.has(m._featureRef); })) ? ' cluster-ghosted' : '';
 
-        return L.divIcon({ html: '<div class="cluster-icon ' + cls + ghostCls + '" style="background:' + bgColor + '">' + count + '</div>', className: '', iconSize: [40, 40] });
+        return L.divIcon({ html: '<div class="cluster-icon ' + cls + ghostCls + '" style="background:' + bgColor + '">' + count + badge + '</div>', className: '', iconSize: [40, 40] });
       }
     });
     state.clusterActive = false;
@@ -133,7 +162,7 @@
     });
 
     var bounds = L.featureGroup(polys).getBounds();
-    var bar = document.getElementById('live-bar');
+    var bar = document.getElementById('module-bar') || document.getElementById('live-bar');
     var bottomPad = (bar && !bar.classList.contains('collapsed')) ? bar.offsetHeight + 24 : 40;
     state.map.fitBounds(bounds, {
       maxZoom: 17,
@@ -157,7 +186,7 @@
       if (members[i].centroid) pts.push(members[i].centroid);
     }
     if (!pts.length) return;
-    var bar = document.getElementById('live-bar');
+    var bar = document.getElementById('module-bar') || document.getElementById('live-bar');
     var bottomPad = (bar && !bar.classList.contains('collapsed')) ? bar.offsetHeight + 24 : 40;
     state.map.fitBounds(L.latLngBounds(pts), {
       maxZoom: 15,
@@ -272,7 +301,8 @@
 
       // Add centroid marker to cluster group
       if (centroid) {
-        var marker = L.marker(centroid);
+        var marker = L.marker(centroid, { icon: dotIcon(featureColor(state, featureData)) });
+        featureData._marker = marker;                 // back-ref for off-map pruning
         marker.bindPopup(
           '<div style="font-family:Inter,sans-serif;min-width:140px">' +
             '<b style="color:#111827">' + type + '</b><br>' +
@@ -343,6 +373,14 @@
       })(type);
     }
 
+    // Recolour single-farm dots too (lone markers shown when unclustered) so a
+    // solitary critical farm still reads red, matching its polygon + cluster badge.
+    for (var t in state.markersByType) {
+      state.markersByType[t].forEach(function (m) {
+        if (m._featureRef && m.setIcon) m.setIcon(dotIcon(featureColor(state, m._featureRef)));
+      });
+    }
+
     // Force a full cluster rebuild so iconCreateFunction reruns with the
     // current colours (and ghost state).
     rebuildClusters(state);
@@ -392,6 +430,64 @@
     applyGhost(state);
   }
 
+  // Mock-data credibility: the placeholder plots carry a few duplicate fids
+  // (two "#53"s). Reassign collisions to fresh ids above the current max so no
+  // table or dossier ever shows the same farm number twice. Runs before the
+  // metric prepare() passes so the reassigned id seeds those metrics.
+  function dedupeFids(features) {
+    var seen = {}, maxFid = 0, i;
+    for (i = 0; i < features.length; i++) {
+      var v = features[i].fid;
+      if (typeof v === 'number' && v > maxFid) maxFid = v;
+    }
+    var next = maxFid + 1;
+    for (i = 0; i < features.length; i++) {
+      var f = features[i];
+      if (seen[f.fid]) f.fid = next++;
+      seen[f.fid] = true;
+    }
+  }
+
+  // Never draw a farm marker in the sea. A handful of placeholder centroids fall
+  // well outside the region; flag them (_offMap) and drop only their map marker —
+  // the table row stays. Bounds are derived from the 2nd/98th percentile of all
+  // centroids (+ generous pad), so nothing region-hardcoded.
+  function pruneOffMapMarkers(state) {
+    var fs = state.farmFeatures;
+    if (!fs || fs.length < 25) return;
+    var lats = [], lngs = [], i;
+    for (i = 0; i < fs.length; i++) {
+      if (fs[i].centroid) { lats.push(fs[i].centroid[0]); lngs.push(fs[i].centroid[1]); }
+    }
+    lats.sort(function (a, b) { return a - b; });
+    lngs.sort(function (a, b) { return a - b; });
+    function q(arr, p) { return arr[Math.min(arr.length - 1, Math.floor(arr.length * p))]; }
+    var latLo = q(lats, 0.02), latHi = q(lats, 0.98), lngLo = q(lngs, 0.02), lngHi = q(lngs, 0.98);
+    var padLat = (latHi - latLo) * 0.5 || 0.1, padLng = (lngHi - lngLo) * 0.5 || 0.1;
+    var b = { latLo: latLo - padLat, latHi: latHi + padLat, lngLo: lngLo - padLng, lngHi: lngHi + padLng };
+
+    var offByType = {}, pruned = 0;
+    for (i = 0; i < fs.length; i++) {
+      var f = fs[i], c = f.centroid;
+      if (!c) continue;
+      if (c[0] < b.latLo || c[0] > b.latHi || c[1] < b.lngLo || c[1] > b.lngHi) {
+        f._offMap = true;
+        pruned++;
+        if (f._marker) {
+          if (state.clusterGroup) state.clusterGroup.removeLayer(f._marker);
+          (offByType[f.type] = offByType[f.type] || []).push(f._marker);
+        }
+      }
+    }
+    // Drop pruned markers from the per-type arrays so updateLayerMode never re-adds them.
+    Object.keys(offByType).forEach(function (type) {
+      var drop = offByType[type];
+      if (!state.markersByType[type]) return;
+      state.markersByType[type] = state.markersByType[type].filter(function (m) { return drop.indexOf(m) === -1; });
+    });
+    if (pruned) console.warn('[plotsLayer] pruned ' + pruned + ' off-map farm marker(s) outside the region bounds');
+  }
+
   function finishLoading(state, total) {
     var allLayers = [];
     Object.keys(state.layerGroups).forEach(function (k) {
@@ -406,6 +502,10 @@
     if (state.currentDataset === 'plots') {
       state.farmFeatures = state.allFeatures.slice();
       state.totalFarmCount = state.totalFarms;
+      // Credibility fixes on the placeholder data, before any metric seeding:
+      // unique farm ids, and no markers stranded in the sea.
+      dedupeFids(state.farmFeatures);
+      pruneOffMapMarkers(state);
       // Precompute the per-farm module values (IER / yield deviation / water)
       // once, on the same objects the map + module panels read from.
       W.dashboard.modules.prepare(state.farmFeatures);

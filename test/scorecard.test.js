@@ -46,9 +46,11 @@ check("includes headline, fee, label and links to the module route", function ()
   assert.ok(html.indexOf("Palms &amp; Fruit Trees") !== -1, "label escaped + present");
   assert.ok(html.indexOf('href="#/m/palms"') !== -1, "routes to module page");
 });
-check("warn status uses the amber chip, ok status uses the brand chip", function () {
-  assert.ok(sc.cardHtml(vmWarn).indexOf("amber") !== -1, "warn → amber");
-  assert.ok(sc.cardHtml(vmOk).indexOf("brand") !== -1, "ok → brand");
+check("status chip is tri-state: ok / warn / critical (COLOUR CONTRACT)", function () {
+  assert.ok(sc.cardHtml(vmOk).indexOf("scorecard-chip--ok") !== -1, "ok → ok chip");
+  assert.ok(sc.cardHtml(vmWarn).indexOf("scorecard-chip--warn") !== -1, "warn → warn chip");
+  var vmCrit = Object.assign({}, vmWarn, { statusKind: "critical" });
+  assert.ok(sc.cardHtml(vmCrit).indexOf("scorecard-chip--critical") !== -1, "critical → critical chip");
 });
 check("hero module gets the emphasised border", function () {
   assert.ok(sc.cardHtml(vmWarn).indexOf("border-brand-500") !== -1, "hero border");

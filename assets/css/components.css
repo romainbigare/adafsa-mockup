@@ -269,6 +269,30 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
 /* Scorecard cards (F3) hover affordance. */
 .scorecard-card { text-decoration: none; }
 
+/* Tri-state status chip — the COLOUR CONTRACT (see tokens.css). */
+.scorecard-chip--ok       { background: var(--status-ok-bg);       color: var(--status-ok); }
+.scorecard-chip--warn     { background: var(--status-warn-bg);     color: var(--status-warn); }
+.scorecard-chip--critical { background: var(--status-critical-bg); color: var(--status-critical); }
+
+/* Cluster "N need attention" badge — a small red count pinned to the bubble so
+   critical farms survive aggregation instead of being hidden by majority colour. */
+.cluster-icon { position: relative; }
+.cluster-badge {
+  position: absolute; top: -5px; inset-inline-end: -5px;
+  min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px;
+  background: var(--status-critical); color: #fff; border: 1.5px solid #fff;
+  font: 700 10px/13px "JetBrains Mono", monospace; text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,.35);
+}
+
+/* Single-farm marker (a lone, unclustered farm). A small band-coloured dot in
+   the same visual language as clusters — never Leaflet's default blue pin. */
+.farm-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.95);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+}
+
 /* --------------------------------------------------------------------------
    Proposal A2 — the region map framed at the top of Home (module routes use
    the default full-bleed #map). !important beats Tailwind's inset-0/h-full.

@@ -30,30 +30,35 @@
   // Bands within a module are disjoint and complete, so classification returns
   // the first band whose predicate matches.
 
+  // `sev` = attention severity, 0 (fine) .. higher (worse). Used by the region
+  // status roll-up (which band counts as "critical") and by the cluster badge
+  // (how many members fall in the worst band). It is NOT the array order — Water
+  // and Yield have "fine" bands after "bad" ones — so it is stated explicitly.
+
   // Module 4 — Irrigation Efficiency (IER score 0..100).
   var IER_BANDS = [
-    { label: 'Excellent',  range: '90–100', color: '#1a9850', min: 90,  contains: function (v) { return v >= 90; } },
-    { label: 'Good',       range: '80–89',  color: '#91cf60', min: 80,  contains: function (v) { return v >= 80 && v < 90; } },
-    { label: 'Acceptable', range: '65–79',  color: '#fee08b', min: 65,  contains: function (v) { return v >= 65 && v < 80; } },
-    { label: 'Poor',       range: '50–64',  color: '#fc8d59', min: 50,  contains: function (v) { return v >= 50 && v < 65; } },
-    { label: 'Critical',   range: '<50',    color: '#d73027', min: -Infinity, contains: function (v) { return v < 50; } }
+    { label: 'Excellent',  range: '90–100', color: '#1a9850', min: 90,  sev: 0, contains: function (v) { return v >= 90; } },
+    { label: 'Good',       range: '80–89',  color: '#91cf60', min: 80,  sev: 1, contains: function (v) { return v >= 80 && v < 90; } },
+    { label: 'Acceptable', range: '65–79',  color: '#fee08b', min: 65,  sev: 2, contains: function (v) { return v >= 65 && v < 80; } },
+    { label: 'Poor',       range: '50–64',  color: '#fc8d59', min: 50,  sev: 3, contains: function (v) { return v >= 50 && v < 65; } },
+    { label: 'Critical',   range: '<50',    color: '#d73027', min: -Infinity, sev: 4, contains: function (v) { return v < 50; } }
   ];
 
   // Module 5 — Yield Forecast (deviation %, vs the farm's sub-zone average).
   var YIELD_BANDS = [
-    { label: 'Above Expected',                range: '≥ +10%',        color: '#1a9850', min: 10,  contains: function (v) { return v >= 10; } },
-    { label: 'On Track',                      range: '–10% to +10%',  color: '#a6d96a', min: -10, contains: function (v) { return v >= -10 && v < 10; } },
-    { label: 'Below Expected',                range: '–25% to –10%',  color: '#fdae61', min: -25, contains: function (v) { return v >= -25 && v < -10; } },
-    { label: 'Significantly Underperforming', range: '< –25%',        color: '#d73027', min: -Infinity, contains: function (v) { return v < -25; } }
+    { label: 'Above Expected',                range: '≥ +10%',        color: '#1a9850', min: 10,  sev: 0, contains: function (v) { return v >= 10; } },
+    { label: 'On Track',                      range: '–10% to +10%',  color: '#a6d96a', min: -10, sev: 0, contains: function (v) { return v >= -10 && v < 10; } },
+    { label: 'Below Expected',                range: '–25% to –10%',  color: '#fdae61', min: -25, sev: 2, contains: function (v) { return v >= -25 && v < -10; } },
+    { label: 'Significantly Underperforming', range: '< –25%',        color: '#d73027', min: -Infinity, sev: 3, contains: function (v) { return v < -25; } }
   ];
 
   // Module 6 — Crop Water Allocation (water use %, vs modelled demand).
   // Anchored on the over-allocation threshold: Over-Allocated is > 125%.
   var WATER_BANDS = [
-    { label: 'Water-Stressed', range: '< 80%',    color: '#e08214', min: -Infinity, contains: function (v) { return v < 80; } },
-    { label: 'Efficient',      range: '80–105%',  color: '#1a9850', min: 80,  contains: function (v) { return v >= 80 && v < 105; } },
-    { label: 'Mild Excess',    range: '105–125%', color: '#fee08b', min: 105, contains: function (v) { return v >= 105 && v <= 125; } },
-    { label: 'Over-Allocated', range: '> 125%',   color: '#b30000', min: 125, contains: function (v) { return v > 125; } }
+    { label: 'Water-Stressed', range: '< 80%',    color: '#e08214', min: -Infinity, sev: 2, contains: function (v) { return v < 80; } },
+    { label: 'Efficient',      range: '80–105%',  color: '#1a9850', min: 80,  sev: 0, contains: function (v) { return v >= 80 && v < 105; } },
+    { label: 'Mild Excess',    range: '105–125%', color: '#fee08b', min: 105, sev: 1, contains: function (v) { return v >= 105 && v <= 125; } },
+    { label: 'Over-Allocated', range: '> 125%',   color: '#b30000', min: 125, sev: 3, contains: function (v) { return v > 125; } }
   ];
 
   // ---- Module registry ------------------------------------------------------

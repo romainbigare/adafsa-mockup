@@ -15,12 +15,30 @@
   ];
   var CROPS = ['Date Palm', 'Alfalfa', 'Rhodes Grass', 'Tomato', 'Cucumber', 'Wheat'];
 
+  // Feed credibility: never repeat the previous template two items in a row, and
+  // give each item a distinct, stepped timestamp so a seeded backlog doesn't read
+  // as five identical "Satellite scan completed" lines at the same second.
+  var _lastIdx = -1;
+  var _clock = null;   // virtual "now" that advances a few seconds each item
+
+  function pickTemplateIdx() {
+    if (NEWS_TEMPLATES.length < 2) return 0;
+    var idx;
+    do { idx = Math.floor(Math.random() * NEWS_TEMPLATES.length); } while (idx === _lastIdx);
+    _lastIdx = idx;
+    return idx;
+  }
+
   function generateNewsItem() {
-    var tpl = NEWS_TEMPLATES[Math.floor(Math.random() * NEWS_TEMPLATES.length)];
+    var tpl = NEWS_TEMPLATES[pickTemplateIdx()];
     var farm = Math.floor(Math.random() * 5320 + 1);
     var crop = CROPS[Math.floor(Math.random() * CROPS.length)];
-    var now = new Date();
-    var time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    // Seed the backlog ~1 min in the past, then step forward 4–9s per item so
+    // successive items carry increasing, non-identical times.
+    if (_clock == null) _clock = Date.now() - 60000;
+    _clock += 4000 + Math.floor(Math.random() * 5000);
+    var time = new Date(Math.min(_clock, Date.now()))
+      .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     return {
       icon: tpl.icon,
       color: tpl.color,
