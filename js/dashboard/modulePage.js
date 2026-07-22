@@ -134,9 +134,10 @@
     var tax = W.dashboard.taxonomyLayers;
     var view = tax.viewForModule(CUR.key);
     var layersOnly = tax.isLayersOnly(CUR.key);
-    // Legend sits below the toggle for "both" modules; otherwise takes its place.
+    // Legend sits below the toggle for "both" modules; otherwise takes its place,
+    // clear of the KPI strip above it (strip bottom sits at ~81.5px).
     var legend = document.getElementById('module-legend');
-    if (legend) legend.style.top = (view && !layersOnly) ? '120px' : '74px';
+    if (legend) legend.style.top = (view && !layersOnly) ? '120px' : '92px';
     // Layers-only modules (Land Use & Structures) have no analysis mode → no toggle.
     if (!view || layersOnly) { el.innerHTML = ''; el.classList.add('hidden'); return; }
     el.classList.remove('hidden');
