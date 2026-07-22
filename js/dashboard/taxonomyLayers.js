@@ -37,6 +37,12 @@
   var TITLE_FOR_VIEW = { landuse: 'LAND-USE LAYERS', crops: 'CROP LAYERS', trees: 'TREE LAYERS' };
   function viewForModule(key) { return VIEW_FOR_MODULE[key] || null; }
 
+  // Modules with NO band-analysis of their own — the taxonomy browser IS the
+  // module. Land Use & Structures is just the land-use classification, so it
+  // opens straight into layers with no Analysis/Map-layers toggle.
+  var LAYERS_ONLY = { structures: true };
+  function isLayersOnly(key) { return !!LAYERS_ONLY[key]; }
+
   function treeFor(view) {
     var tax = W.dashboard.taxonomy;
     return view === 'landuse' ? tax.LAND_USE_TREE
@@ -358,6 +364,7 @@
     toggle: toggle,
     isOpen: panelOpen,
     viewForModule: viewForModule,
+    isLayersOnly: isLayersOnly,
     // Pure helpers — exposed for tests / reuse (see test/taxonomyLayers.test.js).
     datasetFor: datasetFor,
     ownTypes: ownTypes,

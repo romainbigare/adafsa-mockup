@@ -131,9 +131,14 @@
     var sel = document.getElementById('colour-by');
     if (!sel) return;
     if (!sel.options.length) {
-      sel.innerHTML = reg.MODULES.map(function (m) {
+      // Overall criticality (composite) leads — the map answers "which farms
+      // need attention, across everything?" — then the six single-module lenses.
+      var opts = '<option value="composite">' + reg.COMPOSITE.label + '</option>';
+      opts += '<option disabled>──────────</option>';
+      opts += reg.MODULES.map(function (m) {
         return '<option value="' + m.key + '">' + m.label + '</option>';
       }).join('');
+      sel.innerHTML = opts;
     }
     sel.value = colourBy;
     if (!wired) {
@@ -152,8 +157,8 @@
     // Verdict.
     renderVerdict(state, verdict(ms));
 
-    // Default "Colour by" = today's worst problem (chosen once, then sticky).
-    if (colourBy == null) colourBy = pickDefaultModule(ms);
+    // Default "Colour by" = the composite criticality lens (no arbitrary module).
+    if (colourBy == null) colourBy = 'composite';
     wireColourBy(state);
     applyColour(state);
   }

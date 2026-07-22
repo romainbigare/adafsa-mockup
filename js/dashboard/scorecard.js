@@ -71,10 +71,15 @@
       '</a>';
   }
 
-  // "Status" tile for the Situation screen. Answers OK/not-OK and is a door; the
-  // border/chip carry the state (COLOUR CONTRACT) so a healthy region stays quiet
-  // and problems glow. A subtle band strip at the foot fills the card and adds a
-  // glanceable distribution without turning the landing into an analysis view.
+  // Plain-language verdict word per state — the tile's headline answer.
+  function statusWord(kind) {
+    return kind === 'critical' ? 'Needs attention' : kind === 'warn' ? 'Watch' : 'On track';
+  }
+
+  // "Status" tile for the Situation screen. Leads with a clear status WORD (the
+  // answer), then a plain supporting line (the evidence), then a band strip. The
+  // border + word colour carry the state (COLOUR CONTRACT) so a healthy region
+  // stays quiet and problems glow. Clicking opens the module.
   function statusCard(vm) {
     var kindCls = vm.statusKind === 'critical' ? 'status-tile--critical'
       : vm.statusKind === 'warn' ? 'status-tile--warn' : 'status-tile--ok';
@@ -83,10 +88,14 @@
         'class="status-tile ' + kindCls + (vm.hero ? ' status-tile--hero' : '') + ' group block">' +
         '<div class="flex items-start justify-between gap-2">' +
           '<span class="status-tile-name">' + esc(vm.label) + '</span>' +
-          '<span class="status-tile-fee" title="Share of contract fee">' + vm.feePct + '%</span>' +
+          '<span class="status-tile-fee" title="Share of contract value">' + vm.feePct + '%</span>' +
         '</div>' +
-        '<div class="status-tile-headline">' + esc(vm.headline) + '</div>' +
-        '<div class="status-tile-bottom">' + chip(vm) +
+        '<div class="status-tile-status">' +
+          '<span class="status-tile-dot"></span>' +
+          '<span class="status-tile-word">' + statusWord(vm.statusKind) + '</span>' +
+        '</div>' +
+        '<div class="status-tile-support">' + esc(vm.summary || vm.headline) + '</div>' +
+        '<div class="status-tile-bottom">' +
           '<div class="status-tile-strip">' + bandStrip(vm.bands, 6) + '</div>' +
         '</div>' +
       '</a>';

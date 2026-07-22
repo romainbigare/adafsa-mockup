@@ -69,7 +69,7 @@
     format: function (v) { return String(Math.round(v)); }
   };
   var structuresCore = {
-    key: 'structures', label: 'Structures', icon: 'home_work', bands: TIER_BANDS,
+    key: 'structures', label: 'Land Use & Structures', icon: 'home_work', bands: TIER_BANDS,
     valueOf: function (f) { return f._farm ? f._farm.tierIdx : null; },
     format: function (v) { var b = TIER_BANDS[Math.round(v)]; return b ? b.label : '—'; }
   };
@@ -131,6 +131,11 @@
         var fallow = countBand(cropCore, fs, 'Fallow');
         return { headline: fmtInt(cultivated) + ' dun cultivated',
           status: fallow > 0 ? { label: fallow + ' fallow', kind: 'warn' } : { label: 'On Track', kind: 'ok' } };
+      },
+      summary: function (fs) {
+        var fallow = countBand(cropCore, fs, 'Fallow');
+        var cultivated = sum(fs, function (f) { return f._farm ? f.area * f._farm.cultivatedFrac : 0; });
+        return fallow > 0 ? fmtInt(fallow) + ' farms fully fallow' : fmtInt(cultivated) + ' dunums cultivated';
       }
     },
     {
@@ -159,10 +164,17 @@
         var stressPct = scored.length ? (stress / scored.length * 100) : 0;
         return { headline: fmtCompact(trees) + ' trees',
           status: stressPct > 0 ? { label: stressPct.toFixed(1) + '% canopy stress', kind: 'warn' } : { label: 'Healthy', kind: 'ok' } };
+      },
+      summary: function (fs) {
+        var scored = values(palmsCore, fs);
+        var stress = countBand(palmsCore, fs, 'Stressed') + countBand(palmsCore, fs, 'Severe Stress');
+        var pct = scored.length ? (stress / scored.length * 100) : 0;
+        var trees = sum(fs, function (f) { return f._farm ? f._farm.trees : 0; });
+        return Math.round(pct) + '% canopy stress · ' + fmtCompact(trees) + ' trees';
       }
     },
     {
-      core: structuresCore, feePct: 21.0, short: 'Structures',
+      core: structuresCore, feePct: 21.0, short: 'Land Use',
       severity: function (f) { return f.area || 0; }, // no risk axis — rank by size
       kpis: function (fs) {
         return [
@@ -175,6 +187,10 @@
       rollup: function (fs) {
         var detected = countBand(structuresCore, fs, 'Structures') + countBand(structuresCore, fs, 'Protected');
         return { headline: fmtInt(detected) + ' built', status: { label: '4 tiers', kind: 'ok' } };
+      },
+      summary: function (fs) {
+        return fmtInt(countBand(structuresCore, fs, 'Open Agriculture')) + ' open-ag · ' +
+          fmtInt(countBand(structuresCore, fs, 'Structures')) + ' structures';
       }
     },
     {
@@ -198,6 +214,11 @@
         var poorOrWorse = countBand(m, fs, 'Critical') + countBand(m, fs, 'Poor');
         return { headline: fmtInt(poorOrWorse) + ' farms poor or worse',
           status: poorOrWorse > 0 ? { label: 'Needs review', kind: 'warn' } : { label: 'On Track', kind: 'ok' } };
+      },
+      summary: function (fs) {
+        var m = M.byKey('ier');
+        var crit = countBand(m, fs, 'Critical');
+        return fmtInt(crit) + ' critical · ' + fmtInt(crit + countBand(m, fs, 'Poor')) + ' poor or worse';
       }
     },
     {
@@ -215,7 +236,8 @@
       },
       rollup: function () {
         return { headline: 'baseline period', status: { label: 'Counts from M6', kind: 'ok' } };
-      }
+      },
+      summary: function () { return 'Baseline period — counts from month 6'; }
     },
     {
       core: M.byKey('water'), feePct: 9.4, short: 'Water',
@@ -234,6 +256,10 @@
         var m = M.byKey('water'); var over = countBand(m, fs, 'Over-Allocated');
         return { headline: fmtInt(over) + ' over-allocated',
           status: over > 0 ? { label: 'Flags', kind: 'warn' } : { label: 'Balanced', kind: 'ok' } };
+      },
+      summary: function (fs) {
+        var m = M.byKey('water');
+        return fmtInt(countBand(m, fs, 'Over-Allocated')) + ' farms over-allocated';
       }
     }
   ];
@@ -249,7 +275,7 @@
       key: core.key, label: core.label, shortLabel: d.short, icon: core.icon,
       feePct: d.feePct, hero: !!d.hero,
       bands: core.bands, valueOf: core.valueOf, format: core.format,
-      severity: d.severity, kpis: d.kpis, rollup: d.rollup,
+      severity: d.severity, kpis: d.kpis, rollup: d.rollup, summary: d.summary,
       worstSev: worstSev
     };
   });
@@ -257,9 +283,56 @@
   var BY_KEY = {};
   MODULES.forEach(function (m) { BY_KEY[m.key] = m; });
 
-  function byKey(k) { return BY_KEY[k] || null; }
   function colourOf(module, feature) { return M.colorOf(module, feature); }
   function bandOf(module, feature) { return M.bandOf(module, feature); }
+
+  // ---- Composite criticality (the Overview lens) ----------------------------
+  // One fee-weighted criticality score per farm, 0 (healthy on everything) .. 100
+  // (worst on everything). Each module's band severity is normalised by that
+  // module's own worst severity, weighted by contract share, and averaged over
+  // the modules that actually score the farm. This is the Overview map's default
+  // colouring — "how much does this farm need attention, across everything?" —
+  // so no single arbitrary module drives the landing; a per-module breakdown
+  // shows on hover. It plugs into every band helper because it is shaped like a
+  // module (bands + valueOf).
+  var COMPOSITE_BANDS = [
+    { label: 'Healthy',  range: '0–9',   color: '#1a9850', sev: 0, contains: function (v) { return v < 10; } },
+    { label: 'Watch',    range: '10–24', color: '#a6d96a', sev: 1, contains: function (v) { return v >= 10 && v < 25; } },
+    { label: 'Elevated', range: '25–44', color: '#fdae61', sev: 2, contains: function (v) { return v >= 25 && v < 45; } },
+    { label: 'Critical', range: '≥ 45',  color: '#d73027', sev: 3, contains: function (v) { return v >= 45; } }
+  ];
+  function compositeScore(feature) {
+    var total = 0, wsum = 0;
+    for (var i = 0; i < MODULES.length; i++) {
+      var m = MODULES[i];
+      var band = bandOf(m, feature);
+      if (!band || !m.worstSev) continue;               // unscored / categorical → no contribution
+      total += m.feePct * ((band.sev || 0) / m.worstSev);
+      wsum += m.feePct;
+    }
+    return wsum ? (total / wsum) * 100 : null;
+  }
+  var COMPOSITE = {
+    key: 'composite', label: 'Overall criticality', icon: 'warning', bands: COMPOSITE_BANDS,
+    valueOf: compositeScore, format: function (v) { return String(Math.round(v)); },
+    worstSev: 3
+  };
+
+  function byKey(k) { return BY_KEY[k] || (k === 'composite' ? COMPOSITE : null); }
+
+  // Per-farm module breakdown (for the map hover + the dossier): every module's
+  // band + formatted value, plus the composite. Pure data.
+  function farmBreakdown(feature) {
+    var rows = MODULES.map(function (m) {
+      var b = bandOf(m, feature);
+      var v = m.valueOf(feature);
+      return { key: m.key, label: m.label, band: b ? b.label : null, color: b ? b.color : UNKNOWN,
+        value: (v == null) ? null : m.format(v) };
+    });
+    var cb = bandOf(COMPOSITE, feature);
+    var cs = compositeScore(feature);
+    return { score: cs, band: cb ? cb.label : null, color: cb ? cb.color : UNKNOWN, rows: rows };
+  }
 
   // ---- Region severity (the COLOUR CONTRACT, roll-up side) -------------------
   // A module escalates from 'warn' to 'critical' when a meaningful share of its
@@ -311,6 +384,7 @@
       icon: module.icon, feePct: module.feePct, hero: module.hero,
       headline: r.headline,
       statusLabel: r.status.label, statusKind: statusKindOf(module, features),
+      summary: module.summary ? module.summary(features) : r.headline,
       criticalCount: criticalCountOf(module, features),
       bands: bandShares(module, features)
     };
@@ -337,6 +411,10 @@
     criticalCountOf: criticalCountOf,
     statusKindOf: statusKindOf,
     CRITICAL_SHARE: CRITICAL_SHARE,
+    // composite criticality (Overview lens) + per-farm breakdown
+    COMPOSITE: COMPOSITE,
+    compositeScore: compositeScore,
+    farmBreakdown: farmBreakdown,
     // exposed for tests / reuse
     cores: { crop: cropCore, palms: palmsCore, structures: structuresCore }
   };

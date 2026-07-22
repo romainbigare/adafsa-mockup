@@ -32,7 +32,7 @@
           links: [
             { id: "crop", label: "Crop Monitoring", icon: "grass", href: "index.html#/m/crop" },
             { id: "palms", label: "Palms & Fruit Trees", icon: "park", href: "index.html#/m/palms" },
-            { id: "structures", label: "Structures", icon: "home_work", href: "index.html#/m/structures" },
+            { id: "structures", label: "Land Use & Structures", icon: "home_work", href: "index.html#/m/structures" },
             { id: "ier", label: "Irrigation Efficiency", icon: "water_drop", href: "index.html#/m/ier" },
             { id: "yield", label: "Yield Forecast", icon: "agriculture", href: "index.html#/m/yield" },
             { id: "water", label: "Water Allocation", icon: "opacity", href: "index.html#/m/water" }

@@ -76,6 +76,29 @@
     });
   }
 
+  // Hover breakdown — the per-farm criticality story: the composite score/band
+  // up top, then every module's band + value. Built lazily on hover (metrics are
+  // ready by then) so it reflects the same registry numbers as everything else.
+  function farmTooltipHtml(ref) {
+    var reg = W.dashboard.moduleRegistry;
+    if (!reg || !ref || !reg.farmBreakdown) return '';
+    var bd = reg.farmBreakdown(ref);
+    var head = '<div class="ftt-head"><b>Farm #' + ref.fid + '</b>' +
+      (bd.band ? ' <span class="ftt-score" style="color:' + bd.color + '">' + bd.band + ' · ' + Math.round(bd.score) + '</span>' : '') +
+      '</div>';
+    var rows = bd.rows.map(function (r) {
+      // Categorical modules put the label in the band already — don't repeat it.
+      var val = (r.value != null && r.value !== r.band) ? ' · ' + r.value : '';
+      return '<div class="ftt-row">' +
+          '<span class="ftt-dot" style="background:' + r.color + '"></span>' +
+          '<span class="ftt-label">' + r.label + '</span>' +
+          '<span class="ftt-band">' + (r.band || 'no data') + val + '</span>' +
+        '</div>';
+    }).join('');
+    return '<div class="farm-tt-inner">' + head + rows + '</div>';
+  }
+  function tooltipFn(layer) { return farmTooltipHtml(layer._featureRef); }
+
   // Creates the cluster layer for the zoomed-out view (centroid markers with
   // counts). Each cluster is coloured by the majority value of its members
   // (see majorityColor) so the zoomed-out map reflects the same taxonomy
@@ -287,18 +310,10 @@
           color: featureColor(state, featureData), weight: 1, opacity: 0.8, fillOpacity: 0.35
         });
         poly._featureRef = featureData;
-        poly.bindPopup(
-          '<div style="font-family:Inter,sans-serif;min-width:160px">' +
-            '<b style="color:#111827">' + type + '</b><br>' +
-            '<span style="color:#6b7280;font-size:11px">Category: ' + category + '</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">Owner: ' + owner + '</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">ID: ' + fid + '</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">Area: ~' + area.toFixed(1) + ' dunums</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">Grade: ' + (rnd(fid * 7 + 13) * 4 + 1).toFixed(1) + '/5</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">Growth: ' + Math.round(rnd(fid * 7 + 26) * 85 + 10) + '%</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">Irrigation: ' + metrics.IRRIGATION_LABELS[Math.floor(rnd(fid * 7 + 39) * 4)] + '</span>' +
-          '</div>'
-        );
+        // Hover breakdown (only for farm boundaries; taxonomy parcels keep none).
+        if (state.currentDataset === 'plots') {
+          poly.bindTooltip(tooltipFn, { sticky: true, direction: 'top', className: 'farm-tt', opacity: 1 });
+        }
         state.layerGroups[type].addLayer(poly);
       }
 
@@ -306,15 +321,9 @@
       if (centroid) {
         var marker = L.marker(centroid, { icon: dotIcon(featureColor(state, featureData)) });
         featureData._marker = marker;                 // back-ref for off-map pruning
-        marker.bindPopup(
-          '<div style="font-family:Inter,sans-serif;min-width:140px">' +
-            '<b style="color:#111827">' + type + '</b><br>' +
-            '<span style="color:#6b7280;font-size:11px">Owner: ' + owner + '</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">Area: ~' + area.toFixed(1) + ' dunums</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">Grade: ' + (rnd(fid * 7 + 13) * 4 + 1).toFixed(1) + '/5</span><br>' +
-            '<span style="color:#6b7280;font-size:11px">Growth: ' + Math.round(rnd(fid * 7 + 26) * 85 + 10) + '%</span>' +
-          '</div>'
-        );
+        if (state.currentDataset === 'plots') {
+          marker.bindTooltip(tooltipFn, { sticky: true, direction: 'top', className: 'farm-tt', opacity: 1 });
+        }
         marker.featureType = type;
         marker._featureRef = featureData;
         state.markersByType[type].push(marker);

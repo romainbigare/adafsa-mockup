@@ -127,6 +127,7 @@ check("kpis() returns labelled values; rollup() a headline + status", function (
     assert.ok(vm.headline, m.key + " rollup has a headline");
     assert.ok(vm.statusKind === "ok" || vm.statusKind === "warn" || vm.statusKind === "critical", m.key + " status kind valid");
     assert.ok(typeof vm.criticalCount === "number", m.key + " card model carries a critical count");
+    assert.ok(typeof vm.summary === "string" && vm.summary.length, m.key + " card model carries a plain summary");
     assert.ok(Array.isArray(vm.bands), m.key + " card model has band shares");
   });
 });

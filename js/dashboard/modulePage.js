@@ -131,11 +131,14 @@
   function renderModeToggle(state) {
     var el = document.getElementById('module-modetoggle');
     if (!el) return;
-    var view = W.dashboard.taxonomyLayers.viewForModule(CUR.key);
-    // Legend sits below the toggle when present, otherwise takes its place.
+    var tax = W.dashboard.taxonomyLayers;
+    var view = tax.viewForModule(CUR.key);
+    var layersOnly = tax.isLayersOnly(CUR.key);
+    // Legend sits below the toggle for "both" modules; otherwise takes its place.
     var legend = document.getElementById('module-legend');
-    if (legend) legend.style.top = view ? '120px' : '74px';
-    if (!view) { el.innerHTML = ''; el.classList.add('hidden'); return; }
+    if (legend) legend.style.top = (view && !layersOnly) ? '120px' : '74px';
+    // Layers-only modules (Land Use & Structures) have no analysis mode → no toggle.
+    if (!view || layersOnly) { el.innerHTML = ''; el.classList.add('hidden'); return; }
     el.classList.remove('hidden');
     var inLayers = !!state.taxonomyView;
     el.innerHTML =
@@ -217,10 +220,23 @@
     setModule(key);
     if (!CUR.module) return;
     BOUND_STATE = state;
-    state.activeModule = key;
+    var tax = W.dashboard.taxonomyLayers;
+    var layersOnly = tax.isLayersOnly(key);
+
     renderModeToggle(state);
-    W.dashboard.plotsLayer.applyColoring(state);
     renderKpis(state.farmFeatures || []);
+    // Layers-only modules have no close-to-analysis; the panel is permanent.
+    var taxClose = document.getElementById('tax-close');
+    if (taxClose) taxClose.style.display = layersOnly ? 'none' : '';
+
+    if (layersOnly) {
+      // No band analysis — enter the module's taxonomy browser directly.
+      if (!state.taxonomyView) tax.openFor(state, tax.viewForModule(key));
+      return;
+    }
+
+    state.activeModule = key;
+    W.dashboard.plotsLayer.applyColoring(state);
     renderLegend(state);
     attentionTable.rebuild(state);
     summaryTable.rebuild(state);
