@@ -17,7 +17,7 @@
 
   var CUR = { key: null, module: null };
   var activeTab = 'attention';
-  var BOUND_STATE = null;   // set on show(); used by syncModeToggle()
+  var BOUND_STATE = null;   // set on show(); used by the mode-switch buttons
 
   // An attention-row click descends to ALTITUDE 3 — the farm dossier — instead
   // of only zooming: the row becomes a place with a verdict and an exit action.
@@ -124,42 +124,25 @@
     }).join('');
   }
 
-  // ---- The mode toggle (Analysis ↔ Map layers) --------------------------------
-  // Only the three modules that own a taxonomy get it (Structures=land use,
-  // Crop Monitoring=crops, Palms=trees). Clicking flips the whole map between the
-  // module's band analysis and its taxonomy browser.
-  function renderModeToggle(state) {
-    var el = document.getElementById('module-modetoggle');
-    if (!el) return;
+  // ---- The mode switch (Analysis ↔ full taxonomy) -----------------------------
+  // No persistent toggle: a single button on whichever panel is showing flips
+  // modes. "Switch to full taxonomy" lives at the foot of the legend (analysis
+  // mode); "Switch to analysis" at the foot of the Map Layers panel (layers
+  // mode). Only the modules that own a taxonomy AND have their own analysis get
+  // them (Crop Monitoring, Palms). Layers-only (Land Use & Structures) and the
+  // analysis-only modules (Irrigation / Yield / Water) show neither.
+  function renderModeSwitch() {
     var tax = W.dashboard.taxonomyLayers;
-    var view = tax.viewForModule(CUR.key);
-    var layersOnly = tax.isLayersOnly(CUR.key);
-    // Legend sits below the toggle for "both" modules; otherwise takes its place,
-    // clear of the KPI strip above it (strip bottom sits at ~81.5px).
-    var legend = document.getElementById('module-legend');
-    if (legend) legend.style.top = (view && !layersOnly) ? '120px' : '92px';
-    // Layers-only modules (Land Use & Structures) have no analysis mode → no toggle.
-    if (!view || layersOnly) { el.innerHTML = ''; el.classList.add('hidden'); return; }
-    el.classList.remove('hidden');
-    var inLayers = !!state.taxonomyView;
-    el.innerHTML =
-      '<button class="mode-btn' + (!inLayers ? ' active' : '') + '" data-mode="analysis">' +
-        '<span class="material-symbols-outlined">insights</span>Analysis</button>' +
-      '<button class="mode-btn' + (inLayers ? ' active' : '') + '" data-mode="layers">' +
-        '<span class="material-symbols-outlined">layers</span>Map layers</button>';
-    el.querySelector('[data-mode="analysis"]').addEventListener('click', function () {
-      if (state.taxonomyView) W.dashboard.taxonomyLayers.close(state);   // → restore re-drives Analysis
-    });
-    el.querySelector('[data-mode="layers"]').addEventListener('click', function () {
-      if (!state.taxonomyView) { W.dashboard.taxonomyLayers.openFor(state, view); syncModeToggle(); }
-    });
+    var isBoth = !!tax.viewForModule(CUR.key) && !tax.isLayersOnly(CUR.key);
+    var ls = document.getElementById('module-legend-switch');
+    var ts = document.getElementById('tax-switch');
+    if (ls) ls.classList.toggle('hidden', !isBoth);   // shown in the legend (analysis mode)
+    if (ts) ts.classList.toggle('hidden', !isBoth);   // shown in the panel (layers mode)
   }
 
-  // Re-render the toggle to reflect the current mode (called by taxonomyLayers
-  // when it enters/leaves layers mode).
-  function syncModeToggle() {
-    if (BOUND_STATE) renderModeToggle(BOUND_STATE);
-  }
+  // Called by taxonomyLayers when it enters/leaves layers mode (defensive: the
+  // buttons' per-mode visibility is handled by panel visibility, but re-assert).
+  function syncModeSwitch() { renderModeSwitch(); }
 
   // ---- Legend (in-view band shares) -----------------------------------------
   function farmsInView(state) {
@@ -171,7 +154,9 @@
   }
 
   function renderLegend(state) {
-    var el = document.getElementById('module-legend');
+    // Render into the legend BODY so the persistent switch button (a sibling)
+    // survives the innerHTML replace.
+    var el = document.getElementById('module-legend-body');
     if (!el || !CUR.module) return;
     // Shared legend component, scoped to the farms currently on screen.
     W.dashboard.legend.render(el, CUR.module, farmsInView(state), { scope: 'view' });
@@ -208,6 +193,17 @@
       bar.classList.toggle('collapsed');
       if (chev) chev.textContent = bar.classList.contains('collapsed') ? 'expand_less' : 'expand_more';
     });
+
+    // Mode switch — one button per panel; the state is read at click time.
+    var legendSwitch = document.getElementById('module-legend-switch');
+    if (legendSwitch) legendSwitch.addEventListener('click', function () {
+      var view = W.dashboard.taxonomyLayers.viewForModule(CUR.key);
+      if (view && BOUND_STATE && !BOUND_STATE.taxonomyView) W.dashboard.taxonomyLayers.openFor(BOUND_STATE, view);
+    });
+    var taxSwitch = document.getElementById('tax-switch');
+    if (taxSwitch) taxSwitch.addEventListener('click', function () {
+      if (BOUND_STATE && BOUND_STATE.taxonomyView) W.dashboard.taxonomyLayers.close(BOUND_STATE);
+    });
   }
 
   // ---- Route entry -----------------------------------------------------------
@@ -224,7 +220,7 @@
     var tax = W.dashboard.taxonomyLayers;
     var layersOnly = tax.isLayersOnly(key);
 
-    renderModeToggle(state);
+    renderModeSwitch();
     renderKpis(state.farmFeatures || []);
     // Layers-only modules have no close-to-analysis; the panel is permanent.
     var taxClose = document.getElementById('tax-close');
@@ -247,6 +243,6 @@
   // On pan/zoom, only the in-view legend needs refreshing.
   function refresh(state) { if (CUR.module) renderLegend(state); }
 
-  W.dashboard.modulePage = { wire: wire, show: show, refresh: refresh, syncModeToggle: syncModeToggle };
+  W.dashboard.modulePage = { wire: wire, show: show, refresh: refresh, syncModeSwitch: syncModeSwitch };
 
 })(window.Wafra);

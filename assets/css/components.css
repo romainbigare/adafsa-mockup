@@ -283,27 +283,28 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
 .module-pill.active { background: var(--status-ok); color: #fff; }
 .module-pill .material-symbols-outlined { font-size: 16px; }
 
-/* Mode toggle — Analysis ↔ Map layers, on the three modules that own a taxonomy
-   (Structures=land use, Crop Monitoring=crops, Palms=trees). Segmented control
-   in the row under the KPI strip; the small map-rail button is gone. */
-.mode-toggle {
-  position: absolute; top: 74px; inset-inline-start: 20px; z-index: 21;
-  display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px;
-  background: rgba(255,255,255,0.96); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border: 1px solid #e5e7eb; box-shadow: 0 6px 16px rgba(15,23,42,.12);
+/* Mode switch — a single button on the active panel flips between a module's
+   band Analysis and its full taxonomy (Structures=land use, Crop=crops,
+   Palms=trees). "Switch to full taxonomy" sits under the legend (analysis mode);
+   "Switch to analysis" sits at the foot of the Map Layers panel (layers mode). */
+.legend-switch {
+  display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
+  margin-top: 6px; padding: 8px 12px; cursor: pointer;
+  color: var(--status-ok); font: 600 12px/1 var(--font-sans);
 }
-.mode-toggle.hidden { display: none; }
-.mode-btn {
-  display: inline-flex; align-items: center; gap: 6px; border: none; cursor: pointer;
-  padding: 6px 14px; border-radius: 7px; background: transparent; color: #4b5563;
-  font: 600 12px/1 var(--font-sans); white-space: nowrap; transition: background .12s ease, color .12s ease;
+.legend-switch:hover { background: var(--status-ok-bg); }
+.legend-switch.hidden { display: none; }
+
+.tax-switch-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin: 8px; padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  background: var(--status-ok); color: #fff; border: none; font: 600 12px/1 var(--font-sans);
 }
-.mode-btn:hover { color: #111827; }
-.mode-btn.active { background: var(--status-ok); color: #fff; }
-.mode-btn .material-symbols-outlined { font-size: 16px; }
+.tax-switch-btn:hover { background: var(--brand-700); }
+.tax-switch-btn.hidden { display: none; }
 
 /* In Map-layers mode the taxonomy panel is the workspace, so the band-only
-   legend and attention sheet step aside (the KPI strip + toggle stay for context). */
+   legend and attention sheet step aside (the KPI strip stays for context). */
 body.layers-mode #module-legend,
 body.layers-mode #module-bar { display: none; }
 

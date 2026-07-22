@@ -55,11 +55,15 @@
            modules); kept in the code for possible reuse. -->
       <nav id="module-dial" class="module-dial pointer-events-auto route-hidden" aria-label="Switch module"></nav>
 
-      <!-- Mode toggle — Analysis vs Map layers, on modules that own a taxonomy. -->
-      <div id="module-modetoggle" class="mode-toggle pointer-events-auto hidden"></div>
-
-      <!-- Legend (left, clear of the KPI strip / mode toggle above it) -->
-      <div id="module-legend" class="glass-panel pointer-events-auto absolute left-5 z-20" style="top:92px;width:250px"></div>
+      <!-- Legend (left, clear of the KPI strip above it). For modules that own a
+           taxonomy, a single footer button switches into the full-taxonomy view. -->
+      <div id="module-legend" class="pointer-events-auto absolute left-5 z-20" style="top:92px;width:250px">
+        <div id="module-legend-body" class="glass-panel"></div>
+        <button id="module-legend-switch" class="legend-switch glass-panel hidden">
+          <span class="material-symbols-outlined" style="font-size:16px;">layers</span>
+          <span>Switch to full taxonomy</span>
+        </button>
+      </div>
 
       <!-- Activity feed — top-right corner (not in the zoom stack, not under the
            bottom sheet). The AI heartbeat: satellite scans, grades, harvests. -->
@@ -99,10 +103,15 @@
         <div id="tax-switcher" class="hidden"></div>
         <p class="px-3 pt-2 pb-1 text-[10px] text-gray-400 flex-shrink-0">Tick a type to draw it on the map · shares are of area in view</p>
         <div id="tax-content" class="flex-1 overflow-y-auto scroll-thin px-2 pb-2"></div>
-        <div class="flex gap-2 p-2 border-t border-gray-200 flex-shrink-0">
+        <div class="flex gap-2 px-2 pt-2 flex-shrink-0">
           <button id="tax-select-all" class="flex-1 border border-gray-300 rounded-lg py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors">Select all</button>
           <button id="tax-clear" class="flex-1 border border-gray-300 rounded-lg py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors">Clear</button>
         </div>
+        <!-- Return to the module's analysis view (hidden for layers-only modules). -->
+        <button id="tax-switch" class="tax-switch-btn hidden flex-shrink-0">
+          <span class="material-symbols-outlined" style="font-size:16px;">insights</span>
+          <span>Switch to analysis</span>
+        </button>
       </div>
 
       <!-- Bottom sheet — Attention list + Band summary -->

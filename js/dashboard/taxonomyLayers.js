@@ -71,12 +71,12 @@
   function enterLayersMode() {
     if (typeof document === 'undefined') return;
     document.body.classList.add('layers-mode');
-    if (W.dashboard.modulePage && W.dashboard.modulePage.syncModeToggle) W.dashboard.modulePage.syncModeToggle();
+    if (W.dashboard.modulePage && W.dashboard.modulePage.syncModeSwitch) W.dashboard.modulePage.syncModeSwitch();
   }
   function exitLayersMode() {
     if (typeof document === 'undefined') return;
     document.body.classList.remove('layers-mode');
-    if (W.dashboard.modulePage && W.dashboard.modulePage.syncModeToggle) W.dashboard.modulePage.syncModeToggle();
+    if (W.dashboard.modulePage && W.dashboard.modulePage.syncModeSwitch) W.dashboard.modulePage.syncModeSwitch();
   }
 
   function showPanel() { if (els.panel) els.panel.classList.remove('tax-hidden'); if (els.toggle) els.toggle.classList.add('active'); enterLayersMode(); }
@@ -329,6 +329,7 @@
     els.panel = $('taxonomy-panel');
     els.toggle = $('toggle-taxonomy');       // legacy global button (removed) — optional
     els.close = $('tax-close');
+    els.switch = $('tax-switch');
     els.switcher = $('tax-switcher');
     els.content = $('tax-content');
     els.selectAll = $('tax-select-all');
@@ -338,6 +339,7 @@
     buildSwitcher(state);
     if (els.toggle) els.toggle.addEventListener('click', function () { toggle(state); });
     if (els.close) els.close.addEventListener('click', function () { close(state); });
+    if (els.switch) els.switch.addEventListener('click', function () { close(state); });   // "Switch to analysis"
     if (els.selectAll) els.selectAll.addEventListener('click', function () { setAll(state, true); });
     if (els.clear) els.clear.addEventListener('click', function () { setAll(state, false); });
 
