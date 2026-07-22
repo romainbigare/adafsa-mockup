@@ -2,7 +2,12 @@
 
 A static, **buildless** front-end mockup for a farm-monitoring platform (Abu Dhabi / Al Ain region). Two pages backed by placeholder data, served entirely from static files — no server, no build step, no npm.
 
-- **Farms Overview** (`index.html`) — **Proposal A2, "map-led hub".** Everything in Proposal A (nav sells the six modules; a hash router drives module pages built from one template: KPI strip + module-coloured map + legend + ranked attention list), **plus** the Home page leads with the region map (all farm boundaries, framed) and a "Colour by" control, with the six modules as a mini launch strip beneath it. The **same** single Leaflet map is framed on Home and full-height on a module route.
+- **Farms Overview** (`index.html`) — **Proposal Combined.** Synthesises the three layout proposals into one experience built around **three altitudes**, sharing one screen grammar (verdict on top, map in the centre, ranked list docked below, nav on the left edge):
+  - **Altitude 1 — the Situation** (`#/overview`): the glancer's screen. A plain-language **verdict** ("4 of 6 areas need attention — …"), the region map coloured by today's worst problem (chosen automatically) with red "N need attention" badges so problems glow through aggregation, and six **calm** status tiles (green ok · amber warn · red critical).
+  - **Altitude 2 — the Question** (`#/m/<key>`): one module owns the map. KPI strip, a **dial** to switch modules in place (map viewport preserved), one legend, and a ranked attention list. Opening **Map Layers** visibly *pauses* the module chrome instead of contradicting it.
+  - **Altitude 3 — the Farm** (`#/farm/<fid>`): a dossier drawer over the zoomed, highlighted farm — the AI's verdict in one sentence, per-module status, and an exit that ends in an **action** (export / open Farm Analysis).
+
+  Two contracts hold throughout, enforced by tests: the **number contract** (every figure comes from `moduleRegistry`, so no two screens disagree) and the **colour contract** (red = needs action, amber = watch, green = fine — everywhere, including cluster badges).
 - **Farm Analysis** (`farm-analysis.html`) — per-farm view with a canvas heatmap (growth / irrigation / phenology / density), weather, soil, growth-phase, water-scheduler and advisory panels.
 
 > The data is **placeholder**. See [Data & the mock boundary](#data--the-mock-boundary).
@@ -57,6 +62,7 @@ warfa-dashboard/
 │   ├── map/createMap.js         # Wafra.map.create() — Leaflet map + basemaps + toggle
 │   ├── ui/
 │   │   ├── sidebar.js           # Wafra.ui.renderSidebar() — shared left nav
+│   │   ├── strings.js           # Wafra.str() — user-facing copy in one place (i18n seam)
 │   │   ├── ticker.js            # Wafra.ui.renderTicker() — shared bottom status bar
 │   │   └── mapControls.js       # Wafra.ui.wireZoom / wireBasemap
 │   │
@@ -68,20 +74,25 @@ warfa-dashboard/
 │   ├── dashboard/               # Farms Overview feature modules (share one state object)
 │   │   ├── taxonomy.js          #   land-use / crop trees + palettes
 │   │   ├── state.js             #   createState() — the single shared mutable state
-│   │   ├── modules.js           #   3 banded farm modules (IER / Yield / Water) + generic band helpers
-│   │   ├── moduleRegistry.js    #   F1 — the SIX contract modules as one model (wraps modules.js + mock metrics)
-│   │   ├── scorecard.js         #   F3 — reusable module scorecard card (big / mini) — Home cards
-│   │   ├── attentionList.js     #   F4 — ranked per-module farm table helpers (metric labels)
-│   │   ├── plotsLayer.js        #   streaming render, clustering, module colouring (shape = band, cluster = majority band)
+│   │   ├── modules.js           #   3 banded farm modules (IER / Yield / Water) + per-band severity (sev)
+│   │   ├── moduleRegistry.js    #   the SIX contract modules as one model; tri-state status + criticalCount
+│   │   ├── scorecard.js         #   module card component (big / mini / status tile) — tri-state chip
+│   │   ├── legend.js            #   one legend, scope-aware (In view / All farms)
+│   │   ├── attentionList.js     #   ranked per-module farm table helpers (metric labels)
+│   │   ├── plotsLayer.js        #   streaming render, clustering; band-coloured dots + red "N critical" badges
 │   │   ├── dataTable.js         #   shared sortable/reorderable/exportable table factory
-│   │   ├── modulePage.js        #   A — the reusable module-page template (KPI strip + legend + attention/summary)
-│   │   └── router.js            #   A — hash router (#/overview, #/m/<key>); shows/hides the single map
+│   │   ├── modulePage.js        #   Altitude 2 — module-page template (KPI strip + dial + legend + attention)
+│   │   ├── situation.js         #   Altitude 1 — the Situation: verdict + calm status tiles + default colour-by
+│   │   ├── farmDossier.js       #   Altitude 3 — the farm dossier drawer (verdict + module status + actions)
+│   │   ├── newsBell.js          #   activity feed bell (top-right; click / outside / Escape)
+│   │   ├── taxonomyLayers.js    #   Map Layers browser; pauses module chrome in "layers mode"
+│   │   └── router.js            #   hash router (#/overview, #/m/<key>, #/farm/<fid>); drives the single map
 │   │
 │   ├── farmAnalysis/heatmap.js  # Farm Analysis canvas heatmap overlay + colour scales
 │   │
 │   └── pages/                   # one entry point per page — bootstraps + wires everything
-│       ├── dashboard.js         #   A2 — creates the map once, wires chrome, hands off to the router
-│       ├── overview.js          #   A2 — Home: framed region map + colour-by + six mini F3 tiles
+│       ├── dashboard.js         #   creates the map once, wires chrome + mobile nav, hands off to the router
+│       ├── overview.js          #   thin seam — delegates Home rendering to situation.js
 │       └── farmAnalysis.js
 │
 ├── data/                        # placeholder GeoJSON, wrapped as window.WafraData globals
@@ -104,6 +115,16 @@ Everything under **`data/`** (geometry) and **`js/mock/`** (generated metrics, w
 
 - Swap `data/*.js` for real data (either keep the `window.WafraData.* = {...}` global form, or reintroduce `fetch()` in `js/data/loader.js` if you no longer need `file://` support).
 - Replace the generators in `js/mock/*` with real API calls. The feature/page modules consume them through `Wafra.mock.*` / `Wafra.data.*`, so nothing else needs to change.
+
+## Tests
+
+Pure logic (the registry, band/severity model, the Situation verdict, the farm dossier, the news generator, the strings seam) is unit-tested with **plain Node — no build, no npm**:
+
+```bash
+node test/all.js        # runs every test/*.test.js in a fresh node, fails loudly
+```
+
+Run the runner, **not** `node --test test/` — the suites are plain assertion scripts (`node test/<file>.test.js`), which `node --test` mis-parses. `test/all.js` is what CI should call.
 
 ## Notes
 
