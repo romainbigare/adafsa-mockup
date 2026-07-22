@@ -26,14 +26,19 @@
   }
 
   // cfg: {
-  //   columns: [{ key, label, align, visible, val(f), text(f), csv(f)?, title(f)? }, ...],
+  //   columns: [{ key, label, align, visible, val(f), text(f), csv(f)?, title(f)? }, ...]
+  //            OR a function(state) -> that array, resolved on each rebuild so one
+  //            grid can swap its whole column set with the mode (see the Full
+  //            Dataset tab: farm columns vs taxonomy-parcel columns). Return a
+  //            STABLE reference per mode so per-column visibility/order survive.
   //   theadId, tbodyId, countId, columnsBtnId, columnsMenuId, exportBtnId,
   //   csvPrefix, emptyText,
   //   getRows(state) -> array of feature records (each needs .fid; .rings for zoom-to-select),
   //   onSelectRow(state, record) -> void   (optional — e.g. zoom the map to the row's feature)
   // }
   function createTable(cfg) {
-    var COLUMNS = cfg.columns;
+    var dynamicColumns = typeof cfg.columns === 'function';
+    var COLUMNS = dynamicColumns ? cfg.columns(null) : cfg.columns;
     var rows = [];
     var sortKey = cfg.initialSortKey || COLUMNS[0].key;
     var sortDir = cfg.initialSortDir || 'asc';    // 'asc' | 'desc'
@@ -230,6 +235,15 @@
     // Refresh the row set from the current dataset (called after each map load).
     function rebuild(state) {
       currentState = state;
+      // Swap the column set if this grid is mode-driven and the mode changed.
+      if (dynamicColumns) {
+        var nextCols = cfg.columns(state);
+        if (nextCols && nextCols !== COLUMNS) {
+          COLUMNS = nextCols;
+          if (!colByKey(sortKey)) { sortKey = COLUMNS[0].key; sortDir = 'asc'; }
+          buildColumnMenu();
+        }
+      }
       rows = cfg.getRows(state) || [];
       // Drop the selection only if it no longer exists in the new row set —
       // e.g. the Farms table's rows are stable across category switches, so

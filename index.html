@@ -125,6 +125,9 @@
             <button class="mp-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-mp-tab="summary">
               <span class="material-symbols-outlined" style="font-size:16px;">insights</span><span>BAND SUMMARY</span>
             </button>
+            <button class="mp-tab flex items-center gap-1.5 px-3 py-2 font-label-caps text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap" data-mp-tab="dataset">
+              <span class="material-symbols-outlined" style="font-size:16px;">table_rows</span><span>FULL DATASET</span>
+            </button>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
             <div class="mp-ctx-attention flex items-center gap-2">
@@ -141,6 +144,14 @@
               </div>
               <button id="mp-sum-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"><span class="material-symbols-outlined" style="font-size:15px;">download</span><span class="hidden sm:inline">Export CSV</span></button>
             </div>
+            <div class="mp-ctx-dataset hidden flex items-center gap-2">
+              <span id="mp-data-count" class="text-xs text-gray-400 tabular-nums hidden sm:inline"></span>
+              <div class="relative">
+                <button id="mp-data-columns-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs border border-gray-300 rounded-lg bg-white hover:bg-gray-100 transition-colors text-gray-700"><span class="material-symbols-outlined" style="font-size:15px;">view_column</span><span class="hidden sm:inline">Columns</span></button>
+                <div id="mp-data-columns-menu" class="hidden absolute right-0 bottom-full mb-1 w-52 max-h-72 overflow-y-auto scroll-thin bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2"></div>
+              </div>
+              <button id="mp-data-export-btn" class="flex items-center gap-1 px-2.5 py-1 text-xs bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"><span class="material-symbols-outlined" style="font-size:15px;">download</span><span class="hidden sm:inline">Export CSV</span></button>
+            </div>
             <button id="module-bar-collapse" class="text-gray-400 hover:text-gray-700 pl-1" title="Collapse"><span class="material-symbols-outlined" id="module-bar-chevron" style="font-size:18px;">expand_more</span></button>
           </div>
         </div>
@@ -149,6 +160,9 @@
         </div>
         <div class="mp-panel lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-mp-panel="summary">
           <table class="farm-table w-full text-left border-collapse"><thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="mp-sum-thead"></tr></thead><tbody id="mp-sum-tbody"></tbody></table>
+        </div>
+        <div class="mp-panel lb-panel hidden overflow-auto scroll-thin rounded-b-lg" data-mp-panel="dataset">
+          <table class="farm-table w-full text-left border-collapse"><thead class="bg-gray-100/95 sticky top-0 z-10"><tr id="mp-data-thead"></tr></thead><tbody id="mp-data-tbody"></tbody></table>
         </div>
       </div>
     </div>

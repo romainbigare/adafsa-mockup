@@ -304,9 +304,16 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
 .tax-switch-btn.hidden { display: none; }
 
 /* In Map-layers mode the taxonomy panel is the workspace, so the band-only
-   legend and attention sheet step aside (the KPI strip stays for context). */
-body.layers-mode #module-legend,
-body.layers-mode #module-bar { display: none; }
+   legend steps aside. The bottom data sheet STAYS — its Full Dataset tab lists
+   the taxonomy parcels — but shifts clear of the taxonomy panel on the left, and
+   only the full-dataset tab is meaningful (the band Attention/Summary tabs hide). */
+body.layers-mode #module-legend { display: none; }
+body.layers-mode #module-bar { left: 306px; }
+body.layers-mode .mp-tab[data-mp-tab="attention"],
+body.layers-mode .mp-tab[data-mp-tab="summary"],
+body.layers-mode .mp-ctx-attention,
+body.layers-mode .mp-ctx-summary { display: none; }
+@media (max-width: 640px) { body.layers-mode #module-bar { left: 0.75rem; } }
 
 /* --------------------------------------------------------------------------
    Farm dossier (ALTITUDE 3) — right-side drawer over the map.

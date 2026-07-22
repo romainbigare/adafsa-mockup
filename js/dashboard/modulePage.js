@@ -17,6 +17,7 @@
 
   var CUR = { key: null, module: null };
   var activeTab = 'attention';
+  var analysisTab = 'attention';   // last analysis tab the user chose (restored on leaving layers mode)
   var BOUND_STATE = null;   // set on show(); used by the mode-switch buttons
 
   // An attention-row click descends to ALTITUDE 3 — the farm dossier — instead
@@ -94,6 +95,67 @@
     onSelectRow: selectGroup
   });
 
+  // ---- Full-dataset table (all records, both modes) --------------------------
+  // A third tab that exposes the RAW dataset behind the map, past the ranked
+  // Attention list and the aggregated Band summary. In analysis mode it lists
+  // every farm — identity, area, overall criticality, and (optional) each
+  // module's value. In layers mode it lists every taxonomy parcel with its
+  // classification. Columns swap with the mode; the grid machinery is identical.
+  function fmtArea(f) { return (f.area || 0).toFixed(1); }
+
+  // Farm columns: the essentials are shown; each module's value is available via
+  // the Columns menu (friendly-first, funnel the full metric set to power users).
+  var farmDatasetColumns = [
+    { key: 'fid', label: 'Farm ID', align: 'left', visible: true,
+      val: function (f) { return f.fid; }, text: function (f) { return '#' + f.fid; } },
+    { key: 'owner', label: 'Owner', align: 'left', visible: true,
+      val: function (f) { return String(f.owner).toLowerCase(); }, text: function (f) { return f.owner; } },
+    { key: 'crop', label: 'Crop', align: 'left', visible: true,
+      val: function (f) { return String(f.type || ''); }, text: function (f) { return f.type || '—'; } },
+    { key: 'area', label: 'Area (dun)', align: 'right', visible: true,
+      val: function (f) { return f.area || 0; }, text: fmtArea },
+    { key: 'composite', label: 'Overall', align: 'right', visible: true,
+      val: function (f) { var s = reg.compositeScore(f); return s == null ? -1 : s; },
+      text: function (f) { var s = reg.compositeScore(f); return s == null ? '—' : String(Math.round(s)); },
+      title: function (f) { var b = reg.bandOf(reg.byKey('composite'), f); return b ? b.label : ''; } }
+  ].concat(reg.MODULES.map(function (m) {
+    // Namespace the module keys ('m_' + key) so a module such as Crop Monitoring
+    // never collides with a base column key (the 'crop' type column).
+    return { key: 'm_' + m.key, label: m.shortLabel || m.label, align: 'right', visible: false,
+      val: function (f) { var v = m.valueOf(f); return v == null ? -Infinity : v; },
+      text: function (f) { var v = m.valueOf(f); return v == null ? '—' : m.format(v); },
+      title: function (f) { var b = reg.bandOf(m, f); return b ? b.label : ''; } };
+  }));
+
+  // Parcel columns: the taxonomy classification for every plot on the layer map.
+  var parcelDatasetColumns = [
+    { key: 'fid', label: 'ID', align: 'left', visible: true,
+      val: function (f) { return f.fid; }, text: function (f) { return '#' + f.fid; } },
+    { key: 'owner', label: 'Owner', align: 'left', visible: true,
+      val: function (f) { return String(f.owner).toLowerCase(); }, text: function (f) { return f.owner; } },
+    { key: 'category', label: 'Category', align: 'left', visible: true,
+      val: function (f) { return String(f.category || ''); }, text: function (f) { return f.category || '—'; } },
+    { key: 'type', label: 'Type', align: 'left', visible: true,
+      val: function (f) { return String(f.type || ''); }, text: function (f) { return f.type || '—'; } },
+    { key: 'area', label: 'Area (dun)', align: 'right', visible: true,
+      val: function (f) { return f.area || 0; }, text: fmtArea }
+  ];
+
+  function datasetColumnsFor(state) { return (state && state.taxonomyView) ? parcelDatasetColumns : farmDatasetColumns; }
+  function datasetRows(state) { if (!state) return []; return (state.taxonomyView ? state.allFeatures : state.farmFeatures) || []; }
+  function datasetColumnKeys(state) { return datasetColumnsFor(state).map(function (c) { return c.key; }); }
+
+  var datasetTable = W.dashboard.dataTable.create({
+    columns: datasetColumnsFor,
+    initialSortKey: 'composite', initialSortDir: 'desc',
+    theadId: 'mp-data-thead', tbodyId: 'mp-data-tbody', countId: 'mp-data-count',
+    columnsBtnId: 'mp-data-columns-btn', columnsMenuId: 'mp-data-columns-menu', exportBtnId: 'mp-data-export-btn',
+    csvPrefix: 'dataset', emptyText: 'No records.',
+    getRows: datasetRows,
+    // A parcel row zooms/ghosts to that plot; a farm row descends to its dossier.
+    onSelectRow: function (state, f) { if (state.taxonomyView) selectGroup(state, [f]); else selectFarm(state, f); }
+  });
+
   // ---- KPI strip -------------------------------------------------------------
   function renderKpis(features) {
     var el = document.getElementById('kpi-strip');
@@ -140,9 +202,10 @@
     if (ts) ts.classList.toggle('hidden', !isBoth);   // shown in the panel (layers mode)
   }
 
-  // Called by taxonomyLayers when it enters/leaves layers mode (defensive: the
-  // buttons' per-mode visibility is handled by panel visibility, but re-assert).
-  function syncModeSwitch() { renderModeSwitch(); }
+  // Called by taxonomyLayers when it enters/leaves layers mode: re-assert the
+  // switch buttons AND swap the bottom-sheet tab (only the full dataset applies
+  // over a taxonomy map; analysis tabs return when we leave).
+  function syncModeSwitch() { renderModeSwitch(); applyTabForMode(); }
 
   // ---- Legend (in-view band shares) -----------------------------------------
   function farmsInView(state) {
@@ -163,15 +226,24 @@
   }
 
   // ---- Tabs / collapse -------------------------------------------------------
-  function setTab(name) {
+  function inLayersMode() { return typeof document !== 'undefined' && document.body.classList.contains('layers-mode'); }
+
+  // Pick the tab that fits the current mode: the full dataset over a taxonomy map
+  // (the only meaningful one there), otherwise the last analysis tab the user chose.
+  function applyTabForMode() { setTab(inLayersMode() ? 'dataset' : analysisTab); }
+
+  function setTab(name, fromUser) {
+    if (inLayersMode()) name = 'dataset';       // band tabs don't apply over a taxonomy map
+    else if (fromUser) analysisTab = name;      // remember the analysis choice to restore on exit
     activeTab = name;
     document.querySelectorAll('.mp-tab').forEach(function (t) { t.classList.toggle('active', t.dataset.mpTab === name); });
     document.querySelectorAll('.mp-panel').forEach(function (p) { p.classList.toggle('hidden', p.dataset.mpPanel !== name); });
-    ['attention', 'summary'].forEach(function (t) {
+    ['attention', 'summary', 'dataset'].forEach(function (t) {
       document.querySelectorAll('.mp-ctx-' + t).forEach(function (e) { e.classList.toggle('hidden', name !== t); });
     });
     attentionTable.setActive(name === 'attention');
     summaryTable.setActive(name === 'summary');
+    datasetTable.setActive(name === 'dataset');
     var bar = document.getElementById('module-bar');
     if (bar && bar.classList.contains('collapsed')) {
       bar.classList.remove('collapsed');
@@ -183,8 +255,9 @@
   function wire() {
     attentionTable.init();
     summaryTable.init();
+    datasetTable.init();
     document.querySelectorAll('.mp-tab').forEach(function (tab) {
-      tab.addEventListener('click', function () { setTab(tab.dataset.mpTab); });
+      tab.addEventListener('click', function () { setTab(tab.dataset.mpTab, true); });
     });
     var bar = document.getElementById('module-bar');
     var btn = document.getElementById('module-bar-collapse');
@@ -237,12 +310,15 @@
     renderLegend(state);
     attentionTable.rebuild(state);
     summaryTable.rebuild(state);
-    setTab(activeTab);
+    datasetTable.rebuild(state);
+    applyTabForMode();
   }
 
   // On pan/zoom, only the in-view legend needs refreshing.
   function refresh(state) { if (CUR.module) renderLegend(state); }
 
-  W.dashboard.modulePage = { wire: wire, show: show, refresh: refresh, syncModeSwitch: syncModeSwitch };
+  W.dashboard.modulePage = { wire: wire, show: show, refresh: refresh, syncModeSwitch: syncModeSwitch,
+    // Pure selectors exposed for tests (see test/datasetTab.test.js).
+    datasetRows: datasetRows, datasetColumnKeys: datasetColumnKeys };
 
 })(window.Wafra);
