@@ -45,8 +45,37 @@
       <!-- KPI strip -->
       <div id="kpi-strip" class="kpi-strip pointer-events-auto"></div>
 
-      <!-- Legend (left) -->
-      <div id="module-legend" class="glass-panel pointer-events-auto absolute left-5 z-20" style="top:84px;width:250px"></div>
+      <!-- The dial — switch the module in place (map viewport preserved). Six
+           links; the router does the work, the persistent map keeps its view. -->
+      <nav id="module-dial" class="module-dial pointer-events-auto" aria-label="Switch module"></nav>
+
+      <!-- Legend (left, below the dial) -->
+      <div id="module-legend" class="glass-panel pointer-events-auto absolute left-5 z-20" style="top:120px;width:250px"></div>
+
+      <!-- Layers-mode badge — shown only while the Map Layers browser drives the
+           map, making it honest that the module's own data is paused. -->
+      <div id="layers-badge" class="layers-badge pointer-events-auto">
+        <span class="material-symbols-outlined" style="font-size:16px;">layers</span>
+        <span id="layers-badge-text">Map Layers — module data paused</span>
+        <button id="layers-return" class="layers-badge-btn">Return to module</button>
+      </div>
+
+      <!-- Activity feed — top-right corner (not in the zoom stack, not under the
+           bottom sheet). The AI heartbeat: satellite scans, grades, harvests. -->
+      <button id="news-bell" class="glass-panel pointer-events-auto w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all absolute z-30" style="top:12px;inset-inline-end:16px" title="Activity feed" aria-label="Activity feed">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="absolute top-1.5 right-1.5 flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+        </span>
+      </button>
+      <div id="news-popover" class="hidden news-popover pointer-events-auto absolute z-30 w-72 max-h-96 glass-panel flex flex-col overflow-hidden" style="top:60px;inset-inline-end:16px">
+        <div class="px-3 py-2 border-b border-gray-200 bg-gray-50/80 flex items-center gap-2">
+          <span class="material-symbols-outlined text-brand-600" style="font-size:16px;">notifications_active</span>
+          <span class="font-label-caps text-gray-900">ACTIVITY</span>
+        </div>
+        <div id="news-feed" class="flex-1 overflow-y-auto scroll-thin px-3 py-2"></div>
+      </div>
 
       <!-- Map controls (right) -->
       <div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 hidden md:flex pointer-events-auto">
@@ -157,6 +186,7 @@
 <script src="data/crops.js"></script>
 <script src="data/landuse.js"></script>
 <script src="js/mock/metrics.js"></script>
+<script src="js/mock/news.js"></script>
 <script src="js/dashboard/taxonomy.js"></script>
 <script src="js/dashboard/state.js"></script>
 <script src="js/dashboard/modules.js"></script>
@@ -169,6 +199,7 @@
 <script src="js/dashboard/scorecard.js"></script>
 <script src="js/dashboard/modulePage.js"></script>
 <script src="js/dashboard/situation.js"></script>
+<script src="js/dashboard/newsBell.js"></script>
 <script src="js/pages/overview.js"></script>
 <script src="js/dashboard/router.js"></script>
 <script src="js/pages/dashboard.js"></script>

@@ -13,6 +13,7 @@
 
   W.dashboard.plotsLayer.init(state);
   W.dashboard.modulePage.wire();
+  W.dashboard.newsBell.init();
 
   function initStatusBadges() {
     var scan = document.getElementById('last-scan');

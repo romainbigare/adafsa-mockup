@@ -106,6 +106,22 @@
         '<span class="kpi-fee">' + CUR.module.feePct + '% of contract</span></div>' + tiles;
   }
 
+  // ---- The dial (module switcher) -------------------------------------------
+  // Six links; the active one is the current route. Switching does NOT touch the
+  // map viewport — the router just recolours + swaps the tables, so the user
+  // keeps their place on the region (Proposal B's spatial continuity, as nav).
+  function renderDial(key) {
+    var el = document.getElementById('module-dial');
+    if (!el) return;
+    el.innerHTML = reg.MODULES.map(function (m) {
+      var active = m.key === key ? ' active' : '';
+      return '<a class="module-pill' + active + '" href="#/m/' + m.key + '"' +
+        (active ? ' aria-current="page"' : '') + ' title="' + m.label + '">' +
+        '<span class="material-symbols-outlined">' + m.icon + '</span>' +
+        '<span>' + m.shortLabel + '</span></a>';
+    }).join('');
+  }
+
   // ---- Legend (in-view band shares) -----------------------------------------
   function farmsInView(state) {
     var b = state.map.getBounds();
@@ -166,6 +182,7 @@
     setModule(key);
     if (!CUR.module) return;
     state.activeModule = key;
+    renderDial(key);
     W.dashboard.plotsLayer.applyColoring(state);
     renderKpis(state.farmFeatures || []);
     renderLegend(state);

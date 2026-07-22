@@ -51,8 +51,31 @@
 
   // ---- open / close ----------------------------------------------------------
   function panelOpen() { return els.panel && !els.panel.classList.contains('tax-hidden'); }
-  function showPanel() { if (els.panel) els.panel.classList.remove('tax-hidden'); if (els.toggle) els.toggle.classList.add('active'); }
-  function hidePanel() { if (els.panel) els.panel.classList.add('tax-hidden'); if (els.toggle) els.toggle.classList.remove('active'); }
+
+  // Entering layers mode pauses the host module's chrome (see .layers-mode CSS)
+  // so it never asserts module facts over a taxonomy map. The bottom sheet is
+  // auto-collapsed; a badge names the module to return to.
+  function enterLayersMode() {
+    if (typeof document === 'undefined') return;
+    document.body.classList.add('layers-mode');
+    var bar = document.getElementById('module-bar');
+    if (bar) bar.classList.add('collapsed');
+    var txt = document.getElementById('layers-badge-text');
+    if (txt && W.dashboard.router && W.dashboard.moduleRegistry) {
+      var r = W.dashboard.router.current();
+      var m = r && r.key && W.dashboard.moduleRegistry.byKey(r.key);
+      txt.textContent = m ? (m.label + ' paused — showing Map Layers') : 'Map Layers — module data paused';
+    }
+  }
+  function exitLayersMode() {
+    if (typeof document === 'undefined') return;
+    document.body.classList.remove('layers-mode');
+    var bar = document.getElementById('module-bar');
+    if (bar) bar.classList.remove('collapsed');
+  }
+
+  function showPanel() { if (els.panel) els.panel.classList.remove('tax-hidden'); if (els.toggle) els.toggle.classList.add('active'); enterLayersMode(); }
+  function hidePanel() { if (els.panel) els.panel.classList.add('tax-hidden'); if (els.toggle) els.toggle.classList.remove('active'); exitLayersMode(); }
 
   function open(state) { showPanel(); enter(state, lastView); }
   function close(state) { hidePanel(); leaveTaxonomy(state, restore); }
@@ -305,6 +328,8 @@
     buildSwitcher(state);
     els.toggle.addEventListener('click', function () { toggle(state); });
     if (els.close) els.close.addEventListener('click', function () { close(state); });
+    els.return = $('layers-return');
+    if (els.return) els.return.addEventListener('click', function () { close(state); });
     if (els.selectAll) els.selectAll.addEventListener('click', function () { setAll(state, true); });
     if (els.clear) els.clear.addEventListener('click', function () { setAll(state, false); });
 
