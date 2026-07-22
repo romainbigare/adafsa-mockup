@@ -17,6 +17,7 @@
 
   var CUR = { key: null, module: null };
   var activeTab = 'attention';
+  var BOUND_STATE = null;   // set on show(); used by syncModeToggle()
 
   // An attention-row click descends to ALTITUDE 3 — the farm dossier — instead
   // of only zooming: the row becomes a place with a verdict and an exit action.
@@ -108,10 +109,9 @@
         '<span class="kpi-fee">' + CUR.module.feePct + '% of contract</span></div>' + tiles;
   }
 
-  // ---- The dial (module switcher) -------------------------------------------
-  // Six links; the active one is the current route. Switching does NOT touch the
-  // map viewport — the router just recolours + swaps the tables, so the user
-  // keeps their place on the region (Proposal B's spatial continuity, as nav).
+  // ---- The dial (module switcher) — HIDDEN for now -----------------------------
+  // Kept for possible reuse; the left nav already switches modules, so showing a
+  // second in-map switcher was redundant. Not rendered.
   function renderDial(key) {
     var el = document.getElementById('module-dial');
     if (!el) return;
@@ -122,6 +122,39 @@
         '<span class="material-symbols-outlined">' + m.icon + '</span>' +
         '<span>' + m.shortLabel + '</span></a>';
     }).join('');
+  }
+
+  // ---- The mode toggle (Analysis ↔ Map layers) --------------------------------
+  // Only the three modules that own a taxonomy get it (Structures=land use,
+  // Crop Monitoring=crops, Palms=trees). Clicking flips the whole map between the
+  // module's band analysis and its taxonomy browser.
+  function renderModeToggle(state) {
+    var el = document.getElementById('module-modetoggle');
+    if (!el) return;
+    var view = W.dashboard.taxonomyLayers.viewForModule(CUR.key);
+    // Legend sits below the toggle when present, otherwise takes its place.
+    var legend = document.getElementById('module-legend');
+    if (legend) legend.style.top = view ? '120px' : '74px';
+    if (!view) { el.innerHTML = ''; el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    var inLayers = !!state.taxonomyView;
+    el.innerHTML =
+      '<button class="mode-btn' + (!inLayers ? ' active' : '') + '" data-mode="analysis">' +
+        '<span class="material-symbols-outlined">insights</span>Analysis</button>' +
+      '<button class="mode-btn' + (inLayers ? ' active' : '') + '" data-mode="layers">' +
+        '<span class="material-symbols-outlined">layers</span>Map layers</button>';
+    el.querySelector('[data-mode="analysis"]').addEventListener('click', function () {
+      if (state.taxonomyView) W.dashboard.taxonomyLayers.close(state);   // → restore re-drives Analysis
+    });
+    el.querySelector('[data-mode="layers"]').addEventListener('click', function () {
+      if (!state.taxonomyView) { W.dashboard.taxonomyLayers.openFor(state, view); syncModeToggle(); }
+    });
+  }
+
+  // Re-render the toggle to reflect the current mode (called by taxonomyLayers
+  // when it enters/leaves layers mode).
+  function syncModeToggle() {
+    if (BOUND_STATE) renderModeToggle(BOUND_STATE);
   }
 
   // ---- Legend (in-view band shares) -----------------------------------------
@@ -183,8 +216,9 @@
   function show(state, key) {
     setModule(key);
     if (!CUR.module) return;
+    BOUND_STATE = state;
     state.activeModule = key;
-    renderDial(key);
+    renderModeToggle(state);
     W.dashboard.plotsLayer.applyColoring(state);
     renderKpis(state.farmFeatures || []);
     renderLegend(state);
@@ -196,6 +230,6 @@
   // On pan/zoom, only the in-view legend needs refreshing.
   function refresh(state) { if (CUR.module) renderLegend(state); }
 
-  W.dashboard.modulePage = { wire: wire, show: show, refresh: refresh };
+  W.dashboard.modulePage = { wire: wire, show: show, refresh: refresh, syncModeToggle: syncModeToggle };
 
 })(window.Wafra);

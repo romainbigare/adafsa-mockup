@@ -71,9 +71,10 @@
       '</a>';
   }
 
-  // Calm "status" tile for the Situation screen. Answers OK/not-OK and is a
-  // door — nothing more. No band strip; the tile's border/chip carry the state
-  // (COLOUR CONTRACT) so a healthy region is visually quiet and problems glow.
+  // "Status" tile for the Situation screen. Answers OK/not-OK and is a door; the
+  // border/chip carry the state (COLOUR CONTRACT) so a healthy region stays quiet
+  // and problems glow. A subtle band strip at the foot fills the card and adds a
+  // glanceable distribution without turning the landing into an analysis view.
   function statusCard(vm) {
     var kindCls = vm.statusKind === 'critical' ? 'status-tile--critical'
       : vm.statusKind === 'warn' ? 'status-tile--warn' : 'status-tile--ok';
@@ -85,7 +86,9 @@
           '<span class="status-tile-fee" title="Share of contract fee">' + vm.feePct + '%</span>' +
         '</div>' +
         '<div class="status-tile-headline">' + esc(vm.headline) + '</div>' +
-        '<div class="mt-2">' + chip(vm) + '</div>' +
+        '<div class="status-tile-bottom">' + chip(vm) +
+          '<div class="status-tile-strip">' + bandStrip(vm.bands, 6) + '</div>' +
+        '</div>' +
       '</a>';
   }
 

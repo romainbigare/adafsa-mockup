@@ -51,20 +51,15 @@
       <!-- KPI strip -->
       <div id="kpi-strip" class="kpi-strip pointer-events-auto"></div>
 
-      <!-- The dial — switch the module in place (map viewport preserved). Six
-           links; the router does the work, the persistent map keeps its view. -->
-      <nav id="module-dial" class="module-dial pointer-events-auto" aria-label="Switch module"></nav>
+      <!-- Module-switching dial — hidden for now (the left nav already switches
+           modules); kept in the code for possible reuse. -->
+      <nav id="module-dial" class="module-dial pointer-events-auto route-hidden" aria-label="Switch module"></nav>
 
-      <!-- Legend (left, below the dial) -->
+      <!-- Mode toggle — Analysis vs Map layers, on modules that own a taxonomy. -->
+      <div id="module-modetoggle" class="mode-toggle pointer-events-auto hidden"></div>
+
+      <!-- Legend (left, below the toggle) -->
       <div id="module-legend" class="glass-panel pointer-events-auto absolute left-5 z-20" style="top:120px;width:250px"></div>
-
-      <!-- Layers-mode badge — shown only while the Map Layers browser drives the
-           map, making it honest that the module's own data is paused. -->
-      <div id="layers-badge" class="layers-badge pointer-events-auto">
-        <span class="material-symbols-outlined" style="font-size:16px;">layers</span>
-        <span id="layers-badge-text">Map Layers — module data paused</span>
-        <button id="layers-return" class="layers-badge-btn">Return to module</button>
-      </div>
 
       <!-- Activity feed — top-right corner (not in the zoom stack, not under the
            bottom sheet). The AI heartbeat: satellite scans, grades, harvests. -->
@@ -89,19 +84,20 @@
         <button id="zoom-out" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Zoom out"><span class="material-symbols-outlined">remove</span></button>
         <button id="locate-me" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 mt-4" title="Recenter"><span class="material-symbols-outlined">my_location</span></button>
         <button id="toggle-basemap" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95" title="Switch basemap"><span class="material-symbols-outlined">satellite_alt</span></button>
-        <button id="toggle-taxonomy" class="glass-panel w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 mt-4" title="Map layers — browse & filter the crop / tree / land-use taxonomy"><span class="material-symbols-outlined">layers</span></button>
       </div>
 
       <!-- Map Layers panel — the full Land Use / Crops / Trees taxonomy with
            per-type checkboxes that show/hide those parcels on the map. -->
-      <div id="taxonomy-panel" class="tax-panel tax-hidden glass-panel pointer-events-auto absolute left-5" style="top:84px;bottom:16px">
+      <div id="taxonomy-panel" class="tax-panel tax-hidden glass-panel pointer-events-auto absolute left-5" style="top:116px;bottom:16px">
         <div class="px-3 py-2 border-b border-gray-200 bg-gray-50/80 rounded-t-lg flex items-center gap-2 flex-shrink-0">
           <span class="material-symbols-outlined text-brand-600" style="font-size:16px;">layers</span>
-          <span class="font-label-caps text-gray-900">MAP LAYERS</span>
-          <button id="tax-close" class="ml-auto text-gray-400 hover:text-gray-700 transition-colors" title="Close layers"><span class="material-symbols-outlined" style="font-size:18px;">close</span></button>
+          <span id="tax-title" class="font-label-caps text-gray-900">MAP LAYERS</span>
+          <button id="tax-close" class="ml-auto text-gray-400 hover:text-gray-700 transition-colors" title="Back to analysis"><span class="material-symbols-outlined" style="font-size:18px;">close</span></button>
         </div>
-        <div class="px-2 pt-2 flex-shrink-0"><div id="tax-switcher" class="tax-switcher"></div></div>
-        <p class="px-3 pt-1.5 pb-1 text-[10px] text-gray-400 flex-shrink-0">Tick a type to draw it on the map · shares are of area in view</p>
+        <!-- The active module fixes which taxonomy this shows, so the in-panel
+             Land Use / Crops / Trees switcher is hidden. -->
+        <div id="tax-switcher" class="hidden"></div>
+        <p class="px-3 pt-2 pb-1 text-[10px] text-gray-400 flex-shrink-0">Tick a type to draw it on the map · shares are of area in view</p>
         <div id="tax-content" class="flex-1 overflow-y-auto scroll-thin px-2 pb-2"></div>
         <div class="flex gap-2 p-2 border-t border-gray-200 flex-shrink-0">
           <button id="tax-select-all" class="flex-1 border border-gray-300 rounded-lg py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors">Select all</button>
@@ -169,13 +165,13 @@
       <!-- Home legend — region-wide band breakdown for the coloured module (top-left) -->
       <div id="situation-legend" class="glass-panel pointer-events-auto absolute z-30" style="top:78px;inset-inline-start:24px;width:230px"></div>
 
-      <!-- Status tile strip: the six modules below the map. Calm by default. -->
-      <div id="situation-strip" class="pointer-events-auto absolute left-3 right-3 bottom-3 z-20" style="top:56%">
-        <div class="flex items-center justify-between mb-2 px-1">
+      <!-- Status tile strip: the six modules, a bottom-anchored row below the map. -->
+      <div id="situation-strip" class="pointer-events-auto absolute left-3 right-3 bottom-3 z-20 flex flex-col" style="height:184px">
+        <div class="flex items-center justify-between mb-2 px-1 flex-none">
           <span class="font-label-caps text-gray-900">The six modules</span>
           <span class="text-[10px] text-gray-400">Tap a tile to open it</span>
         </div>
-        <div id="overview-cards" class="situation-tiles"></div>
+        <div id="overview-cards" class="situation-tiles flex-1"></div>
       </div>
     </div>
 

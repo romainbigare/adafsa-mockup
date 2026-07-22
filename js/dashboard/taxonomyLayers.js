@@ -30,6 +30,13 @@
     { key: 'trees',   label: 'Trees',    icon: 'park' }
   ];
 
+  // Each taxonomy is surfaced inside the ONE module it belongs to — so the map
+  // layers are reached from the relevant module's Analysis/Map-layers toggle,
+  // not a global button. Modules without an entry are analysis-only.
+  var VIEW_FOR_MODULE = { structures: 'landuse', crop: 'crops', palms: 'trees' };
+  var TITLE_FOR_VIEW = { landuse: 'LAND-USE LAYERS', crops: 'CROP LAYERS', trees: 'TREE LAYERS' };
+  function viewForModule(key) { return VIEW_FOR_MODULE[key] || null; }
+
   function treeFor(view) {
     var tax = W.dashboard.taxonomy;
     return view === 'landuse' ? tax.LAND_USE_TREE
@@ -52,28 +59,18 @@
   // ---- open / close ----------------------------------------------------------
   function panelOpen() { return els.panel && !els.panel.classList.contains('tax-hidden'); }
 
-  // Entering layers mode pauses the host module's chrome (see .layers-mode CSS)
-  // so it never asserts module facts over a taxonomy map. The bottom sheet is
-  // auto-collapsed; a badge names the module to return to.
+  // In Map-layers mode the taxonomy panel is the workspace; the band-only legend
+  // and attention sheet step aside (see .layers-mode CSS). The KPI strip + mode
+  // toggle stay for context.
   function enterLayersMode() {
     if (typeof document === 'undefined') return;
     document.body.classList.add('layers-mode');
-    var bar = document.getElementById('module-bar');
-    if (bar) bar.classList.add('collapsed');
-    var txt = document.getElementById('layers-badge-text');
-    if (txt && W.dashboard.router && W.dashboard.moduleRegistry) {
-      var r = W.dashboard.router.current();
-      var m = r && r.key && W.dashboard.moduleRegistry.byKey(r.key);
-      txt.textContent = m
-        ? (W.str ? W.str('layersPaused', { module: m.label }) : m.label + ' paused — showing Map Layers')
-        : (W.str ? W.str('layersPausedGeneric') : 'Map Layers — module data paused');
-    }
+    if (W.dashboard.modulePage && W.dashboard.modulePage.syncModeToggle) W.dashboard.modulePage.syncModeToggle();
   }
   function exitLayersMode() {
     if (typeof document === 'undefined') return;
     document.body.classList.remove('layers-mode');
-    var bar = document.getElementById('module-bar');
-    if (bar) bar.classList.remove('collapsed');
+    if (W.dashboard.modulePage && W.dashboard.modulePage.syncModeToggle) W.dashboard.modulePage.syncModeToggle();
   }
 
   function showPanel() { if (els.panel) els.panel.classList.remove('tax-hidden'); if (els.toggle) els.toggle.classList.add('active'); enterLayersMode(); }
@@ -83,11 +80,16 @@
   function close(state) { hidePanel(); leaveTaxonomy(state, restore); }
   function toggle(state) { panelOpen() ? close(state) : open(state); }
 
+  // Open the layers browser fixed to a specific taxonomy (the active module's).
+  function openFor(state, view) { showPanel(); enter(state, view); }
+
   // ---- enter a taxonomy view -------------------------------------------------
   function enter(state, view) {
     lastView = view;
     state.taxonomyView = view;
     state.activeModule = null;                 // colour by taxonomy value, not a band
+    var title = document.getElementById('tax-title');
+    if (title) title.textContent = TITLE_FOR_VIEW[view] || 'MAP LAYERS';
     markSwitcher();
     var ds = datasetFor(view);
     if (state.currentDataset !== ds) {
@@ -319,19 +321,17 @@
     opts = opts || {};
     restore = opts.restore || null;
     els.panel = $('taxonomy-panel');
-    els.toggle = $('toggle-taxonomy');
+    els.toggle = $('toggle-taxonomy');       // legacy global button (removed) — optional
     els.close = $('tax-close');
     els.switcher = $('tax-switcher');
     els.content = $('tax-content');
     els.selectAll = $('tax-select-all');
     els.clear = $('tax-clear');
-    if (!els.panel || !els.toggle) return;   // this page has no layers chrome
+    if (!els.panel) return;                  // this page has no layers chrome
 
     buildSwitcher(state);
-    els.toggle.addEventListener('click', function () { toggle(state); });
+    if (els.toggle) els.toggle.addEventListener('click', function () { toggle(state); });
     if (els.close) els.close.addEventListener('click', function () { close(state); });
-    els.return = $('layers-return');
-    if (els.return) els.return.addEventListener('click', function () { close(state); });
     if (els.selectAll) els.selectAll.addEventListener('click', function () { setAll(state, true); });
     if (els.clear) els.clear.addEventListener('click', function () { setAll(state, false); });
 
@@ -353,9 +353,11 @@
     init: init,
     ensurePlots: ensurePlots,
     open: open,
+    openFor: openFor,
     close: close,
     toggle: toggle,
     isOpen: panelOpen,
+    viewForModule: viewForModule,
     // Pure helpers — exposed for tests / reuse (see test/taxonomyLayers.test.js).
     datasetFor: datasetFor,
     ownTypes: ownTypes,
