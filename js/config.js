@@ -14,7 +14,11 @@
           options: { maxZoom: 19, attribution: "&copy; OpenStreetMap" }
         }
       },
-      defaults: { center: [23.85, 53.78], zoom: 10 }
+      defaults: { center: [23.85, 53.78], zoom: 10 },
+      // Region envelope (Abu Dhabi / Al Ain). Farm centroids outside it are
+      // placeholder-data strays (some mock farms sit out in the Gulf) — they get
+      // no map marker or heat. Generous, so it only trims the clearly-offshore.
+      regionBounds: { sw: [22.5, 52.0], ne: [25.6, 56.6] }
     },
     // Proposal A — the nav sells the six contract modules by name. Module links
     // point at hash routes on index.html (the SPA shell); the router marks the

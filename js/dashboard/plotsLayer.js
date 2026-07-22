@@ -427,23 +427,28 @@
     }
   }
 
-  // Never draw a farm marker in the sea. A handful of placeholder centroids fall
-  // well outside the region; flag them (_offMap) and drop only their map marker —
-  // the table row stays. Bounds are derived from the 2nd/98th percentile of all
-  // centroids (+ generous pad), so nothing region-hardcoded.
+  // Never draw a farm marker (or heat) in the sea. Some placeholder centroids
+  // sit out in the Gulf; flag them (_offMap) and drop their map marker — the
+  // table row stays. Primary bound is the configured region envelope
+  // (config.map.regionBounds); if absent, fall back to Tukey IQR fences.
   function pruneOffMapMarkers(state) {
     var fs = state.farmFeatures;
     if (!fs || fs.length < 25) return;
-    var lats = [], lngs = [], i;
-    for (i = 0; i < fs.length; i++) {
-      if (fs[i].centroid) { lats.push(fs[i].centroid[0]); lngs.push(fs[i].centroid[1]); }
+    var b, rb = W.config && W.config.map && W.config.map.regionBounds;
+    if (rb) {
+      b = { latLo: rb.sw[0], latHi: rb.ne[0], lngLo: rb.sw[1], lngHi: rb.ne[1] };
+    } else {
+      var lats = [], lngs = [], i;
+      for (i = 0; i < fs.length; i++) {
+        if (fs[i].centroid) { lats.push(fs[i].centroid[0]); lngs.push(fs[i].centroid[1]); }
+      }
+      lats.sort(function (a, b) { return a - b; });
+      lngs.sort(function (a, b) { return a - b; });
+      var q = function (arr, p) { return arr[Math.min(arr.length - 1, Math.floor(arr.length * p))]; };
+      var fence = function (arr) { var q1 = q(arr, 0.25), q3 = q(arr, 0.75), iqr = (q3 - q1) || 0.05; return [q1 - 3 * iqr, q3 + 3 * iqr]; };
+      var fl = fence(lats), fn = fence(lngs);
+      b = { latLo: fl[0], latHi: fl[1], lngLo: fn[0], lngHi: fn[1] };
     }
-    lats.sort(function (a, b) { return a - b; });
-    lngs.sort(function (a, b) { return a - b; });
-    function q(arr, p) { return arr[Math.min(arr.length - 1, Math.floor(arr.length * p))]; }
-    var latLo = q(lats, 0.02), latHi = q(lats, 0.98), lngLo = q(lngs, 0.02), lngHi = q(lngs, 0.98);
-    var padLat = (latHi - latLo) * 0.5 || 0.1, padLng = (lngHi - lngLo) * 0.5 || 0.1;
-    var b = { latLo: latLo - padLat, latHi: latHi + padLat, lngLo: lngLo - padLng, lngHi: lngHi + padLng };
 
     var offByType = {}, pruned = 0;
     for (i = 0; i < fs.length; i++) {

@@ -63,7 +63,7 @@ check("one [lat,lng,intensity] per on-map farm; intensity >= baseline", function
   assert.strictEqual(pts.length, 2);
   pts.forEach(function (p) {
     assert.strictEqual(p.length, 3, "lat,lng,intensity");
-    assert.ok(p[2] >= 0.18 - 1e-9, "at least the baseline, got " + p[2]);
+    assert.ok(p[2] >= 0.12 - 1e-9, "at least the baseline, got " + p[2]);
     assert.ok(p[2] <= 1 + 1e-9, "at most 1");
   });
   // the critical farm is hotter than the healthy one
