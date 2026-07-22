@@ -14,7 +14,7 @@
     allFeatures: [],
     polygons: [],
     selectedFarm: null,
-    currentHeatmap: 'growth-week',
+    currentHeatmap: 'crop',
     heatmapOpacity: 0.65,
     totalFarms: 0,
     totalArea: 0,
@@ -46,15 +46,15 @@
       var ring = plot.coords.map(function (c) { return mercToLatLng(c[0], c[1]); });
       // Close ring if needed
       if (ring[0][0] !== ring[ring.length - 1][0] || ring[0][1] !== ring[ring.length - 1][1]) ring.push(ring[0]);
-      var feature = { properties: { fid: plot.fid, Type: plot.type }, _growthWeek: 0, _growthMonth: 0, _irrigation: 0, _crop: null, _cropCat: null, type: plot.type };
+      var feature = { properties: { fid: plot.fid, Type: plot.type }, _cropMon: 0, _palms: 0, _ier: 0, _yield: 0, _water: 0, _crop: null, _cropCat: null, type: plot.type };
       mock.assignMetrics(feature, plot.fid);
-      // Precompute detailed per-shape heatmap fields for each metric
+      // Precompute detailed per-shape heatmap fields for each module
       feature._fields = {
-        'growth-week': mock.generateHeatField(plot.fid, 'growth-week'),
-        'growth-month': mock.generateHeatField(plot.fid, 'growth-month'),
-        'irrigation': mock.generateHeatField(plot.fid, 'irrigation'),
-        'phenology': mock.generateHeatField(plot.fid, 'phenology'),
-        'density': mock.generateHeatField(plot.fid, 'density'),
+        'crop': mock.generateHeatField(plot.fid, 'crop'),
+        'palms': mock.generateHeatField(plot.fid, 'palms'),
+        'ier': mock.generateHeatField(plot.fid, 'ier'),
+        'yield': mock.generateHeatField(plot.fid, 'yield'),
+        'water': mock.generateHeatField(plot.fid, 'water'),
       };
       // Estimate area from mercator bbox
       var xs = plot.coords.map(function (c) { return c[0]; }), ys = plot.coords.map(function (c) { return c[1]; });
@@ -110,28 +110,45 @@
     heatmap.drawHeatmapOverlay(state);
   }
 
+  // Module display names + the bands each 0..1 score falls into (high → low, so
+  // the first threshold a value clears wins). Mirrors the overview's module bands.
+  var METRIC_LABEL = {
+    crop: 'Crop Monitoring', palms: 'Palms & Fruit Trees', ier: 'Irrigation Efficiency',
+    yield: 'Yield Forecast', water: 'Crop Water Allocation'
+  };
+  var METRIC_BANDS = {
+    crop:  [[0.66, 'Cultivated'], [0.33, 'Partially Fallow'], [0, 'Fallow']],
+    palms: [[0.75, 'Healthy'], [0.5, 'Fair'], [0.25, 'Stressed'], [0, 'Severe Stress']],
+    ier:   [[0.8, 'Excellent'], [0.6, 'Good'], [0.4, 'Acceptable'], [0.2, 'Poor'], [0, 'Critical']],
+    yield: [[0.75, 'Above Expected'], [0.5, 'On Track'], [0.25, 'Below Expected'], [0, 'Significantly Underperforming']],
+    water: [[0.8, 'Over-Allocated'], [0.6, 'Mild Excess'], [0.3, 'Efficient'], [0, 'Water-Stressed']]
+  };
+  function classify(metric, v) {
+    var bands = METRIC_BANDS[metric] || METRIC_BANDS.crop;
+    for (var i = 0; i < bands.length; i++) if (v >= bands[i][0]) return bands[i][1];
+    return bands[bands.length - 1][1];
+  }
+
   function buildPopup(item) {
     var f = item.feature;
-    var extra = '';
     var ch = state.currentHeatmap;
-    if (ch === 'growth-week') extra = '<span style="color:#6b7280;font-size:11px">Growth (7d): <b style="color:#16a34a">' + Math.round(f._growthWeek * 100) + '%</b></span><br>';
-    else if (ch === 'growth-month') extra = '<span style="color:#6b7280;font-size:11px">Growth (30d): <b style="color:#15803d">' + Math.round(f._growthMonth * 100) + '%</b></span><br>';
-    else if (ch === 'irrigation') { var pct = Math.round(f._irrigation * 100); var lvl = f._irrigation > 0.66 ? 'Optimal' : f._irrigation > 0.33 ? 'Moderate' : 'Low'; extra = '<span style="color:#6b7280;font-size:11px">Irrigation: <b style="color:#2196f3">' + lvl + ' (' + pct + '%)</b></span><br>'; }
-    else if (ch === 'phenology') { var pct2 = Math.round(f._phenology * 100); var st = f._phenology > 0.66 ? 'Reproductive' : f._phenology > 0.33 ? 'Vegetative' : 'Emergence'; extra = '<span style="color:#6b7280;font-size:11px">Phenology: <b style="color:#7b1fa2">' + st + ' (' + pct2 + '%)</b></span><br>'; }
-    else if (ch === 'density') { var pct3 = Math.round(f._density * 100); var st2 = f._density > 0.66 ? 'Dense' : f._density > 0.33 ? 'Moderate' : 'Sparse'; extra = '<span style="color:#6b7280;font-size:11px">Density: <b style="color:#2e7d32">' + st2 + ' (' + pct3 + '%)</b></span><br>'; }
+    var v = f[metricKey(ch)];
+    var col = metricColorFn(ch)(v);
+    var extra = '<span style="color:#6b7280;font-size:11px">' + METRIC_LABEL[ch] +
+      ': <b style="color:' + col + '">' + classify(ch, v) + ' (' + Math.round(v * 100) + '%)</b></span><br>';
     return '<div style="font-family:Inter,sans-serif;min-width:140px"><b style="color:#111827">' + item.type + '</b><br><span style="color:#6b7280;font-size:11px">ID: ' + item.fid + '</span><br><span style="color:#6b7280;font-size:11px">Area: ~' + item.area.toFixed(1) + ' dun</span><br>' + extra + '</div>';
   }
 
   // ---- Stats (6-month average trend chart) ----
   function metricKey(metric) {
-    return metric === 'growth-week' ? '_growthWeek' : metric === 'growth-month' ? '_growthMonth' : metric === 'irrigation' ? '_irrigation' : metric === 'phenology' ? '_phenology' : metric === 'density' ? '_density' : '_growthWeek';
+    return metric === 'palms' ? '_palms' : metric === 'ier' ? '_ier' : metric === 'yield' ? '_yield' : metric === 'water' ? '_water' : '_cropMon';
   }
   function metricColorFn(metric) {
-    return metric === 'irrigation' ? heatmap.irrigationColor : metric === 'phenology' ? heatmap.phenologyColor : metric === 'density' ? heatmap.densityColor : heatmap.growthColor;
+    return metric === 'palms' ? heatmap.palmsColor : metric === 'ier' ? heatmap.ierColor : metric === 'yield' ? heatmap.yieldColor : metric === 'water' ? heatmap.waterColor : heatmap.cropColor;
   }
 
   function updateStats() {
-    var titles = { 'growth-week': 'GROWTH — LAST WEEK', 'growth-month': 'GROWTH — LAST MONTH', 'irrigation': 'IRRIGATION LEVELS', 'phenology': 'CROP PHENOLOGY', 'density': 'CROP DENSITY' };
+    var titles = { 'crop': 'CROP MONITORING', 'palms': 'PALMS & FRUIT TREES', 'ier': 'IRRIGATION EFFICIENCY', 'yield': 'YIELD FORECAST', 'water': 'CROP WATER ALLOCATION' };
     document.getElementById('stats-title').textContent = titles[state.currentHeatmap];
     document.getElementById('stat-farms').textContent = state.totalFarms;
     document.getElementById('stat-area').innerHTML = Math.round(state.totalArea).toLocaleString() + ' <span class="font-data-sm text-gray-500">dun</span>';
@@ -165,17 +182,43 @@
   }
 
   // ---- Legend ----
+  // One legend per module: a gradient built from the module's band palette, the
+  // band names as ticks, and a plain-language description of the metric.
+  var LEGENDS = {
+    crop: {
+      grad: 'rgb(217,164,65),rgb(254,224,139),rgb(145,207,96),rgb(26,152,80)',
+      ticks: ['Fallow', 'Partially Fallow', 'Cultivated'],
+      desc: 'Cultivated fraction of each plot'
+    },
+    palms: {
+      grad: 'rgb(215,48,39),rgb(254,224,139),rgb(145,207,96),rgb(26,152,80)',
+      ticks: ['Severe Stress', 'Stressed', 'Fair', 'Healthy'],
+      desc: 'Canopy-health index (NDVI-like)'
+    },
+    ier: {
+      grad: 'rgb(215,48,39),rgb(252,141,89),rgb(254,224,139),rgb(145,207,96),rgb(26,152,80)',
+      ticks: ['Critical', 'Acceptable', 'Excellent'],
+      desc: 'Irrigation efficiency score'
+    },
+    yield: {
+      grad: 'rgb(215,48,39),rgb(253,174,97),rgb(166,217,106),rgb(26,152,80)',
+      ticks: ['Underperforming', 'On Track', 'Above Expected'],
+      desc: 'Yield vs. sub-zone expectation'
+    },
+    water: {
+      grad: 'rgb(224,130,20),rgb(26,152,80),rgb(254,224,139),rgb(179,0,0)',
+      ticks: ['Water-Stressed', 'Efficient', 'Over-Allocated'],
+      desc: 'Water use vs. modelled demand'
+    }
+  };
   function updateLegend() {
     var el = document.getElementById('legend-content');
-    if (state.currentHeatmap === 'growth-week' || state.currentHeatmap === 'growth-month') {
-      el.innerHTML = '<div class="space-y-2"><div class="legend-bar" style="background:linear-gradient(to right,rgb(120,80,40),rgb(200,170,60),rgb(180,210,80),rgb(80,200,80),rgb(20,120,40))"></div><div class="flex justify-between text-xs text-gray-500"><span>Low</span><span>Moderate</span><span>High</span></div><p class="text-xs text-gray-400">NDVI-based vegetation growth index</p></div>';
-    } else if (state.currentHeatmap === 'irrigation') {
-      el.innerHTML = '<div class="space-y-2"><div class="legend-bar" style="background:linear-gradient(to right,rgb(200,180,120),rgb(180,200,160),rgb(100,180,220),rgb(40,130,200),rgb(10,60,140))"></div><div class="flex justify-between text-xs text-gray-500"><span>Dry</span><span>Moderate</span><span>Optimal</span></div><p class="text-xs text-gray-400">Soil moisture & irrigation coverage</p></div>';
-    } else if (state.currentHeatmap === 'phenology') {
-      el.innerHTML = '<div class="space-y-2"><div class="legend-bar" style="background:linear-gradient(to right,rgb(90,60,140),rgb(180,80,160),rgb(230,140,80),rgb(200,200,60),rgb(90,200,90),rgb(20,130,50))"></div><div class="flex justify-between text-xs text-gray-500"><span>Emergence</span><span>Vegetative</span><span>Reproductive</span></div><p class="text-xs text-gray-400">Crop phenological stage progression</p></div>';
-    } else if (state.currentHeatmap === 'density') {
-      el.innerHTML = '<div class="space-y-2"><div class="legend-bar" style="background:linear-gradient(to right,rgb(240,240,230),rgb(200,220,160),rgb(120,200,100),rgb(40,160,60),rgb(10,80,30))"></div><div class="flex justify-between text-xs text-gray-500"><span>Sparse</span><span>Moderate</span><span>Dense</span></div><p class="text-xs text-gray-400">Plant canopy density & cover</p></div>';
-    }
+    var cfg = LEGENDS[state.currentHeatmap] || LEGENDS.crop;
+    var ticks = cfg.ticks.map(function (t) { return '<span>' + t + '</span>'; }).join('');
+    el.innerHTML = '<div class="space-y-2">' +
+      '<div class="legend-bar" style="background:linear-gradient(to right,' + cfg.grad + ')"></div>' +
+      '<div class="flex justify-between text-xs text-gray-500">' + ticks + '</div>' +
+      '<p class="text-xs text-gray-400">' + cfg.desc + '</p></div>';
   }
 
   // ---- Farm Information Panel ----

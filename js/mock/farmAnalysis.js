@@ -15,11 +15,14 @@
 
   // ---- Assign metrics per plot (deterministic) ----
   function assignMetrics(f, fid) {
-    f._growthWeek = 0.2 + seededRandom(fid) * 0.7;
-    f._growthMonth = 0.15 + seededRandom(fid + 1000) * 0.8;
-    f._irrigation = 0.1 + seededRandom(fid + 2000) * 0.85;
-    f._phenology = 0.1 + seededRandom(fid + 3000) * 0.85;
-    f._density = 0.15 + seededRandom(fid + 4000) * 0.8;
+    // Per-plot module scores (0..1). Seeds are unchanged from the original
+    // growth/irrigation/phenology/density metrics so the mock visuals stay
+    // byte-identical — only what each field REPRESENTS was renamed.
+    f._cropMon = 0.2 + seededRandom(fid) * 0.7;         // Crop Monitoring
+    f._palms = 0.15 + seededRandom(fid + 1000) * 0.8;   // Palms & Fruit Trees
+    f._ier = 0.1 + seededRandom(fid + 2000) * 0.85;     // Irrigation Efficiency
+    f._yield = 0.1 + seededRandom(fid + 3000) * 0.85;   // Yield Forecast
+    f._water = 0.15 + seededRandom(fid + 4000) * 0.8;   // Crop Water Allocation
     f._crop = f.type === 'Palm Trees' ? 'Date Palm' : f.type === 'Other Trees' ? 'Olive' : f.type === 'Fruit Trees' ? 'Citrus' : f.type === 'Cultivated Fields' ? 'Alfalfa' : null;
     f._cropCat = f._crop ? (f.type.includes('Trees') ? 'Trees' : 'Fodder') : null;
   }
@@ -58,7 +61,7 @@
 
   // Generate a normalized field for a given plot + metric
   function generateHeatField(fid, metric) {
-    var seed = fid + (metric === 'growth-week' ? 100 : metric === 'growth-month' ? 200 : metric === 'irrigation' ? 300 : 400);
+    var seed = fid + (metric === 'crop' ? 100 : metric === 'palms' ? 200 : metric === 'ier' ? 300 : 400);
     var field = new Float32Array(HEATMAP_GRID * HEATMAP_GRID);
     // Collect raw noise then normalize to full 0..1 range per plot for max contrast
     var raw = new Float32Array(HEATMAP_GRID * HEATMAP_GRID);
@@ -88,15 +91,15 @@
   // ---- Farm Information panel ----
   function buildFarmInfoItems(selectedFarm, allFeatures, totalArea) {
     var crop = (allFeatures[0] && allFeatures[0].feature && allFeatures[0].feature._crop) || 'Date Palm';
-    var growthScore = (allFeatures.reduce(function (s, i) { return s + i.feature._growthWeek; }, 0) / allFeatures.length * 100).toFixed(1);
-    var irrScore = (allFeatures.reduce(function (s, i) { return s + i.feature._irrigation; }, 0) / allFeatures.length * 100).toFixed(1);
+    var cropScore = (allFeatures.reduce(function (s, i) { return s + i.feature._cropMon; }, 0) / allFeatures.length * 100).toFixed(1);
+    var irrScore = (allFeatures.reduce(function (s, i) { return s + i.feature._ier; }, 0) / allFeatures.length * 100).toFixed(1);
     var irrRating = irrScore > 80 ? 'Excellent' : irrScore > 60 ? 'Good' : 'Moderate';
     var seedFid = selectedFarm.plots[0].fid;
     return [
-      { icon: 'trending_up', label: 'Crop Growth', value: 'Critical crop-growth', sub: growthScore },
-      { icon: 'water_drop', label: 'Irrigation Score', value: irrScore, sub: 'Rating: ' + irrRating },
+      { icon: 'grass', label: 'Crop Monitoring', value: cropScore + '% cultivated' },
+      { icon: 'water_drop', label: 'Irrigation Efficiency', value: irrScore, sub: 'Rating: ' + irrRating },
       { icon: 'crop_square', label: 'Total Area', value: totalArea.toFixed(1) + ' dun' },
-      { icon: 'grass', label: 'Crop Name', value: crop },
+      { icon: 'spa', label: 'Crop Name', value: crop },
       { icon: 'schedule', label: 'Crop Age', value: (Math.floor(seededRandom(seedFid) * 200) + 60) + ' days' },
       { icon: 'agriculture', label: 'Yield Forecast', value: (Math.floor(seededRandom(seedFid + 500) * 80) + 20) + ' kg/tree' },
       { icon: 'construction', label: 'Tillage Type', value: 'No Till' },

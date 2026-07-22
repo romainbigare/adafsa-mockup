@@ -9,41 +9,53 @@
 
   function colorFor(t) { return TYPE_COLORS[t] || '#999'; }
 
-  // ---- Heatmap color scales ----
-  function growthColor(v) {
-    var s = [[0, [110, 60, 30]], [0.15, [180, 130, 40]], [0.35, [210, 190, 60]], [0.5, [170, 210, 70]], [0.65, [90, 200, 80]], [0.85, [30, 150, 50]], [1, [10, 90, 30]]];
+  // ---- Heatmap colour scales — one per tracked module, built from the module's
+  // band palette (low → high) so the map obeys the same COLOUR CONTRACT as the
+  // overview (red = needs action, amber = watch, green = fine).
+
+  // Crop Monitoring — Fallow → Partially Fallow → Cultivated.
+  function cropColor(v) {
+    var s = [[0, [217, 164, 65]], [0.4, [254, 224, 139]], [0.7, [145, 207, 96]], [1, [26, 152, 80]]];
     return interp(s, v);
   }
-  function irrigationColor(v) {
-    var s = [[0, [210, 170, 100]], [0.2, [220, 200, 140]], [0.4, [150, 200, 180]], [0.6, [60, 170, 210]], [0.8, [20, 110, 200]], [1, [5, 40, 120]]];
+  // Palms & Fruit Trees — Severe Stress → Stressed → Fair → Healthy.
+  function palmsColor(v) {
+    var s = [[0, [215, 48, 39]], [0.4, [254, 224, 139]], [0.7, [145, 207, 96]], [1, [26, 152, 80]]];
     return interp(s, v);
   }
-  function phenologyColor(v) {
-    var s = [[0, [90, 60, 140]], [0.2, [180, 80, 160]], [0.4, [230, 140, 80]], [0.6, [200, 200, 60]], [0.8, [90, 200, 90]], [1, [20, 130, 50]]];
+  // Irrigation Efficiency — Critical → Poor → Acceptable → Good → Excellent.
+  function ierColor(v) {
+    var s = [[0, [215, 48, 39]], [0.3, [252, 141, 89]], [0.55, [254, 224, 139]], [0.8, [145, 207, 96]], [1, [26, 152, 80]]];
     return interp(s, v);
   }
-  function densityColor(v) {
-    var s = [[0, [240, 240, 230]], [0.25, [200, 220, 160]], [0.5, [120, 200, 100]], [0.75, [40, 160, 60]], [1, [10, 80, 30]]];
+  // Yield Forecast — Significantly Underperforming → Below Expected → On Track → Above Expected.
+  function yieldColor(v) {
+    var s = [[0, [215, 48, 39]], [0.4, [253, 174, 97]], [0.7, [166, 217, 106]], [1, [26, 152, 80]]];
+    return interp(s, v);
+  }
+  // Crop Water Allocation — diverging: Water-Stressed → Efficient → Mild Excess → Over-Allocated.
+  function waterColor(v) {
+    var s = [[0, [224, 130, 20]], [0.4, [26, 152, 80]], [0.7, [254, 224, 139]], [1, [179, 0, 0]]];
     return interp(s, v);
   }
 
-  // Color for a heatmap value (0..1) given the current metric
+  // Colour for a heatmap value (0..1) under the current module.
   function heatmapValueColor(metric, v) {
-    if (metric === 'irrigation') return irrigationColor(v);
-    if (metric === 'phenology') return phenologyColor(v);
-    if (metric === 'density') return densityColor(v);
-    // growth-week / growth-month share the growth scale
-    return growthColor(v);
+    if (metric === 'palms') return palmsColor(v);
+    if (metric === 'ier') return ierColor(v);
+    if (metric === 'yield') return yieldColor(v);
+    if (metric === 'water') return waterColor(v);
+    return cropColor(v); // crop
   }
 
-  // Solid outline/fallback color for a feature under the current heatmap mode
+  // Solid outline/fallback colour for a feature under the current module.
   function featureColor(f, currentHeatmap) {
     switch (currentHeatmap) {
-      case 'growth-week': return growthColor(f._growthWeek);
-      case 'growth-month': return growthColor(f._growthMonth);
-      case 'irrigation': return irrigationColor(f._irrigation);
-      case 'phenology': return phenologyColor(f._phenology);
-      case 'density': return densityColor(f._density);
+      case 'crop': return cropColor(f._cropMon);
+      case 'palms': return palmsColor(f._palms);
+      case 'ier': return ierColor(f._ier);
+      case 'yield': return yieldColor(f._yield);
+      case 'water': return waterColor(f._water);
       default: return colorFor(f.type);
     }
   }
@@ -124,10 +136,11 @@
   }
 
   W.farmAnalysis.heatmap = {
-    growthColor: growthColor,
-    irrigationColor: irrigationColor,
-    phenologyColor: phenologyColor,
-    densityColor: densityColor,
+    cropColor: cropColor,
+    palmsColor: palmsColor,
+    ierColor: ierColor,
+    yieldColor: yieldColor,
+    waterColor: waterColor,
     heatmapValueColor: heatmapValueColor,
     featureColor: featureColor,
 
