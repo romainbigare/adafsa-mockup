@@ -112,28 +112,30 @@
       </div>
     </div>
 
-    <!-- ============ HOME: MAP-LED (overview route) ============ -->
-    <!-- Transparent overlay: the framed region map (#map, .map-framed) shows
-         through the top; the launch strip sits below. -->
+    <!-- ============ ALTITUDE 1 — THE SITUATION (overview route) ============ -->
+    <!-- Transparent overlay: verdict on top, the framed region map (#map,
+         .map-framed) shows through the middle, calm status tiles below. -->
     <div id="route-overview" class="route-hidden absolute inset-0 z-20 pointer-events-none">
 
-      <!-- Colour-by control, floating over the framed map -->
-      <div class="pointer-events-auto absolute left-6 z-30 flex items-center gap-2 glass-panel px-3 py-2" style="top:24px">
-        <span class="font-label-caps text-gray-900">REGION OVERVIEW</span>
-        <span class="text-[10px] text-gray-400" id="overview-meta">—</span>
-      </div>
-      <div class="pointer-events-auto absolute right-6 z-30 flex items-center gap-2 glass-panel px-3 py-1.5" style="top:24px">
+      <!-- Verdict bar — the single most load-bearing element: is anything red? -->
+      <div id="situation-verdict" class="situation-verdict pointer-events-auto"></div>
+
+      <!-- Colour-by control, floating over the framed map (top-right) -->
+      <div class="pointer-events-auto absolute z-30 flex items-center gap-2 glass-panel px-3 py-1.5" style="top:78px;inset-inline-end:24px">
         <span class="text-xs text-gray-500">Colour by</span>
         <select id="colour-by" class="text-xs font-medium text-gray-800 bg-transparent focus:outline-none cursor-pointer"></select>
       </div>
 
-      <!-- Launch strip: the six module tiles below the map -->
-      <div id="overview-strip" class="pointer-events-auto absolute left-3 right-3 bottom-3 z-20 glass-panel p-3 overflow-y-auto scroll-thin" style="top:58%">
-        <div class="flex items-center justify-between mb-2">
-          <span class="font-label-caps text-gray-900">MODULES</span>
-          <span class="text-[10px] text-gray-400">Click a tile to open its full module page</span>
+      <!-- Home legend — region-wide band breakdown for the coloured module (top-left) -->
+      <div id="situation-legend" class="glass-panel pointer-events-auto absolute z-30" style="top:78px;inset-inline-start:24px;width:230px"></div>
+
+      <!-- Status tile strip: the six modules below the map. Calm by default. -->
+      <div id="situation-strip" class="pointer-events-auto absolute left-3 right-3 bottom-3 z-20" style="top:56%">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <span class="font-label-caps text-gray-900">The six modules</span>
+          <span class="text-[10px] text-gray-400">Tap a tile to open it</span>
         </div>
-        <div id="overview-cards" class="grid gap-2" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))"></div>
+        <div id="overview-cards" class="situation-tiles"></div>
       </div>
     </div>
 
@@ -163,8 +165,10 @@
 <script src="js/dashboard/taxonomyLayers.js"></script>
 <script src="js/dashboard/dataTable.js"></script>
 <script src="js/dashboard/attentionList.js"></script>
+<script src="js/dashboard/legend.js"></script>
 <script src="js/dashboard/scorecard.js"></script>
 <script src="js/dashboard/modulePage.js"></script>
+<script src="js/dashboard/situation.js"></script>
 <script src="js/pages/overview.js"></script>
 <script src="js/dashboard/router.js"></script>
 <script src="js/pages/dashboard.js"></script>

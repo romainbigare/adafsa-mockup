@@ -118,30 +118,8 @@
   function renderLegend(state) {
     var el = document.getElementById('module-legend');
     if (!el || !CUR.module) return;
-    var m = CUR.module;
-    var counts = mods.bandCounts(m, farmsInView(state));
-    var scored = 0; m.bands.forEach(function (b) { scored += counts[b.label] || 0; });
-    var segs = m.bands.map(function (b) {
-      var p = scored ? (counts[b.label] || 0) / scored * 100 : 0;
-      return p > 0 ? '<span class="cat-chart-seg" style="width:' + p + '%;background:' + b.color + '"></span>' : '';
-    }).join('');
-    var rows = m.bands.map(function (b) {
-      var p = scored ? Math.round((counts[b.label] || 0) / scored * 100) : 0;
-      return '<div class="flex items-center justify-between py-0.5">' +
-          '<div class="flex items-center gap-1.5 min-w-0">' +
-            '<span class="w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background:' + b.color + '"></span>' +
-            '<span class="text-xs text-gray-700 truncate">' + b.label + '</span>' +
-          '</div>' +
-          '<div class="flex items-center gap-2 flex-shrink-0 pl-2">' +
-            '<span class="text-[10px] text-gray-400 font-mono whitespace-nowrap">' + b.range + '</span>' +
-            '<span class="text-xs text-gray-500 tabular-nums w-8 text-right">' + p + '%</span>' +
-          '</div></div>';
-    }).join('');
-    el.innerHTML =
-      '<div class="px-3 py-2 border-b border-gray-200 bg-gray-50/80 rounded-t-lg font-label-caps text-gray-900">LEGEND</div>' +
-      '<div class="p-3"><div class="cat-chart mb-2"><div class="cat-chart-bar">' + segs + '</div></div>' +
-        '<div class="space-y-0.5">' + rows + '</div>' +
-        '<p class="text-[10px] text-gray-400 mt-2">Shares are of farms currently in view.</p></div>';
+    // Shared legend component, scoped to the farms currently on screen.
+    W.dashboard.legend.render(el, CUR.module, farmsInView(state), { scope: 'view' });
   }
 
   // ---- Tabs / collapse -------------------------------------------------------

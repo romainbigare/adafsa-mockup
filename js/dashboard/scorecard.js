@@ -71,8 +71,29 @@
       '</a>';
   }
 
+  // Calm "status" tile for the Situation screen. Answers OK/not-OK and is a
+  // door — nothing more. No band strip; the tile's border/chip carry the state
+  // (COLOUR CONTRACT) so a healthy region is visually quiet and problems glow.
+  function statusCard(vm) {
+    var kindCls = vm.statusKind === 'critical' ? 'status-tile--critical'
+      : vm.statusKind === 'warn' ? 'status-tile--warn' : 'status-tile--ok';
+    return '' +
+      '<a href="#/m/' + esc(vm.key) + '" data-module="' + esc(vm.key) + '" ' +
+        'class="status-tile ' + kindCls + (vm.hero ? ' status-tile--hero' : '') + ' group block">' +
+        '<div class="flex items-start justify-between gap-2">' +
+          '<span class="status-tile-name">' + esc(vm.label) + '</span>' +
+          '<span class="status-tile-fee" title="Share of contract fee">' + vm.feePct + '%</span>' +
+        '</div>' +
+        '<div class="status-tile-headline">' + esc(vm.headline) + '</div>' +
+        '<div class="mt-2">' + chip(vm) + '</div>' +
+      '</a>';
+  }
+
   function cardHtml(vm, opts) {
-    return (opts && opts.size === 'mini') ? miniCard(vm) : bigCard(vm);
+    var size = opts && opts.size;
+    if (size === 'status') return statusCard(vm);
+    if (size === 'mini') return miniCard(vm);
+    return bigCard(vm);
   }
 
   // Render a set of module cardModels into a container element.
