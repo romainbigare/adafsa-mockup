@@ -81,14 +81,40 @@
   // Guarded so the pure helpers (severityFor / points) still load under Node in
   // tests, where Leaflet (L) is absent.
   var CriticalityHeat = (typeof L !== 'undefined' && L.Layer) ? L.Layer.extend({
-    options: { radius: 55, pane: 'heatPane', downsample: 2 },
-    initialize: function (opts) { L.setOptions(this, opts); this._farms = []; this._intensity = null; },
+    // power: blend between average (1) and max (∞); ~2 emphasises criticality.
+    // lo/hiAnchor: the meaningful criticality range, stretched across the full
+    //   green→red gradient (the data lives here, so this is where contrast lives).
+    // coverageRef: total weight at which the field is fully opaque (edge fade).
+    options: { radius: 62, pane: 'heatPane', downsample: 2, power: 2, loAnchor: 0.2, hiAnchor: 0.88, loFloor: 0.18, coverageRef: 1.0, maxAlpha: 205 },
+    initialize: function (opts) { L.setOptions(this, opts); this._farms = []; this._intensity = null; this._lo = 0.2; this._hi = 0.88; },
 
     setData: function (farms, intensityFn) {
       this._farms = farms || [];
       this._intensity = intensityFn;
+      this._computeAnchors();
       if (this._map) this._redraw();
       return this;
+    },
+
+    // Anchor the colour gradient to THIS lens's criticality distribution, so the
+    // least-critical farmland reads green and the worst reads red even when the
+    // whole region is broadly critical — that's how "where is it worse?" shows.
+    // A green floor keeps genuinely-healthy areas green (absolute meaning kept
+    // at the low end). Stable across pan/zoom (computed once per lens, not per view).
+    _computeAnchors: function () {
+      var crits = [], i;
+      if (this._intensity) {
+        for (i = 0; i < this._farms.length; i++) {
+          var f = this._farms[i];
+          if (f.centroid && !f._offMap) crits.push(this._intensity(f));
+        }
+      }
+      if (crits.length < 20) { this._lo = this.options.loAnchor; this._hi = this.options.hiAnchor; return; }
+      crits.sort(function (a, b) { return a - b; });
+      var pc = function (q) { return crits[Math.min(crits.length - 1, Math.floor(crits.length * q))]; };
+      var lo = Math.max(this.options.loFloor, pc(0.15));
+      this._lo = lo;
+      this._hi = Math.max(lo + 0.15, pc(0.90));
     },
 
     onAdd: function (map) {
@@ -137,37 +163,54 @@
       ctx.clearRect(0, 0, w, h);
       if (!this._farms.length || !this._intensity) return;
 
-      // MAX-blend into a downsampled float buffer.
+      // Build a smooth CRITICALITY FIELD via a distance-weighted power mean:
+      //   value(px) = ( Σ w·crit^p / Σ w )^(1/p)
+      // p=1 is a plain average (washes out lone critical farms); p→∞ is max
+      // (red dots). p≈3 sits between: critical farms pull the local colour toward
+      // red, but the colour is the AREA'S criticality level, not a blob's peak —
+      // so it stops reading as density. `denom` doubles as coverage (edge fade).
       var ds = this.options.downsample, bw = Math.ceil(w / ds), bh = Math.ceil(h / ds);
-      var buf = new Float32Array(bw * bh);
+      var numer = new Float32Array(bw * bh), denom = new Float32Array(bw * bh);
       var R = this.options.radius / ds, R2 = R * R;
+      var P = this.options.power, invP = 1 / P;
       var farms = this._farms, fn = this._intensity;
       for (var i = 0; i < farms.length; i++) {
         var f = farms[i];
         if (!f.centroid || f._offMap) continue;
-        var p = map.latLngToContainerPoint(f.centroid);
-        var cx = p.x / ds, cy = p.y / ds;
+        var pt = map.latLngToContainerPoint(f.centroid);
+        var cx = pt.x / ds, cy = pt.y / ds;
         if (cx < -R || cx > bw + R || cy < -R || cy > bh + R) continue;
         var crit = fn(f);
-        if (crit <= 0) continue;
+        var critP = Math.pow(crit, P);
         var x0 = Math.max(0, Math.floor(cx - R)), x1 = Math.min(bw - 1, Math.ceil(cx + R));
         var y0 = Math.max(0, Math.floor(cy - R)), y1 = Math.min(bh - 1, Math.ceil(cy + R));
         for (var y = y0; y <= y1; y++) {
           for (var x = x0; x <= x1; x++) {
             var dx = x - cx, dy = y - cy, d2 = dx * dx + dy * dy;
             if (d2 > R2) continue;
-            var fall = 1 - Math.sqrt(d2) / R; fall *= fall;   // smooth quadratic falloff
-            var v = crit * fall, idx = y * bw + x;
-            if (v > buf[idx]) buf[idx] = v;                   // MAX blend — worst wins
+            var t = d2 / R2;                       // 0 at centre, 1 at edge
+            var wgt = (1 - t) * (1 - t);           // smooth weight, 0 at edge
+            var idx = y * bw + x;
+            numer[idx] += wgt * critP;
+            denom[idx] += wgt;
           }
         }
       }
 
-      // Colourise the buffer, then scale it up smoothly for a soft look.
+      // Colourise: colour from the field VALUE (contrast-stretched to this lens's
+      // criticality distribution), alpha from coverage × value.
+      var WREF = this.options.coverageRef, LO = this._lo, HI = this._hi, span = (HI - LO) || 1;
       var img = ctx.createImageData(bw, bh), data = img.data;
-      for (var j = 0; j < buf.length; j++) {
-        var li = Math.min(255, Math.round(buf[j] * 255)) * 4, o = j * 4;
-        data[o] = LUT[li]; data[o + 1] = LUT[li + 1]; data[o + 2] = LUT[li + 2]; data[o + 3] = LUT[li + 3];
+      for (var j = 0; j < denom.length; j++) {
+        var o = j * 4, d = denom[j];
+        if (d <= 1e-6) { data[o + 3] = 0; continue; }
+        var value = Math.pow(numer[j] / d, invP);                 // 0..1 criticality level
+        var vn = (value - LO) / span; vn = vn < 0 ? 0 : vn > 1 ? 1 : vn;  // stretch to gradient
+        var li = (vn * 255 | 0) * 4;
+        var coverage = d < WREF ? d / WREF : 1;                   // fade where farms are sparse
+        var alpha = coverage * (0.42 + 0.58 * vn) * this.options.maxAlpha;
+        data[o] = LUT[li]; data[o + 1] = LUT[li + 1]; data[o + 2] = LUT[li + 2];
+        data[o + 3] = alpha;
       }
       var off = this._buffer || (this._buffer = document.createElement('canvas'));
       off.width = bw; off.height = bh;
