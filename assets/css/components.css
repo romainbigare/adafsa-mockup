@@ -363,6 +363,43 @@ body.layers-mode .mp-ctx-summary { display: none; }
 .dossier-btn--ghost { border: none; color: #6b7280; }
 
 /* --------------------------------------------------------------------------
+   Collapsible side nav — collapses to an icon-only rail (desktop only; the
+   mobile hamburger overlay below is untouched, and the toggle stays hidden
+   under its breakpoint). Labels/group headers/brand hide via CSS on a single
+   class flip — no re-render, so the active route highlight never blinks.
+   -------------------------------------------------------------------------- */
+#sidebar { position: relative; transition: width 0.18s ease; }
+#sidebar-collapse-btn {
+  display: none; position: absolute; top: 24px; inset-inline-end: -12px; z-index: 25;
+  width: 24px; height: 24px; border-radius: 50%; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid #e5e7eb; color: #6b7280; cursor: pointer;
+  box-shadow: 0 1px 4px rgba(15,23,42,.16);
+  transition: background-color .15s ease, color .15s ease;
+}
+#sidebar-collapse-btn:hover { background: #f3f4f6; color: #111827; }
+#sidebar-collapse-btn .material-symbols-outlined { font-size: 16px; }
+/* Mirror the chevron glyph itself rather than swap it in JS — the icon means
+   "collapse this way", and that direction flips visually in RTL. */
+[dir="rtl"] #sidebar-collapse-btn .material-symbols-outlined { transform: scaleX(-1); }
+
+@media (min-width: 768px) {
+  #sidebar-collapse-btn { display: flex; }
+  #sidebar.nav-collapsed { width: 4.25rem; }
+
+  #sidebar.nav-collapsed .sidebar-brand,
+  #sidebar.nav-collapsed .sidebar-group-label,
+  #sidebar.nav-collapsed nav a span:not(.material-symbols-outlined),
+  #sidebar.nav-collapsed .sidebar-footer a span:not(.material-symbols-outlined) {
+    display: none;
+  }
+  #sidebar.nav-collapsed nav a,
+  #sidebar.nav-collapsed .sidebar-footer a {
+    justify-content: center; padding-left: 0; padding-right: 0;
+  }
+  #sidebar.nav-collapsed nav { padding-top: 2.25rem; }  /* clear the toggle handle */
+}
+
+/* --------------------------------------------------------------------------
    Mobile / tablet minimum — hamburger nav overlay, responsive chrome.
    -------------------------------------------------------------------------- */
 .nav-toggle {
