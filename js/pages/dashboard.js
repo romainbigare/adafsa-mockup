@@ -35,6 +35,12 @@
     else W.dashboard.overview.render(s);
   };
 
+  // Map Layers (taxonomy browser). Restoring = re-drive the current route, which
+  // reloads the farm boundaries and re-applies the module colouring.
+  W.dashboard.taxonomyLayers.init(state, {
+    restore: function (s) { W.dashboard.router.apply(s); }
+  });
+
   // ---- Controls ----
   W.ui.wireZoom(state.map, { inId: 'zoom-in', outId: 'zoom-out' });
   var locateBtn = document.getElementById('locate-me');

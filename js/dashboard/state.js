@@ -14,6 +14,9 @@
 
       // dataset / view mode
       currentDataset: 'plots',
+      // Map Layers browser: null | 'landuse' | 'crops' | 'trees'. When set, the
+      // map shows that taxonomy dataset coloured by type instead of a module band.
+      taxonomyView: null,
       activeCategory: null,    // null (Overview) | 'landuse' | 'crops' | 'trees' — expanded category panel
       activeModule: null,      // null | 'ier' | 'yield' | 'water' — farm-boundary band module (mutually exclusive with a category)
       isFirstLoad: true,

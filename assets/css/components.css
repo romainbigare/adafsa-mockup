@@ -305,3 +305,23 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
   animation: farm-highlight-pulse 1.4s ease-in-out infinite;
   filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.85));
 }
+
+/* --------------------------------------------------------------------------
+   Map Layers panel (taxonomy browser)
+   The full Land Use / Crops / Trees taxonomy with per-type checkboxes that
+   show/hide parcels on the map. Slides in from the left; the host chrome sets
+   its top/bottom via inline style so it fits each layout's map frame.
+   -------------------------------------------------------------------------- */
+.tax-panel { z-index: 40; display: flex; flex-direction: column; width: 274px; overflow: hidden;
+  transition: transform 0.28s ease, opacity 0.2s ease; }
+.tax-panel.tax-hidden { transform: translateX(-118%); opacity: 0; pointer-events: none; }
+.tax-switcher { display: flex; gap: 4px; }
+.tax-view-btn { flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 3px;
+  padding: 5px 4px; font-size: 11px; font-weight: 600; color: #6b7280;
+  background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 7px;
+  cursor: pointer; white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+.tax-view-btn:hover { background: #e5e7eb; color: #111827; }
+.tax-view-btn.active { background: #16a34a; border-color: #16a34a; color: #fff; }
+/* The Layers toggle button stays lit while the panel is open. */
+#toggle-taxonomy.active { background: #16a34a; color: #fff; }

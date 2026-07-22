@@ -34,6 +34,9 @@
   }
 
   function showOverview(state) {
+    // If the map is in layers (taxonomy) mode, reload the farm boundaries first,
+    // then re-drive this route once they're back.
+    if (W.dashboard.taxonomyLayers.ensurePlots(state, function (s) { showOverview(s); })) return;
     show('route-overview', true);
     show('module-chrome', false);
     // A2 — the map LEADS the Home page, framed at the top (not hidden).
@@ -48,6 +51,8 @@
 
   function showModule(state, key) {
     if (!reg.byKey(key)) { location.hash = '#/overview'; return; }
+    // Leaving layers mode: reload plots, then re-enter this module route.
+    if (W.dashboard.taxonomyLayers.ensurePlots(state, function (s) { showModule(s, key); })) return;
     show('route-overview', false);
     show('module-chrome', true);
     show('map', true);
