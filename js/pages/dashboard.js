@@ -12,6 +12,7 @@
   window.__debugState = state;
 
   W.dashboard.plotsLayer.init(state);
+  if (W.dashboard.heatLayer) W.dashboard.heatLayer.init(state);
   W.dashboard.modulePage.wire();
   W.dashboard.newsBell.init();
 

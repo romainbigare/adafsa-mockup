@@ -66,13 +66,14 @@
     return reg.criticalCountOf(m, refs);
   }
 
-  // Single-farm marker icon: a band-coloured dot in the cluster visual language
-  // (never Leaflet's default blue pin). Colour tracks the active module / taxonomy.
+  // Single-farm marker icon. TEST branch: a subtle monochrome dot — at far zoom
+  // the heat surface carries the criticality colour, so lone farms read as a
+  // quiet "a farm is here" mark, not a coloured signal. (colour arg ignored.)
   function dotIcon(color) {
     return L.divIcon({
       className: '',
-      html: '<div class="farm-dot" style="background:' + (color || NEUTRAL) + '"></div>',
-      iconSize: [14, 14], iconAnchor: [7, 7]
+      html: '<div class="farm-dot-subtle"></div>',
+      iconSize: [12, 12], iconAnchor: [6, 6]
     });
   }
 
@@ -108,48 +109,11 @@
       showCoverageOnHover: false,
       maxClusterRadius: 50,
       iconCreateFunction: function (cluster) {
+        // TEST branch: the heat surface carries the criticality colour now, so
+        // the cluster is just a SUBTLE count — no fill, no colour, no badge.
         var count = cluster.getChildCount();
-        var cls = 'cluster-icon-small';
-        if (count > 50) cls = 'cluster-icon-medium';
-        if (count > 200) cls = 'cluster-icon-large';
-
-        // Collect all markers in cluster to compute metric-based color
-        var markers = [];
-        var seen = new Set();
-        var collect = function (l) {
-          var ms = l._markers || (l.getAllChildMarkers && l.getAllChildMarkers()) || [];
-          for (var mi = 0; mi < ms.length; mi++) {
-            var m = ms[mi];
-            if (m._featureRef && !seen.has(m)) {
-              seen.add(m);
-              markers.push(m);
-            }
-          }
-          if (l._childClusters) l._childClusters.forEach(collect);
-        };
-        if (cluster._childClusters) cluster._childClusters.forEach(collect);
-        var directMarkers = cluster._markers || [];
-        for (var di = 0; di < directMarkers.length; di++) {
-          var dm = directMarkers[di];
-          if (dm._featureRef && !seen.has(dm)) {
-            seen.add(dm);
-            markers.push(dm);
-          }
-        }
-
-        // Colour the cluster bubble by the majority value of its members.
-        var bgColor = majorityColor(state, markers);
-
-        // Red "N need attention" badge — worst-band members surface through the
-        // majority colour so problems are never hidden by aggregation.
-        var crit = clusterCriticalCount(state, markers);
-        var badge = crit > 0 ? '<span class="cluster-badge">' + crit + '</span>' : '';
-
-        // Ghost a cluster whose members are all outside the current selection.
-        var ghost = state.ghostSet;
-        var ghostCls = (ghost && !markers.some(function (m) { return m._featureRef && ghost.has(m._featureRef); })) ? ' cluster-ghosted' : '';
-
-        return L.divIcon({ html: '<div class="cluster-icon ' + cls + ghostCls + '" style="background:' + bgColor + '">' + count + badge + '</div>', className: '', iconSize: [40, 40] });
+        var sizeCls = count > 200 ? ' cluster-subtle-lg' : count > 50 ? ' cluster-subtle-md' : '';
+        return L.divIcon({ html: '<div class="cluster-subtle' + sizeCls + '">' + count + '</div>', className: '', iconSize: [30, 30] });
       }
     });
     state.clusterActive = false;
@@ -392,6 +356,9 @@
         if (m._featureRef && m.setIcon) m.setIcon(dotIcon(featureColor(state, m._featureRef)));
       });
     }
+
+    // Rebuild the criticality heat surface for the active lens.
+    if (W.dashboard.heatLayer && W.dashboard.heatLayer.update) W.dashboard.heatLayer.update(state);
 
     // Force a full cluster rebuild so iconCreateFunction reruns with the
     // current colours (and ghost state).
