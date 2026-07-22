@@ -18,6 +18,7 @@
   var reg = W.dashboard.moduleRegistry;
   var UNKNOWN = (W.dashboard.modules && W.dashboard.modules.UNKNOWN_COLOR) || '#9ca3af';
   var DRAWER_W = 380;
+  function T(key, fallback) { return W.str ? W.str(key) : fallback; }
 
   // ---- Pure model ------------------------------------------------------------
 
@@ -79,7 +80,7 @@
   function rowHtml(r) {
     var badge = r.scored
       ? '<span class="dossier-band" style="background:' + r.color + '1f;color:' + r.color + '">' + esc(r.band) + '</span>'
-      : '<span class="dossier-band dossier-band--none">no data</span>';
+      : '<span class="dossier-band dossier-band--none">' + esc(T('dossierNoData', 'no data')) + '</span>';
     // Categorical modules (Structures) put the label in the band chip already —
     // don't repeat it in the value column.
     var valueText = (r.value === r.band) ? '' : r.value;
@@ -108,14 +109,14 @@
         '<span class="material-symbols-outlined dossier-verdict-icon">neurology</span>' +
         '<span>' + esc(m.verdictSentence) + '</span>' +
       '</div>' +
-      '<div class="dossier-section-label">Module status</div>' +
+      '<div class="dossier-section-label">' + esc(T('dossierModuleStatus', 'Module status')) + '</div>' +
       '<div class="dossier-rows">' + m.rows.map(rowHtml).join('') + '</div>' +
       '<div class="dossier-actions">' +
         '<a href="farm-analysis.html" class="dossier-btn dossier-btn--primary">' +
-          '<span class="material-symbols-outlined" style="font-size:18px;">analytics</span>Open Farm Analysis</a>' +
+          '<span class="material-symbols-outlined" style="font-size:18px;">analytics</span>' + esc(T('dossierOpenAnalysis', 'Open Farm Analysis')) + '</a>' +
         '<button id="dossier-export" class="dossier-btn">' +
-          '<span class="material-symbols-outlined" style="font-size:18px;">download</span>Export farm (CSV)</button>' +
-        '<button id="dossier-back" class="dossier-btn dossier-btn--ghost">Back to list</button>' +
+          '<span class="material-symbols-outlined" style="font-size:18px;">download</span>' + esc(T('dossierExport', 'Export farm (CSV)')) + '</button>' +
+        '<button id="dossier-back" class="dossier-btn dossier-btn--ghost">' + esc(T('dossierBack', 'Back to list')) + '</button>' +
       '</div>';
 
     var closeBtn = document.getElementById('dossier-close');

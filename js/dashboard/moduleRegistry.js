@@ -186,7 +186,7 @@
         return [
           kpi('Farms Scored', fmtInt(scored.length)),
           kpi('Critical', fmtInt(critical), critical > 0),
-          kpi('Avg IER', Math.round(mean(scored)) || '—'),
+          kpi('Avg Score', Math.round(mean(scored)) || '—'),
           kpi('Poor or Worse', fmtInt(critical + countBand(m, fs, 'Poor')), true)
         ];
       },

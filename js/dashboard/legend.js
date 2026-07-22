@@ -13,8 +13,11 @@
   // ============================================================================
 
   var mods = W.dashboard.modules;
+  function T(key, fallback, vars) { return W.str ? W.str(key, vars) : fallback; }
 
-  function scopeLabel(scope) { return scope === 'all' ? 'All farms' : 'In view'; }
+  function scopeLabel(scope) {
+    return scope === 'all' ? T('scopeAll', 'All farms') : T('scopeInView', 'In view');
+  }
 
   function render(el, module, features, opts) {
     if (!el || !module) return;
@@ -57,8 +60,9 @@
       '<div class="p-3">' +
         '<div class="cat-chart mb-2"><div class="cat-chart-bar">' + segs + '</div></div>' +
         '<div class="space-y-0.5">' + rows + '</div>' +
-        '<p class="text-[10px] text-gray-400 mt-2">Shares are of farms ' +
-          (scope === 'all' ? 'across the whole region.' : 'currently in view.') + '</p>' +
+        '<p class="text-[10px] text-gray-400 mt-2">' +
+          (scope === 'all' ? T('legendFootAll', 'Shares are of farms across the whole region.')
+                           : T('legendFootView', 'Shares are of farms currently in view.')) + '</p>' +
       '</div>';
   }
 

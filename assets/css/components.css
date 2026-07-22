@@ -238,7 +238,7 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
 
 /* KPI strip across the top of every module page. */
 .kpi-strip {
-  position: absolute; top: 12px; left: 20px; right: 68px; z-index: 20;
+  position: absolute; top: 12px; inset-inline-start: 20px; inset-inline-end: 68px; z-index: 20;
   display: flex; gap: 8px; align-items: stretch;
   overflow-x: auto; padding: 8px; border-radius: 0.5rem;
   background: rgba(255, 255, 255, 0.96);
@@ -348,6 +348,35 @@ body.layers-mode #module-legend { display: none; }
 .dossier-btn--primary { background: var(--status-ok); border-color: var(--status-ok); color: #fff; }
 .dossier-btn--primary:hover { background: var(--brand-700); }
 .dossier-btn--ghost { border: none; color: #6b7280; }
+
+/* --------------------------------------------------------------------------
+   Mobile / tablet minimum — hamburger nav overlay, responsive chrome.
+   -------------------------------------------------------------------------- */
+.nav-toggle {
+  display: none; position: absolute; top: 10px; inset-inline-start: 10px; z-index: 50;
+  width: 40px; height: 40px; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.96); border: 1px solid #e5e7eb; border-radius: 10px;
+  color: #374151; box-shadow: 0 4px 12px rgba(15,23,42,.14); cursor: pointer;
+}
+.nav-scrim { display: none; }
+@media (max-width: 767px) {
+  .nav-toggle { display: flex; }
+  #sidebar.mobile-open {
+    display: flex !important; position: fixed; inset-block: 0; inset-inline-start: 0;
+    z-index: 60; width: 240px; box-shadow: 8px 0 30px rgba(15,23,42,.24);
+  }
+  .nav-scrim.show { display: block; position: fixed; inset: 0; z-index: 55; background: rgba(0,0,0,.4); }
+
+  /* Keep chrome off the hamburger and let strips scroll. */
+  .kpi-strip { inset-inline-start: 60px; inset-inline-end: 12px; }
+  .module-dial { inset-inline-start: 60px; max-width: calc(100% - 72px); }
+  #situation-verdict { padding-inline-start: 58px; }
+  .situation-verdict-meta { display: none; }        /* sentence first on a phone */
+  .situation-verdict-text { font-size: 13px; }
+  #module-legend { width: 200px !important; }
+  #situation-legend { display: none; }              /* declutter the landing; tiles + map carry it */
+  .farm-dossier { width: 100%; }                    /* full-width drawer on a phone */
+}
 
 /* Module-page bottom sheet reuses the .live-bar / .lb-panel machinery. */
 .mp-tab { border-bottom: 2px solid transparent; margin-bottom: -1px; }

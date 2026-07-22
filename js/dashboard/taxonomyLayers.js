@@ -64,7 +64,9 @@
     if (txt && W.dashboard.router && W.dashboard.moduleRegistry) {
       var r = W.dashboard.router.current();
       var m = r && r.key && W.dashboard.moduleRegistry.byKey(r.key);
-      txt.textContent = m ? (m.label + ' paused — showing Map Layers') : 'Map Layers — module data paused';
+      txt.textContent = m
+        ? (W.str ? W.str('layersPaused', { module: m.label }) : m.label + ' paused — showing Map Layers')
+        : (W.str ? W.str('layersPausedGeneric') : 'Map Layers — module data paused');
     }
   }
   function exitLayersMode() {

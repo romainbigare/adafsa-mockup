@@ -15,6 +15,21 @@
   W.dashboard.modulePage.wire();
   W.dashboard.newsBell.init();
 
+  // Mobile nav: hamburger opens the sidebar as an overlay; scrim / navigation
+  // closes it. The sidebar is re-rendered per route, so we toggle a class on the
+  // persistent <aside> and close on any hashchange.
+  (function wireMobileNav() {
+    var toggle = document.getElementById('nav-toggle');
+    var sidebar = document.getElementById('sidebar');
+    var scrim = document.getElementById('nav-scrim');
+    if (!toggle || !sidebar || !scrim) return;
+    function open() { sidebar.classList.add('mobile-open'); scrim.classList.add('show'); toggle.setAttribute('aria-expanded', 'true'); }
+    function close() { sidebar.classList.remove('mobile-open'); scrim.classList.remove('show'); toggle.setAttribute('aria-expanded', 'false'); }
+    toggle.addEventListener('click', function () { sidebar.classList.contains('mobile-open') ? close() : open(); });
+    scrim.addEventListener('click', close);
+    window.addEventListener('hashchange', close);
+  })();
+
   function initStatusBadges() {
     var scan = document.getElementById('last-scan');
     if (scan) scan.textContent = new Date(Date.now() - Math.floor(Math.random() * 3600000))

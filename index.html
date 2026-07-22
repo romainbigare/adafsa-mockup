@@ -22,6 +22,12 @@
 
 <div class="flex-1 flex overflow-hidden w-full relative min-h-0">
 
+  <!-- Mobile nav toggle (hidden on md+) -->
+  <button id="nav-toggle" class="nav-toggle" aria-label="Menu" aria-expanded="false">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+  <div id="nav-scrim" class="nav-scrim"></div>
+
   <!-- Side Nav: Overview + the six contract modules + Farm Analysis -->
   <aside id="sidebar" data-page="overview" class="hidden md:flex flex-col bg-gray-50 border-r border-gray-200 w-60 py-6 flex-none"></aside>
 
@@ -180,6 +186,7 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
 <script src="js/namespace.js"></script>
 <script src="js/config.js"></script>
+<script src="js/ui/strings.js"></script>
 <script src="js/lib/geo.js"></script>
 <script src="js/lib/color.js"></script>
 <script src="js/lib/random.js"></script>
