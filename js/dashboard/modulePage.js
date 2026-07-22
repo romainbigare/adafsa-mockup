@@ -18,7 +18,9 @@
   var CUR = { key: null, module: null };
   var activeTab = 'attention';
 
-  function selectFarm(state, f) { W.dashboard.plotsLayer.selectFarm(state, f); }
+  // An attention-row click descends to ALTITUDE 3 — the farm dossier — instead
+  // of only zooming: the row becomes a place with a verdict and an exit action.
+  function selectFarm(state, f) { if (f && f.fid != null) location.hash = '#/farm/' + f.fid; }
   function selectGroup(state, g) { W.dashboard.plotsLayer.selectGroup(state, g.members); }
 
   // ---- Attention table (ranked, worst-first) --------------------------------

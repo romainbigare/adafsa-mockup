@@ -144,9 +144,11 @@
   }
 
   // Zoom to a farm (from the farms table) and draw a pulsing highlight around
-  // its boundary. Padding keeps the farm clear of the bottom info panel.
-  function selectFarm(state, feature) {
+  // its boundary. Padding keeps the farm clear of the bottom info panel and, when
+  // opts.padRight is set (the dossier drawer), of the drawer on the right.
+  function selectFarm(state, feature, opts) {
     if (!feature || !feature.rings || !feature.rings.length) return;
+    opts = opts || {};
     state.highlightLayer.clearLayers();
 
     var polys = [];
@@ -164,10 +166,11 @@
     var bounds = L.featureGroup(polys).getBounds();
     var bar = document.getElementById('module-bar') || document.getElementById('live-bar');
     var bottomPad = (bar && !bar.classList.contains('collapsed')) ? bar.offsetHeight + 24 : 40;
+    var rightPad = opts.padRight ? opts.padRight + 24 : 40;
     state.map.fitBounds(bounds, {
       maxZoom: 17,
       paddingTopLeft: [40, 40],
-      paddingBottomRight: [40, bottomPad]
+      paddingBottomRight: [rightPad, bottomPad]
     });
   }
 

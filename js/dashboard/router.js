@@ -33,7 +33,15 @@
     if (pts.length) state.map.fitBounds(L.latLngBounds(pts), { padding: [30, 30] });
   }
 
+  function findFarm(state, fid) {
+    var want = String(fid);
+    var fs = state.farmFeatures || [];
+    for (var i = 0; i < fs.length; i++) if (String(fs[i].fid) === want) return fs[i];
+    return null;
+  }
+
   function showOverview(state) {
+    W.dashboard.farmDossier.close(state);
     // If the map is in layers (taxonomy) mode, reload the farm boundaries first,
     // then re-drive this route once they're back.
     if (W.dashboard.taxonomyLayers.ensurePlots(state, function (s) { showOverview(s); })) return;
@@ -51,6 +59,7 @@
 
   function showModule(state, key) {
     if (!reg.byKey(key)) { location.hash = '#/overview'; return; }
+    W.dashboard.farmDossier.close(state);
     // Leaving layers mode: reload plots, then re-enter this module route.
     if (W.dashboard.taxonomyLayers.ensurePlots(state, function (s) { showModule(s, key); })) return;
     show('route-overview', false);
@@ -63,9 +72,30 @@
     setTimeout(function () { state.map.invalidateSize(); }, 0);
   }
 
+  // #/farm/<fid> — the dossier drawer over the module map. Keeps the current
+  // module's colouring; a cold deep-link colours by the farm's worst module.
+  function showFarm(state, fid) {
+    if (W.dashboard.taxonomyLayers.ensurePlots(state, function (s) { showFarm(s, fid); })) return;
+    var feature = findFarm(state, fid);
+    if (!feature) { location.hash = '#/overview'; return; }
+    var key = state.activeModule || W.dashboard.farmDossier.worstModuleKey(feature);
+    show('route-overview', false);
+    show('module-chrome', true);
+    show('map', true);
+    var map = el('map');
+    if (map) map.classList.remove('map-framed');
+    W.dashboard.modulePage.show(state, key);
+    W.ui.renderSidebar({ active: key });
+    setTimeout(function () {
+      state.map.invalidateSize();
+      W.dashboard.farmDossier.open(state, feature);
+    }, 0);
+  }
+
   function apply(state) {
     var r = parse();
     if (r.name === 'module') showModule(state, r.key);
+    else if (r.name === 'farm') showFarm(state, r.id);
     else showOverview(state);
     window.scrollTo(0, 0);
   }
