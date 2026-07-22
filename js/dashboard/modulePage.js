@@ -167,8 +167,7 @@
         '</div>';
     }).join('');
     el.innerHTML = '<div class="kpi-name"><span class="material-symbols-outlined text-brand-600" style="font-size:18px;">' +
-        CUR.module.icon + '</span><span>' + CUR.module.label + '</span>' +
-        '<span class="kpi-fee">' + CUR.module.feePct + '% of contract</span></div>' + tiles;
+        CUR.module.icon + '</span><span>' + CUR.module.label + '</span></div>' + tiles;
   }
 
   // ---- The dial (module switcher) — HIDDEN for now -----------------------------

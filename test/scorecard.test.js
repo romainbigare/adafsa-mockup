@@ -39,10 +39,10 @@ var vmOk = {
 };
 
 console.log("big card");
-check("includes headline, fee, label and links to the module route", function () {
+check("includes headline, label and links to the module route (no contract fee)", function () {
   var html = sc.cardHtml(vmWarn, { size: "big" });
   assert.ok(html.indexOf("1.24M trees") !== -1, "headline present");
-  assert.ok(html.indexOf("31.6%") !== -1, "fee present");
+  assert.ok(html.indexOf("31.6%") === -1, "fee not present");
   assert.ok(html.indexOf("Palms &amp; Fruit Trees") !== -1, "label escaped + present");
   assert.ok(html.indexOf('href="#/m/palms"') !== -1, "routes to module page");
 });

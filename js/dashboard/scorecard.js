@@ -46,10 +46,7 @@
       '<a href="#/m/' + esc(vm.key) + '" data-module="' + esc(vm.key) + '" ' +
         'class="scorecard-card group block rounded-xl border bg-white p-4 shadow-sm transition ' +
         'hover:shadow-md hover:-translate-y-0.5 ' + (vm.hero ? 'border-brand-500 border-2' : 'border-gray-200') + '">' +
-        '<div class="flex items-start justify-between gap-2">' +
-          '<span class="font-label-caps text-gray-900 leading-tight">' + esc(vm.label) + '</span>' +
-          '<span class="text-[10px] font-mono text-gray-400 flex-shrink-0" title="Share of contract fee">' + vm.feePct + '%</span>' +
-        '</div>' +
+        '<span class="font-label-caps text-gray-900 leading-tight">' + esc(vm.label) + '</span>' +
         '<div class="mt-2 text-2xl font-bold text-gray-900 tabular-nums leading-none">' + esc(vm.headline) + '</div>' +
         '<div class="mt-2">' + chip(vm) + '</div>' +
         '<div class="mt-3">' + bandStrip(vm.bands, 8) + '</div>' +
@@ -62,10 +59,7 @@
       '<a href="#/m/' + esc(vm.key) + '" data-module="' + esc(vm.key) + '" ' +
         'class="scorecard-card scorecard-mini group block rounded-lg border bg-white p-2.5 shadow-sm transition ' +
         'hover:shadow-md ' + (vm.hero ? 'border-brand-500 border-2' : 'border-gray-200') + '">' +
-        '<div class="flex items-center justify-between gap-1">' +
-          '<span class="text-[10px] font-semibold uppercase tracking-wide text-gray-700 truncate">' + esc(vm.shortLabel || vm.label) + '</span>' +
-          '<span class="text-[9px] font-mono text-gray-400 flex-shrink-0">' + vm.feePct + '%</span>' +
-        '</div>' +
+        '<span class="text-[10px] font-semibold uppercase tracking-wide text-gray-700 truncate">' + esc(vm.shortLabel || vm.label) + '</span>' +
         '<div class="mt-1 text-base font-bold text-gray-900 tabular-nums leading-none truncate">' + esc(vm.headline) + '</div>' +
         '<div class="mt-1.5">' + chip(vm) + '</div>' +
       '</a>';
@@ -86,10 +80,7 @@
     return '' +
       '<a href="#/m/' + esc(vm.key) + '" data-module="' + esc(vm.key) + '" ' +
         'class="status-tile ' + kindCls + (vm.hero ? ' status-tile--hero' : '') + ' group block">' +
-        '<div class="flex items-start justify-between gap-2">' +
-          '<span class="status-tile-name">' + esc(vm.label) + '</span>' +
-          '<span class="status-tile-fee" title="Share of contract value">' + vm.feePct + '%</span>' +
-        '</div>' +
+        '<span class="status-tile-name">' + esc(vm.label) + '</span>' +
         '<div class="status-tile-status">' +
           '<span class="status-tile-dot"></span>' +
           '<span class="status-tile-word">' + statusWord(vm.statusKind) + '</span>' +
