@@ -231,6 +231,60 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
 .cat-chart-seg { height: 100%; }
 .cat-chart-seg + .cat-chart-seg { box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.7); }
 
+/* --------------------------------------------------------------------------
+   Proposal A — module-hub SPA: route show/hide + KPI strip + tabs
+   -------------------------------------------------------------------------- */
+.route-hidden { display: none !important; }
+
+/* KPI strip across the top of every module page. */
+.kpi-strip {
+  position: absolute; top: 12px; left: 20px; right: 68px; z-index: 20;
+  display: flex; gap: 8px; align-items: stretch;
+  overflow-x: auto; padding: 8px; border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #e5e7eb;
+  filter: drop-shadow(0 6px 16px rgba(15, 23, 42, 0.16));
+}
+.kpi-name {
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  flex: none; padding-right: 10px; margin-right: 2px; border-right: 1px solid #e5e7eb;
+  font-weight: 700; color: #111827; font-size: 13px; white-space: nowrap;
+}
+.kpi-name .material-symbols-outlined { vertical-align: -3px; margin-right: 4px; }
+.kpi-name .kpi-fee { font: 500 10px/1 "JetBrains Mono", monospace; color: #9ca3af; text-transform: uppercase; letter-spacing: .05em; }
+.kpi-tile {
+  flex: 1 1 0; min-width: 96px; display: flex; flex-direction: column; gap: 2px;
+  padding: 4px 10px; border-radius: 6px; background: #f8fafc; border: 1px solid #eef2f7;
+}
+.kpi-tile.warn { background: #fff7ed; border-color: #fed7aa; }
+.kpi-label { font: 600 9px/1.2 "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: #6b7280; }
+.kpi-value { font-size: 16px; font-weight: 700; color: #111827; font-variant-numeric: tabular-nums; }
+.kpi-tile.warn .kpi-value { color: #c2410c; }
+
+/* Module-page bottom sheet reuses the .live-bar / .lb-panel machinery. */
+.mp-tab { border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.mp-tab.active { color: #111827; border-bottom-color: #16a34a; }
+
+/* Scorecard cards (F3) hover affordance. */
+.scorecard-card { text-decoration: none; }
+
+/* --------------------------------------------------------------------------
+   Proposal A2 — the region map framed at the top of Home (module routes use
+   the default full-bleed #map). !important beats Tailwind's inset-0/h-full.
+   -------------------------------------------------------------------------- */
+.map-framed {
+  top: 12px !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: auto !important;
+  height: 55% !important;
+  width: auto !important;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.16);
+}
+
 /* Per-category subcategory list — collapsed by default, expanded by
    clicking the category row (independent of the outer cat-panel accordion). */
 .subcat-toggle:hover { background-color: #f9fafb; }
@@ -251,3 +305,23 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
   animation: farm-highlight-pulse 1.4s ease-in-out infinite;
   filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.85));
 }
+
+/* --------------------------------------------------------------------------
+   Map Layers panel (taxonomy browser)
+   The full Land Use / Crops / Trees taxonomy with per-type checkboxes that
+   show/hide parcels on the map. Slides in from the left; the host chrome sets
+   its top/bottom via inline style so it fits each layout's map frame.
+   -------------------------------------------------------------------------- */
+.tax-panel { z-index: 40; display: flex; flex-direction: column; width: 274px; overflow: hidden;
+  transition: transform 0.28s ease, opacity 0.2s ease; }
+.tax-panel.tax-hidden { transform: translateX(-118%); opacity: 0; pointer-events: none; }
+.tax-switcher { display: flex; gap: 4px; }
+.tax-view-btn { flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 3px;
+  padding: 5px 4px; font-size: 11px; font-weight: 600; color: #6b7280;
+  background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 7px;
+  cursor: pointer; white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+.tax-view-btn:hover { background: #e5e7eb; color: #111827; }
+.tax-view-btn.active { background: #16a34a; border-color: #16a34a; color: #fff; }
+/* The Layers toggle button stays lit while the panel is open. */
+#toggle-taxonomy.active { background: #16a34a; color: #fff; }

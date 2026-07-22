@@ -2,7 +2,7 @@
 
 A static, **buildless** front-end mockup for a farm-monitoring platform (Abu Dhabi / Al Ain region). Two pages backed by placeholder data, served entirely from static files — no server, no build step, no npm.
 
-- **Farms Overview** (`index.html`) — Leaflet map of all plots/crops/land-use, with clustering (shapes coloured by taxonomy value, clusters by majority value), a layers panel, viewport statistics, a live activity feed, and sortable/exportable Farms/Land Use/Crops/Trees tables (bottom sheet).
+- **Farms Overview** (`index.html`) — **Proposal A2, "map-led hub".** Everything in Proposal A (nav sells the six modules; a hash router drives module pages built from one template: KPI strip + module-coloured map + legend + ranked attention list), **plus** the Home page leads with the region map (all farm boundaries, framed) and a "Colour by" control, with the six modules as a mini launch strip beneath it. The **same** single Leaflet map is framed on Home and full-height on a module route.
 - **Farm Analysis** (`farm-analysis.html`) — per-farm view with a canvas heatmap (growth / irrigation / phenology / density), weather, soil, growth-phase, water-scheduler and advisory panels.
 
 > The data is **placeholder**. See [Data & the mock boundary](#data--the-mock-boundary).
@@ -70,20 +70,18 @@ warfa-dashboard/
 │   │   ├── state.js             #   createState() — the single shared mutable state
 │   │   ├── modules.js           #   3 banded farm modules (IER / Yield / Water) + generic band helpers
 │   │   ├── moduleRegistry.js    #   F1 — the SIX contract modules as one model (wraps modules.js + mock metrics)
-│   │   ├── scorecard.js         #   F3 — reusable module scorecard card (big / mini)
-│   │   ├── attentionList.js     #   F4 — ranked per-module farm table (built on dataTable.js)
-│   │   ├── plotsLayer.js        #   streaming render, clustering, taxonomy colouring (shape = own value, cluster = majority value)
-│   │   ├── viewportStats.js     #   Overview / Land Use / Crops / Trees panels
-│   │   ├── layersPanel.js       #   layers panel + fit/clear controls
+│   │   ├── scorecard.js         #   F3 — reusable module scorecard card (big / mini) — Home cards
+│   │   ├── attentionList.js     #   F4 — ranked per-module farm table helpers (metric labels)
+│   │   ├── plotsLayer.js        #   streaming render, clustering, module colouring (shape = band, cluster = majority band)
 │   │   ├── dataTable.js         #   shared sortable/reorderable/exportable table factory
-│   │   ├── farmTable.js         #   Farms tab (built on dataTable.js)
-│   │   ├── categoryTables.js    #   Land Use / Crops / Trees tabs (built on dataTable.js)
-│   │   └── liveBar.js           #   bottom-sheet tabs + live feed + collapse
+│   │   ├── modulePage.js        #   A — the reusable module-page template (KPI strip + legend + attention/summary)
+│   │   └── router.js            #   A — hash router (#/overview, #/m/<key>); shows/hides the single map
 │   │
 │   ├── farmAnalysis/heatmap.js  # Farm Analysis canvas heatmap overlay + colour scales
 │   │
 │   └── pages/                   # one entry point per page — bootstraps + wires everything
-│       ├── dashboard.js
+│       ├── dashboard.js         #   A2 — creates the map once, wires chrome, hands off to the router
+│       ├── overview.js          #   A2 — Home: framed region map + colour-by + six mini F3 tiles
 │       └── farmAnalysis.js
 │
 ├── data/                        # placeholder GeoJSON, wrapped as window.WafraData globals
