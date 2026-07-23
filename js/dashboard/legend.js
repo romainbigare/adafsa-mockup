@@ -10,6 +10,10 @@
   // the two never silently disagree (the "17% here vs 16% there" ambiguity).
   //
   // Count share, not area share, to match the module page's existing legend.
+  //
+  // opts.stats — optional [{ value, label }] rolled up by the CALLER (the legend
+  // knows bands, not the region), rendered as a small grid above the bands. The
+  // Situation screen uses it for "how much are we watching?" headline numbers.
   // ============================================================================
 
   var mods = W.dashboard.modules;
@@ -56,7 +60,15 @@
         '<span class="legend-scope ml-auto">' + scopeLabel(scope) + '</span>' +
       '</div>';
 
+    var stats = (opts.stats || []).map(function (s) {
+      return '<div class="legend-stat">' +
+          '<div class="legend-stat-value">' + s.value + '</div>' +
+          '<div class="legend-stat-label">' + s.label + '</div>' +
+        '</div>';
+    }).join('');
+
     el.innerHTML = header +
+      (stats ? '<div class="legend-stats">' + stats + '</div>' : '') +
       '<div class="p-3">' +
         '<div class="cat-chart mb-2"><div class="cat-chart-bar">' + segs + '</div></div>' +
         '<div class="space-y-0.5">' + rows + '</div>' +

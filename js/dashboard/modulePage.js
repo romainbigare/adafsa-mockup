@@ -14,11 +14,14 @@
 
   var reg = W.dashboard.moduleRegistry;
   var mods = W.dashboard.modules;
+  // Every number on this page comes from the FILTERED working set, never from
+  // state.farmFeatures directly — otherwise the tables would count farms the
+  // FILTERING panel has taken off the map.
+  function farms(state) { return W.dashboard.farmFilter.farms(state); }
 
   var CUR = { key: null, module: null };
   var activeTab = 'attention';
   var analysisTab = 'attention';   // last analysis tab the user chose (restored on leaving layers mode)
-  var BOUND_STATE = null;   // set on show(); used by the mode-switch buttons
 
   // An attention-row click descends to ALTITUDE 3 — the farm dossier — instead
   // of only zooming: the row becomes a place with a verdict and an exit action.
@@ -54,10 +57,9 @@
     columnsBtnId: 'mp-att-columns-btn', columnsMenuId: 'mp-att-columns-menu', exportBtnId: 'mp-att-export-btn',
     csvPrefix: 'attention', emptyText: 'No farms to review.',
     getRows: function (state) {
-      var farms = state.farmFeatures || [];
       if (!CUR.module) return [];
-      var out = [];
-      for (var i = 0; i < farms.length; i++) if (CUR.module.valueOf(farms[i]) != null) out.push(farms[i]);
+      var fs = farms(state), out = [];
+      for (var i = 0; i < fs.length; i++) if (CUR.module.valueOf(fs[i]) != null) out.push(fs[i]);
       return out;
     },
     onSelectRow: selectFarm
@@ -88,7 +90,7 @@
     csvPrefix: 'band-summary', emptyText: 'No farm data.',
     getRows: function (state) {
       if (!CUR.module) return [];
-      var rows = mods.bandSummary(CUR.module, state.farmFeatures || []);
+      var rows = mods.bandSummary(CUR.module, farms(state));
       rows.forEach(function (r, i) { r.fid = r.label; r.order = i; });
       return rows;
     },
@@ -142,7 +144,11 @@
   ];
 
   function datasetColumnsFor(state) { return (state && state.taxonomyView) ? parcelDatasetColumns : farmDatasetColumns; }
-  function datasetRows(state) { if (!state) return []; return (state.taxonomyView ? state.allFeatures : state.farmFeatures) || []; }
+  function datasetRows(state) {
+    if (!state) return [];
+    if (state.taxonomyView) return state.allFeatures || [];
+    return state.filteredFarms || state.farmFeatures || [];
+  }
   function datasetColumnKeys(state) { return datasetColumnsFor(state).map(function (c) { return c.key; }); }
 
   var datasetTable = W.dashboard.dataTable.create({
@@ -185,33 +191,15 @@
     }).join('');
   }
 
-  // ---- The mode switch (Analysis ↔ full taxonomy) -----------------------------
-  // No persistent toggle: a single button on whichever panel is showing flips
-  // modes. "Switch to full taxonomy" lives at the foot of the legend (analysis
-  // mode); "Switch to analysis" at the foot of the Map Layers panel (layers
-  // mode). Only the modules that own a taxonomy AND have their own analysis get
-  // them (Crop Monitoring, Palms). Layers-only (Land Use & Structures) and the
-  // analysis-only modules (Irrigation / Yield / Water) show neither.
-  function renderModeSwitch() {
-    var tax = W.dashboard.taxonomyLayers;
-    var isBoth = !!tax.viewForModule(CUR.key) && !tax.isLayersOnly(CUR.key);
-    var ls = document.getElementById('module-legend-switch');
-    var ts = document.getElementById('tax-switch');
-    if (ls) ls.classList.toggle('hidden', !isBoth);   // shown in the legend (analysis mode)
-    if (ts) ts.classList.toggle('hidden', !isBoth);   // shown in the panel (layers mode)
-  }
-
-  // Called by taxonomyLayers when it enters/leaves layers mode: re-assert the
-  // switch buttons AND swap the bottom-sheet tab (only the full dataset applies
-  // over a taxonomy map; analysis tabs return when we leave).
-  function syncModeSwitch() { renderModeSwitch(); applyTabForMode(); }
+  // Called by taxonomyLayers when it enters/leaves layers mode: only the full
+  // dataset tab applies over a taxonomy map; the analysis tabs return on exit.
+  function syncTabsForMode() { applyTabForMode(); }
 
   // ---- Legend (in-view band shares) -----------------------------------------
   function farmsInView(state) {
     var b = state.map.getBounds();
-    var farms = state.farmFeatures || [];
-    var out = [];
-    for (var i = 0; i < farms.length; i++) if (farms[i].centroid && b.contains(farms[i].centroid)) out.push(farms[i]);
+    var fs = farms(state), out = [];
+    for (var i = 0; i < fs.length; i++) if (fs[i].centroid && b.contains(fs[i].centroid)) out.push(fs[i]);
     return out;
   }
 
@@ -265,17 +253,6 @@
       bar.classList.toggle('collapsed');
       if (chev) chev.textContent = bar.classList.contains('collapsed') ? 'expand_less' : 'expand_more';
     });
-
-    // Mode switch — one button per panel; the state is read at click time.
-    var legendSwitch = document.getElementById('module-legend-switch');
-    if (legendSwitch) legendSwitch.addEventListener('click', function () {
-      var view = W.dashboard.taxonomyLayers.viewForModule(CUR.key);
-      if (view && BOUND_STATE && !BOUND_STATE.taxonomyView) W.dashboard.taxonomyLayers.openFor(BOUND_STATE, view);
-    });
-    var taxSwitch = document.getElementById('tax-switch');
-    if (taxSwitch) taxSwitch.addEventListener('click', function () {
-      if (BOUND_STATE && BOUND_STATE.taxonomyView) W.dashboard.taxonomyLayers.close(BOUND_STATE);
-    });
   }
 
   // ---- Route entry -----------------------------------------------------------
@@ -288,35 +265,42 @@
   function show(state, key) {
     setModule(key);
     if (!CUR.module) return;
-    BOUND_STATE = state;
     var tax = W.dashboard.taxonomyLayers;
     var layersOnly = tax.isLayersOnly(key);
 
-    renderModeSwitch();
-    renderKpis(state.farmFeatures || []);
-    // Layers-only modules have no close-to-analysis; the panel is permanent.
-    var taxClose = document.getElementById('tax-close');
-    if (taxClose) taxClose.style.display = layersOnly ? 'none' : '';
+    // Which taxonomy this module may be filtered by (null on a layers-only
+    // module — there the taxonomy IS the analysis, so a filter would be noise).
+    W.dashboard.filterPanel.show(state, layersOnly ? null : W.dashboard.farmFilter.scopeForModule(key));
 
     if (layersOnly) {
       // No band analysis — enter the module's taxonomy browser directly.
+      renderKpis(farms(state));
       if (!state.taxonomyView) tax.openFor(state, tax.viewForModule(key));
       return;
     }
 
     state.activeModule = key;
     W.dashboard.plotsLayer.applyColoring(state);
+    renderAnalysis(state);
+    applyTabForMode();
+  }
+
+  // Everything downstream of the working set: KPIs, legend and the three tables.
+  // Called on route entry and whenever the FILTERING panel changes the set.
+  function renderAnalysis(state) {
+    if (!CUR.module) return;
+    renderKpis(farms(state));
     renderLegend(state);
     attentionTable.rebuild(state);
     summaryTable.rebuild(state);
     datasetTable.rebuild(state);
-    applyTabForMode();
   }
 
   // On pan/zoom, only the in-view legend needs refreshing.
   function refresh(state) { if (CUR.module) renderLegend(state); }
 
-  W.dashboard.modulePage = { wire: wire, show: show, refresh: refresh, syncModeSwitch: syncModeSwitch,
+  W.dashboard.modulePage = { wire: wire, show: show, refresh: refresh,
+    refreshAnalysis: renderAnalysis, syncTabsForMode: syncTabsForMode,
     // Pure selectors exposed for tests (see test/datasetTab.test.js).
     datasetRows: datasetRows, datasetColumnKeys: datasetColumnKeys };
 

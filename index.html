@@ -55,15 +55,13 @@
            modules); kept in the code for possible reuse. -->
       <nav id="module-dial" class="module-dial pointer-events-auto route-hidden" aria-label="Switch module"></nav>
 
-      <!-- Legend (left, clear of the KPI strip above it). For modules that own a
-           taxonomy, a single footer button — inside the panel — switches into the
-           full-taxonomy view. -->
-      <div id="module-legend" class="glass-panel pointer-events-auto absolute left-5 z-20 overflow-hidden" style="top:92px;width:250px">
-        <div id="module-legend-body"></div>
-        <button id="module-legend-switch" class="legend-switch hidden">
-          <span class="material-symbols-outlined" style="font-size:16px;">layers</span>
-          <span>Switch to full taxonomy</span>
-        </button>
+      <!-- Left column: the band legend, with the FILTERING panel stacked under
+           it (minimised until the user opens it). -->
+      <div class="map-left-col pointer-events-none absolute z-20" style="top:92px;left:20px;width:250px">
+        <div id="module-legend" class="glass-panel pointer-events-auto overflow-hidden">
+          <div id="module-legend-body"></div>
+        </div>
+        <div id="module-filter" class="filter-panel glass-panel pointer-events-auto"></div>
       </div>
 
       <!-- Activity feed — top-right corner (not in the zoom stack, not under the
@@ -97,22 +95,13 @@
         <div class="px-3 py-2 border-b border-gray-200 bg-gray-50/80 rounded-t-lg flex items-center gap-2 flex-shrink-0">
           <span class="material-symbols-outlined text-brand-600" style="font-size:16px;">layers</span>
           <span id="tax-title" class="font-label-caps text-gray-900">MAP LAYERS</span>
-          <button id="tax-close" class="ml-auto text-gray-400 hover:text-gray-700 transition-colors" title="Back to analysis"><span class="material-symbols-outlined" style="font-size:18px;">close</span></button>
         </div>
-        <!-- The active module fixes which taxonomy this shows, so the in-panel
-             Land Use / Crops / Trees switcher is hidden. -->
-        <div id="tax-switcher" class="hidden"></div>
         <p class="px-3 pt-2 pb-1 text-[10px] text-gray-400 flex-shrink-0">Tick a type to draw it on the map · shares are of area in view</p>
         <div id="tax-content" class="flex-1 overflow-y-auto scroll-thin px-2 pb-2"></div>
         <div class="flex gap-2 px-2 pt-2 flex-shrink-0">
           <button id="tax-select-all" class="flex-1 border border-gray-300 rounded-lg py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors">Select all</button>
           <button id="tax-clear" class="flex-1 border border-gray-300 rounded-lg py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors">Clear</button>
         </div>
-        <!-- Return to the module's analysis view (hidden for layers-only modules). -->
-        <button id="tax-switch" class="tax-switch-btn hidden flex-shrink-0">
-          <span class="material-symbols-outlined" style="font-size:16px;">insights</span>
-          <span>Switch to analysis</span>
-        </button>
       </div>
 
       <!-- Bottom sheet — Attention list + Band summary -->
@@ -173,24 +162,21 @@
     <aside id="farm-dossier" class="farm-dossier" aria-label="Farm dossier" aria-hidden="true"></aside>
 
     <!-- ============ ALTITUDE 1 — THE SITUATION (overview route) ============ -->
-    <!-- Transparent overlay: verdict on top, the framed region map (#map,
-         .map-framed) shows through the middle, calm status tiles below. -->
+    <!-- Transparent overlay: the framed region map (#map, .map-framed) shows
+         through, with the stats/legend panel over it and the verdict tiles
+         below. The map is always coloured by overall criticality — one fixed
+         lens, no picker. -->
     <div id="route-overview" class="route-hidden absolute inset-0 z-20 pointer-events-none">
 
-      <!-- Verdict bar — the single most load-bearing element: is anything red? -->
-      <div id="situation-verdict" class="situation-verdict pointer-events-auto"></div>
-
-      <!-- Colour-by control, floating over the framed map (top-right) -->
-      <div class="pointer-events-auto absolute z-30 flex items-center gap-2 glass-panel px-3 py-1.5" style="top:78px;inset-inline-end:24px">
-        <span class="text-xs text-gray-500">Colour by</span>
-        <select id="colour-by" class="text-xs font-medium text-gray-800 bg-transparent focus:outline-none cursor-pointer"></select>
+      <!-- Left column: region statistics + band breakdown, with the FILTERING
+           panel stacked under it (minimised until the user opens it). -->
+      <div class="map-left-col pointer-events-none absolute z-30" style="top:24px;inset-inline-start:24px;width:264px">
+        <div id="situation-legend" class="glass-panel pointer-events-auto overflow-hidden"></div>
+        <div id="overview-filter" class="filter-panel glass-panel pointer-events-auto"></div>
       </div>
 
-      <!-- Home legend — region-wide band breakdown for the coloured module (top-left) -->
-      <div id="situation-legend" class="glass-panel pointer-events-auto absolute z-30" style="top:78px;inset-inline-start:24px;width:264px"></div>
-
-      <!-- Status tile strip: the six modules, a bottom-anchored row below the map. -->
-      <div id="situation-strip" class="pointer-events-auto absolute left-3 right-3 bottom-3 z-20 flex flex-col" style="height:184px">
+      <!-- Verdict tiles: the six modules, a bottom-anchored row below the map. -->
+      <div id="situation-strip" class="pointer-events-auto absolute left-3 right-3 bottom-3 z-20 flex flex-col">
         <div class="flex items-center justify-between mb-2 px-1 flex-none">
           <span class="font-label-caps text-gray-900">The six modules</span>
           <span class="text-[10px] text-gray-400">Tap a tile to open it</span>
@@ -223,12 +209,14 @@
 <script src="js/dashboard/state.js"></script>
 <script src="js/dashboard/modules.js"></script>
 <script src="js/dashboard/moduleRegistry.js"></script>
+<script src="js/dashboard/farmFilter.js"></script>
 <script src="js/dashboard/plotsLayer.js"></script>
 <script src="js/dashboard/heatLayer.js"></script>
 <script src="js/dashboard/taxonomyLayers.js"></script>
 <script src="js/dashboard/dataTable.js"></script>
 <script src="js/dashboard/attentionList.js"></script>
 <script src="js/dashboard/legend.js"></script>
+<script src="js/dashboard/filterPanel.js"></script>
 <script src="js/dashboard/scorecard.js"></script>
 <script src="js/dashboard/modulePage.js"></script>
 <script src="js/dashboard/farmDossier.js"></script>

@@ -24,16 +24,12 @@
   // the panel markup + a Layers toggle button somewhere on its map chrome.
   // ============================================================================
 
-  var VIEWS = [
-    { key: 'landuse', label: 'Land Use', icon: 'terrain' },
-    { key: 'crops',   label: 'Crops',    icon: 'grass' },
-    { key: 'trees',   label: 'Trees',    icon: 'park' }
-  ];
-
-  // Each taxonomy is surfaced inside the ONE module it belongs to — so the map
-  // layers are reached from the relevant module's Analysis/Map-layers toggle,
-  // not a global button. Modules without an entry are analysis-only.
-  var VIEW_FOR_MODULE = { structures: 'landuse', crop: 'crops', palms: 'trees' };
+  // Only Land Use & Structures browses a taxonomy: there the classification IS
+  // the analysis. Crops and Trees used to be reachable here through an
+  // "analysis ↔ layers" toggle; they are now a FILTER over the farm map instead
+  // (see farmFilter.js / filterPanel.js), which is the same information without
+  // a mode switch. The view machinery below stays taxonomy-agnostic.
+  var VIEW_FOR_MODULE = { structures: 'landuse' };
   var TITLE_FOR_VIEW = { landuse: 'LAND-USE LAYERS', crops: 'CROP LAYERS', trees: 'TREE LAYERS' };
   function viewForModule(key) { return VIEW_FOR_MODULE[key] || null; }
 
@@ -71,22 +67,20 @@
   function enterLayersMode() {
     if (typeof document === 'undefined') return;
     document.body.classList.add('layers-mode');
-    if (W.dashboard.modulePage && W.dashboard.modulePage.syncModeSwitch) W.dashboard.modulePage.syncModeSwitch();
+    if (W.dashboard.modulePage && W.dashboard.modulePage.syncTabsForMode) W.dashboard.modulePage.syncTabsForMode();
   }
   function exitLayersMode() {
     if (typeof document === 'undefined') return;
     document.body.classList.remove('layers-mode');
-    if (W.dashboard.modulePage && W.dashboard.modulePage.syncModeSwitch) W.dashboard.modulePage.syncModeSwitch();
+    if (W.dashboard.modulePage && W.dashboard.modulePage.syncTabsForMode) W.dashboard.modulePage.syncTabsForMode();
   }
 
-  function showPanel() { if (els.panel) els.panel.classList.remove('tax-hidden'); if (els.toggle) els.toggle.classList.add('active'); enterLayersMode(); }
-  function hidePanel() { if (els.panel) els.panel.classList.add('tax-hidden'); if (els.toggle) els.toggle.classList.remove('active'); exitLayersMode(); }
-
-  function open(state) { showPanel(); enter(state, lastView); }
-  function close(state) { hidePanel(); leaveTaxonomy(state, restore); }
-  function toggle(state) { panelOpen() ? close(state) : open(state); }
+  function showPanel() { if (els.panel) els.panel.classList.remove('tax-hidden'); enterLayersMode(); }
+  function hidePanel() { if (els.panel) els.panel.classList.add('tax-hidden'); exitLayersMode(); }
 
   // Open the layers browser fixed to a specific taxonomy (the active module's).
+  // There is no close: leaving is done by navigating away, which routes through
+  // ensurePlots().
   function openFor(state, view) { showPanel(); enter(state, view); }
 
   // ---- enter a taxonomy view -------------------------------------------------
@@ -96,7 +90,6 @@
     state.activeModule = null;                 // colour by taxonomy value, not a band
     var title = document.getElementById('tax-title');
     if (title) title.textContent = TITLE_FOR_VIEW[view] || 'MAP LAYERS';
-    markSwitcher();
     var ds = datasetFor(view);
     if (state.currentDataset !== ds) {
       // Stream the dataset in; onDataset() runs on completion via the wrapped
@@ -288,26 +281,6 @@
     });
   }
 
-  // ---- switcher (Land Use / Crops / Trees) -----------------------------------
-  function buildSwitcher(state) {
-    if (!els.switcher) return;
-    els.switcher.innerHTML = VIEWS.map(function (v) {
-      return '<button class="tax-view-btn" data-view="' + v.key + '">' +
-        '<span class="material-symbols-outlined" style="font-size:15px;">' + v.icon + '</span>' +
-        '<span>' + v.label + '</span></button>';
-    }).join('');
-    els.switcher.querySelectorAll('.tax-view-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () { selectView(state, btn.dataset.view); });
-    });
-  }
-  function markSwitcher() {
-    if (!els.switcher) return;
-    els.switcher.querySelectorAll('.tax-view-btn').forEach(function (b) {
-      b.classList.toggle('active', b.dataset.view === lastView);
-    });
-  }
-  function selectView(state, view) { if (view !== state.taxonomyView) enter(state, view); }
-
   // Re-apply per-type visibility to the map: switch cluster/polygon layers AND
   // refresh the layer-colour heat so a hidden type drops out of the heat too.
   function applyLayerVisibility(state) {
@@ -332,19 +305,11 @@
     opts = opts || {};
     restore = opts.restore || null;
     els.panel = $('taxonomy-panel');
-    els.toggle = $('toggle-taxonomy');       // legacy global button (removed) — optional
-    els.close = $('tax-close');
-    els.switch = $('tax-switch');
-    els.switcher = $('tax-switcher');
     els.content = $('tax-content');
     els.selectAll = $('tax-select-all');
     els.clear = $('tax-clear');
     if (!els.panel) return;                  // this page has no layers chrome
 
-    buildSwitcher(state);
-    if (els.toggle) els.toggle.addEventListener('click', function () { toggle(state); });
-    if (els.close) els.close.addEventListener('click', function () { close(state); });
-    if (els.switch) els.switch.addEventListener('click', function () { close(state); });   // "Switch to analysis"
     if (els.selectAll) els.selectAll.addEventListener('click', function () { setAll(state, true); });
     if (els.clear) els.clear.addEventListener('click', function () { setAll(state, false); });
 
@@ -365,10 +330,7 @@
   W.dashboard.taxonomyLayers = {
     init: init,
     ensurePlots: ensurePlots,
-    open: open,
     openFor: openFor,
-    close: close,
-    toggle: toggle,
     isOpen: panelOpen,
     viewForModule: viewForModule,
     isLayersOnly: isLayersOnly,

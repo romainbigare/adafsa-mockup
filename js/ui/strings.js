@@ -20,7 +20,6 @@
     // Situation
     tilesHeading: 'The six modules',
     tilesHint: 'Tap a tile to open it',
-    colourBy: 'Colour by',
 
     // Farm dossier
     dossierModuleStatus: 'Module status',

@@ -70,6 +70,54 @@ check("uses the short label and still links to the module", function () {
   assert.ok(html.indexOf("scorecard-mini") !== -1, "mini variant class");
 });
 
+console.log("status (verdict) tile");
+var vmTile = Object.assign({}, vmWarn, { summary: "34% canopy stress · 279.2k trees" });
+check("shows the module icon next to the name", function () {
+  var html = sc.cardHtml(vmTile, { size: "status" });
+  assert.ok(html.indexOf("status-tile-icon") !== -1, "icon slot present");
+  assert.ok(html.indexOf(">park<") !== -1, "renders the module's icon glyph");
+  assert.ok(html.indexOf("Palms &amp; Fruit Trees") !== -1, "full label, not the short one");
+});
+check("status word is the plain-language verdict, keyed by kind", function () {
+  assert.ok(sc.cardHtml(vmOk, { size: "status" }).indexOf("On track") !== -1);
+  assert.ok(sc.cardHtml(vmTile, { size: "status" }).indexOf("Watch") !== -1);
+  var crit = Object.assign({}, vmTile, { statusKind: "critical" });
+  assert.ok(sc.cardHtml(crit, { size: "status" }).indexOf("Needs attention") !== -1);
+});
+check("state rides on ONE modifier class — never a coloured border/hero ring", function () {
+  ["ok", "warn", "critical"].forEach(function (kind) {
+    var html = sc.cardHtml(Object.assign({}, vmTile, { statusKind: kind }), { size: "status" });
+    assert.ok(html.indexOf("status-tile--" + kind) !== -1, kind + " modifier");
+    assert.ok(html.indexOf("status-tile--hero") === -1, "no hero ring on the tile");
+    assert.ok(html.indexOf("border-") === -1, "no utility border classes on the tile");
+  });
+});
+check("shows the summary line, falling back to the headline", function () {
+  assert.ok(sc.cardHtml(vmTile, { size: "status" }).indexOf("34% canopy stress") !== -1);
+  var noSummary = Object.assign({}, vmTile, { summary: null });
+  assert.ok(sc.cardHtml(noSummary, { size: "status" }).indexOf("1.24M trees") !== -1);
+});
+check("draws a column chart: one bar + one % label per band, in band order", function () {
+  var html = sc.bandColumns(vmTile.bands);
+  assert.strictEqual(html.split("tile-bar").length - 1, 4, "four bars");
+  assert.strictEqual(html.split("tile-val\">").length - 1, 4, "four value labels");
+  assert.ok(html.indexOf("height:55%") !== -1, "bar height is the band's share");
+  assert.ok(html.indexOf(">55%<") < html.indexOf(">5%<"), "labels follow band order");
+  assert.ok(html.indexOf('title="Severe Stress — 5% of area"') !== -1, "hover names the band");
+});
+check("keeps zero-share bands as columns so the plot never re-flows", function () {
+  var html = sc.bandColumns([{ label: "Healthy", color: "#1a9850", share: 100 },
+                             { label: "Stressed", color: "#d73027", share: 0 }]);
+  assert.strictEqual(html.split("tile-bar").length - 1, 2, "zero band still drawn");
+  assert.ok(html.indexOf(">0%<") !== -1, "and still labelled");
+});
+check("clamps out-of-range shares (a bar can never overflow the plot)", function () {
+  var html = sc.bandColumns([{ label: "Odd", color: "#000", share: 140 },
+                             { label: "Odd2", color: "#000", share: -5 }]);
+  assert.ok(html.indexOf("height:100%") !== -1, "clamped high");
+  assert.ok(html.indexOf("height:0%") !== -1, "clamped low");
+});
+
 console.log("render");
 check("render() writes one card per model into a container", function () {
   var container = { innerHTML: "" };

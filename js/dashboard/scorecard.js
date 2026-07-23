@@ -70,25 +70,52 @@
     return kind === 'critical' ? 'Needs attention' : kind === 'warn' ? 'Watch' : 'On track';
   }
 
-  // "Status" tile for the Situation screen. Leads with a clear status WORD (the
-  // answer), then a plain supporting line (the evidence), then a band strip. The
-  // border + word colour carry the state (COLOUR CONTRACT) so a healthy region
-  // stays quiet and problems glow. Clicking opens the module.
+  // Band-share COLUMN chart — the verdict tile's evidence. A stacked strip hides
+  // small-but-important bands (a 4% "Severe Stress" sliver disappears); columns
+  // over a shared baseline read as a chart and make the bad band visible even
+  // when it is small. Every tile draws the same fixed-height plot box with the
+  // same gaps, so the six charts line up across the strip regardless of how many
+  // bands (3 or 4) a module has or how much text sits above them.
+  //
+  // Structure is two parallel rows (bars, then values) sharing one flex rhythm —
+  // that is what keeps a bar and its % label in the same column.
+  function bandColumns(bands) {
+    var list = bands || [];
+    var bars = list.map(function (b) {
+      var share = Math.max(0, Math.min(100, b.share || 0));
+      return '<span class="tile-col" title="' + esc(b.label) + ' — ' + Math.round(share) + '% of area">' +
+          '<span class="tile-bar" style="height:' + share + '%;background:' + esc(b.color) + '"></span>' +
+        '</span>';
+    }).join('');
+    var vals = list.map(function (b) {
+      return '<span class="tile-val">' + Math.round(Math.max(0, Math.min(100, b.share || 0))) + '%</span>';
+    }).join('');
+    return '<span class="tile-chart">' +
+        '<span class="tile-plot">' + bars + '</span>' +
+        '<span class="tile-vals">' + vals + '</span>' +
+      '</span>';
+  }
+
+  // "Status" (verdict) tile for the Situation screen: module icon + name, the
+  // status as ONE tinted pill (the answer), a plain supporting line (the
+  // evidence), then the band chart pinned to the bottom. Colour lives only in
+  // the pill and the band bars — the card itself stays neutral, so a healthy
+  // region is quiet and a red pill is the thing that catches the eye. Every row
+  // has a fixed height so the six tiles align row-for-row. Clicking opens the
+  // module.
   function statusCard(vm) {
     var kindCls = vm.statusKind === 'critical' ? 'status-tile--critical'
       : vm.statusKind === 'warn' ? 'status-tile--warn' : 'status-tile--ok';
     return '' +
       '<a href="#/m/' + esc(vm.key) + '" data-module="' + esc(vm.key) + '" ' +
-        'class="status-tile ' + kindCls + (vm.hero ? ' status-tile--hero' : '') + ' group block">' +
-        '<span class="status-tile-name">' + esc(vm.label) + '</span>' +
-        '<div class="status-tile-status">' +
-          '<span class="status-tile-dot"></span>' +
-          '<span class="status-tile-word">' + statusWord(vm.statusKind) + '</span>' +
-        '</div>' +
-        '<div class="status-tile-support">' + esc(vm.summary || vm.headline) + '</div>' +
-        '<div class="status-tile-bottom">' +
-          '<div class="status-tile-strip">' + bandStrip(vm.bands, 6) + '</div>' +
-        '</div>' +
+        'class="status-tile ' + kindCls + ' group block">' +
+        '<span class="status-tile-head">' +
+          (vm.icon ? '<span class="material-symbols-outlined status-tile-icon">' + esc(vm.icon) + '</span>' : '') +
+          '<span class="status-tile-name">' + esc(vm.label) + '</span>' +
+        '</span>' +
+        '<span class="status-tile-word">' + statusWord(vm.statusKind) + '</span>' +
+        '<span class="status-tile-support">' + esc(vm.summary || vm.headline) + '</span>' +
+        bandColumns(vm.bands) +
       '</a>';
   }
 
@@ -110,6 +137,7 @@
   W.dashboard.scorecard = {
     cardHtml: cardHtml,
     bandStrip: bandStrip,
+    bandColumns: bandColumns,
     render: render
   };
 

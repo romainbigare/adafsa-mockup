@@ -29,7 +29,7 @@
   function rowsFor(moduleKey, state) {
     var m = W.dashboard.moduleRegistry.byKey(moduleKey);
     if (!m) return [];
-    var farms = state.farmFeatures || [];
+    var farms = state.filteredFarms || state.farmFeatures || [];
     var out = [];
     for (var i = 0; i < farms.length; i++) {
       if (m.valueOf(farms[i]) != null) out.push(farms[i]);

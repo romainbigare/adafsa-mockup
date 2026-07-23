@@ -16,6 +16,11 @@
   W.dashboard.modulePage.wire();
   W.dashboard.newsBell.init();
 
+  // The FILTERING panel is mounted on both chromes (Overview + module pages);
+  // one selection drives both, so they can never disagree.
+  W.dashboard.filterPanel.mount('overview-filter');
+  W.dashboard.filterPanel.mount('module-filter');
+
   // Mobile nav: hamburger opens the sidebar as an overlay; scrim / navigation
   // closes it. The sidebar is re-rendered per route, so we toggle a class on the
   // persistent <aside> and close on any hashchange.
@@ -31,18 +36,8 @@
     window.addEventListener('hashchange', close);
   })();
 
-  function initStatusBadges() {
-    var scan = document.getElementById('last-scan');
-    if (scan) scan.textContent = new Date(Date.now() - Math.floor(Math.random() * 3600000))
-      .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    var ai = document.getElementById('last-ai-update');
-    if (ai) ai.textContent = new Date(Date.now() - Math.floor(Math.random() * 6 * 3600000))
-      .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  }
-
   // Readiness: once the farm boundaries have streamed in, start the router.
   state.onFirstLoad = function (s) {
-    initStatusBadges();
     W.dashboard.router.init(s);
   };
   // A route re-render keeps the active module's legend + overview cards fresh.

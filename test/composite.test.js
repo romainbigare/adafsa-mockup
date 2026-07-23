@@ -47,7 +47,7 @@ console.log("composite score");
 check("byKey('composite') returns the composite lens", function () {
   var c = reg.byKey("composite");
   assert.ok(c && c.key === "composite", "composite resolvable");
-  assert.strictEqual(c.label, "Overall criticality");
+  assert.strictEqual(c.label, "Overall health");
 });
 check("a healthy farm scores ~0 and bands Healthy", function () {
   var s = reg.compositeScore(healthy());

@@ -286,27 +286,79 @@ body.lb-resizing .lb-resize-grip { background: #16a34a; }
    band Analysis and its full taxonomy (Structures=land use, Crop=crops,
    Palms=trees). "Switch to full taxonomy" sits under the legend (analysis mode);
    "Switch to analysis" sits at the foot of the Map Layers panel (layers mode). */
-.legend-switch {
-  display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
-  padding: 9px 12px; cursor: pointer; border-top: 1px solid #e5e7eb;
-  color: var(--status-ok); font: 600 12px/1 var(--font-sans);
+/* --------------------------------------------------------------------------
+   Left map column — the band legend with the FILTERING panel stacked under it.
+   One flex column so the filter always sits directly below the legend, whatever
+   height the legend's bands give it.
+   -------------------------------------------------------------------------- */
+.map-left-col {
+  display: flex; flex-direction: column; gap: 10px; align-items: stretch; overflow: hidden;
 }
-.legend-switch:hover { background: var(--status-ok-bg); }
-.legend-switch.hidden { display: none; }
+/* Bounded at the bottom by whatever owns the foot of each route — the data
+   sheet on a module page, the tile strip on the Overview — so an open filter
+   tree scrolls inside the column instead of sliding under them. */
+#module-chrome .map-left-col { bottom: calc(var(--lb-body-height, 260px) + 56px); }
+#route-overview .map-left-col { bottom: 220px; }
+/* The legend keeps its natural height; the filter panel takes what is left and
+   scrolls inside itself (without this, both shrink and the legend loses bands). */
+.map-left-col > #module-legend,
+.map-left-col > #situation-legend { flex: none; }
 
-.tax-switch-btn {
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  margin: 8px; padding: 9px 12px; border-radius: 8px; cursor: pointer;
-  background: var(--status-ok); color: #fff; border: none; font: 600 12px/1 var(--font-sans);
+/* FILTERING panel (js/dashboard/filterPanel.js) — minimised to its header until
+   the user opens it, so the landing map is never fronted by checkboxes. */
+.filter-panel { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+.filter-panel.hidden { display: none; }
+.filter-head {
+  display: flex; align-items: center; gap: 8px; width: 100%; flex: none;
+  padding: 9px 11px; cursor: pointer; background: none; border: 0; text-align: start;
 }
-.tax-switch-btn:hover { background: var(--brand-700); }
-.tax-switch-btn.hidden { display: none; }
+.filter-head:hover { background: rgba(15,23,42,.035); }
+.filter-head-icon { font-size: 16px; color: #6b7280; flex: none; }
+.filter-head-title { font: 600 10px/1.3 var(--font-sans); letter-spacing: .06em; color: #111827; }
+.filter-chevron { font-size: 18px; color: #9ca3af; margin-inline-start: auto; flex: none; }
+.filter-chip {
+  font: 600 9px/1.3 var(--font-sans); letter-spacing: .04em; text-transform: uppercase;
+  color: #6b7280; background: #f3f4f6; border-radius: 999px; padding: 2px 7px; white-space: nowrap;
+}
+.filter-chip--on { color: var(--status-ok); background: var(--status-ok-bg); }
+
+.filter-body { border-top: 1px solid #eef0f2; display: flex; flex-direction: column; min-height: 0; }
+.filter-tree { flex: 1 1 auto; min-height: 0; max-height: min(38vh, 320px); overflow-y: auto; padding: 6px; }
+
+.filter-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  padding: 3px 4px; border-radius: 6px; cursor: pointer;
+}
+.filter-row:hover { background: #f6f7f8; }
+.filter-row-main { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.filter-row-meta { display: flex; align-items: center; gap: 7px; flex: none; }
+.filter-row-name { font: 400 11.5px/1.3 var(--font-sans); color: #6b7280; }
+.filter-row-name--cat { font-weight: 600; color: #374151; }
+.filter-row--type { padding-inline-start: 22px; }
+.filter-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.filter-count { font: 500 10px/1 var(--font-sans); color: #9ca3af; font-variant-numeric: tabular-nums; }
+.filter-box { width: 12px; height: 12px; cursor: pointer; accent-color: var(--status-ok); flex: none; }
+.filter-chevron-sm { font-size: 15px; color: #9ca3af; flex: none; transition: transform .15s ease; }
+.filter-cat.open .filter-chevron-sm { transform: rotate(90deg); }
+.filter-cat-body { max-height: 0; overflow: hidden; transition: max-height .25s ease; }
+.filter-cat.open .filter-cat-body { max-height: 600px; }
+
+.filter-foot {
+  display: flex; align-items: center; gap: 6px; flex: none;
+  padding: 7px 10px; border-top: 1px solid #eef0f2;
+}
+.filter-foot-text { font: 400 10px/1.3 var(--font-sans); color: #9ca3af; margin-inline-end: auto; }
+.filter-action {
+  padding: 3px 9px; border: 1px solid #e5e7eb; border-radius: 999px; background: #fff;
+  font: 500 10px/1.3 var(--font-sans); color: #6b7280; cursor: pointer;
+}
+.filter-action:hover { background: #f3f4f6; color: #111827; }
 
 /* In Map-layers mode the taxonomy panel is the workspace, so the band-only
    legend steps aside. The bottom data sheet STAYS — its Full Dataset tab lists
    the taxonomy parcels — but shifts clear of the taxonomy panel on the left, and
    only the full-dataset tab is meaningful (the band Attention/Summary tabs hide). */
-body.layers-mode #module-legend { display: none; }
+body.layers-mode .map-left-col { display: none; }
 body.layers-mode #module-bar { left: 306px; }
 body.layers-mode .mp-tab[data-mp-tab="attention"],
 body.layers-mode .mp-tab[data-mp-tab="summary"],
@@ -419,11 +471,11 @@ body.layers-mode .mp-ctx-summary { display: none; }
   /* Keep chrome off the hamburger and let strips scroll. */
   .kpi-strip { inset-inline-start: 60px; inset-inline-end: 12px; }
   .module-dial { inset-inline-start: 60px; max-width: calc(100% - 72px); }
-  #situation-verdict { padding-inline-start: 58px; }
-  .situation-verdict-meta { display: none; }        /* sentence first on a phone */
-  .situation-verdict-text { font-size: 13px; }
-  #module-legend { width: 200px !important; }
-  #situation-legend { display: none; }              /* declutter the landing; tiles + map carry it */
+  .map-left-col { width: 200px !important; }
+  /* Declutter the landing — the tiles + map carry the bands — but keep the
+     FILTERING panel, clear of the hamburger. */
+  #situation-legend { display: none; }
+  #route-overview .map-left-col { top: 62px !important; }
   .farm-dossier { width: 100%; }                    /* full-width drawer on a phone */
 }
 
@@ -497,16 +549,16 @@ body.layers-mode .mp-ctx-summary { display: none; }
 .ftt-band { font-size: 11px; font-weight: 600; color: #fff; white-space: nowrap; }
 
 /* --------------------------------------------------------------------------
-   Situation screen (ALTITUDE 1) — the region map framed below the verdict bar,
-   with the calm status-tile strip beneath it. Module routes use the default
-   full-bleed #map. !important beats Tailwind's inset-0/h-full.
+   Situation screen (ALTITUDE 1) — the region map framed edge-to-edge, with the
+   verdict-tile strip beneath it. Module routes use the default full-bleed #map.
+   !important beats Tailwind's inset-0/h-full.
    -------------------------------------------------------------------------- */
 .map-framed {
-  top: 66px !important;              /* clears the verdict bar */
+  top: 12px !important;
   inset-inline: 12px !important;
   left: 12px !important;
   right: 12px !important;
-  bottom: 196px !important;          /* fills down to the tile strip — no dead space */
+  bottom: 208px !important;          /* fills down to the tile strip — no dead space */
   height: auto !important;
   width: auto !important;
   border-radius: 12px;
@@ -514,57 +566,81 @@ body.layers-mode .mp-ctx-summary { display: none; }
   box-shadow: 0 6px 16px rgba(15, 23, 42, 0.16);
 }
 
-/* Verdict bar — the plain-language "is anything red?" answer. */
-.situation-verdict {
-  position: absolute; top: 12px; inset-inline: 12px; z-index: 31;
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 16px; border-radius: 12px;
-  background: var(--panel-bg); backdrop-filter: blur(8px);
-  border: 1px solid rgba(0,0,0,.06); box-shadow: 0 6px 16px rgba(15,23,42,.10);
-}
-.situation-verdict--ok       { border-inline-start: 4px solid var(--status-ok); }
-.situation-verdict--warn     { border-inline-start: 4px solid var(--status-warn); }
-.situation-verdict--critical { border-inline-start: 4px solid var(--status-critical); }
-.situation-verdict-icon { font-size: 22px; flex-shrink: 0; }
-.situation-verdict--ok       .situation-verdict-icon { color: var(--status-ok); }
-.situation-verdict--warn     .situation-verdict-icon { color: var(--status-warn); }
-.situation-verdict--critical .situation-verdict-icon { color: var(--status-critical); }
-.situation-verdict-text { font-size: 15px; font-weight: 600; color: #111827; min-width: 0; }
-.situation-verdict-link { color: inherit; text-decoration: underline; text-decoration-color: rgba(0,0,0,.25); text-underline-offset: 2px; }
-.situation-verdict-link:hover { text-decoration-color: currentColor; }
-.situation-verdict-meta { margin-inline-start: auto; font: 500 11px/1.2 var(--font-mono); color: #9ca3af; white-space: nowrap; flex-shrink: 0; }
-
 /* Legend header scope chip — "In view" vs "All farms" (never silently mixed). */
 .legend-scope {
   font: 600 9px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase;
   color: #6b7280; background: #f3f4f6; border-radius: 999px; padding: 2px 7px; white-space: nowrap;
 }
 
-/* Status tiles — six modules, calm by default; warn/critical carry a coloured
-   edge. Taller cards with a band strip so they fill the bottom band cleanly. */
+/* Legend statistics — the region's headline numbers (farms, area, flagged
+   modules, last scan), 2x2 so long values never truncate. */
+.legend-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px;
+  padding: 10px 12px; border-bottom: 1px solid #eef0f2;
+}
+.legend-stat-value { font: 600 15px/1.15 var(--font-sans); color: #111827; font-variant-numeric: tabular-nums; }
+.legend-stat-label { margin-top: 1px; font: 500 10px/1.2 var(--font-sans); color: #9ca3af; }
+
+/* Verdict tiles — six modules. The card itself stays neutral (no coloured
+   border): colour lives only in the status pill and the band chart, so a
+   healthy region is quiet and a red pill is what catches the eye. Every row has
+   a fixed height so the six tiles align row-for-row. */
 .situation-tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 10px; }
 .status-tile {
   display: flex; flex-direction: column; text-decoration: none; background: #fff;
-  border: 1px solid #e5e7eb; border-radius: 12px; padding: 13px 14px;
-  transition: box-shadow .15s ease, transform .15s ease;
+  border: 1px solid #e8eaed; border-radius: 14px; padding: 12px 14px 11px;
+  box-shadow: 0 1px 2px rgba(15,23,42,.04);
+  transition: box-shadow .16s ease, transform .16s ease, border-color .16s ease;
 }
-.status-tile:hover { box-shadow: 0 6px 16px rgba(15,23,42,.12); transform: translateY(-1px); }
-.status-tile-name { font: 600 12px/1.25 var(--font-sans); color: #374151; }
-.status-tile-status { display: flex; align-items: center; gap: 7px; margin-top: 10px; }
-.status-tile-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--status-ok); }
-.status-tile-word { font-size: 17px; font-weight: 700; line-height: 1.1; color: var(--status-ok); }
-.status-tile-support { margin-top: 6px; font-size: 12px; line-height: 1.3; color: #6b7280; }
-.status-tile-bottom { margin-top: auto; padding-top: 12px; }
-.status-tile-strip { margin-top: 0; }
-.status-tile--warn     { border-inline-start: 3px solid var(--status-warn); }
-.status-tile--warn     .status-tile-dot  { background: var(--status-warn); }
-.status-tile--warn     .status-tile-word { color: var(--status-warn); }
-.status-tile--critical { border-inline-start: 3px solid var(--status-critical); }
-.status-tile--critical .status-tile-dot  { background: var(--status-critical); }
-.status-tile--critical .status-tile-word { color: var(--status-critical); }
-.status-tile--hero { box-shadow: inset 0 0 0 1px var(--brand-300); }
-@media (max-width: 1100px) { .situation-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 680px)  { .situation-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.status-tile:hover {
+  border-color: #d6dade; box-shadow: 0 8px 20px rgba(15,23,42,.09); transform: translateY(-2px);
+}
+.status-tile-head { display: flex; align-items: flex-start; gap: 6px; min-height: 33px; }
+.status-tile-icon { font-size: 16px; color: #9ca3af; flex: none; margin-top: 1px; }
+.status-tile-name { font: 600 12px/1.3 var(--font-sans); color: #111827; }
+.status-tile-word {
+  align-self: flex-start; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  font: 600 11px/1.35 var(--font-sans);
+  color: var(--status-ok); background: var(--status-ok-bg);
+}
+.status-tile--warn     .status-tile-word { color: var(--status-warn);     background: var(--status-warn-bg); }
+.status-tile--critical .status-tile-word { color: var(--status-critical); background: var(--status-critical-bg); }
+.status-tile-support {
+  margin-top: 8px; font: 400 11.5px/1.35 var(--font-sans); color: #6b7280; min-height: 31px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Band-share column chart. The plot box and the value row share one flex
+   rhythm (same gap, same 1fr columns) so bars and their labels stay in the same
+   column; the fixed plot height + shared baseline make every tile's chart line
+   up across the strip. */
+.tile-chart { display: block; margin-top: auto; padding-top: 10px; }
+.tile-plot {
+  display: flex; align-items: flex-end; gap: 5px; height: 34px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.tile-col { flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; }
+.tile-bar { width: 100%; min-height: 2px; border-radius: 3px 3px 0 0; }
+.tile-vals { display: flex; gap: 5px; margin-top: 4px; }
+.tile-val {
+  flex: 1 1 0; min-width: 0; text-align: center;
+  font: 500 9.5px/1 var(--font-sans); color: #9ca3af; font-variant-numeric: tabular-nums;
+}
+/* Strip height and the map's bottom inset are one number in two places — the
+   map must end exactly where the tiles begin (12px gutter). */
+#situation-strip { height: 196px; }
+@media (max-width: 1100px) {
+  .situation-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }   /* 2 rows */
+  #situation-strip { height: 388px; }
+  .map-framed { bottom: 400px !important; }
+}
+@media (max-width: 680px) {
+  /* A phone cannot show three rows of tiles AND a usable map: cap the strip and
+     let the tiles scroll inside it. */
+  .situation-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 176px; overflow-y: auto; }
+  #situation-strip { height: 46vh; }
+  .map-framed { bottom: calc(46vh + 12px) !important; }
+}
 
 /* Per-category subcategory list — collapsed by default, expanded by
    clicking the category row (independent of the outer cat-panel accordion). */
@@ -596,13 +672,3 @@ body.layers-mode .mp-ctx-summary { display: none; }
 .tax-panel { z-index: 40; display: flex; flex-direction: column; width: 274px; overflow: hidden;
   transition: transform 0.28s ease, opacity 0.2s ease; }
 .tax-panel.tax-hidden { transform: translateX(-118%); opacity: 0; pointer-events: none; }
-.tax-switcher { display: flex; gap: 4px; }
-.tax-view-btn { flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 3px;
-  padding: 5px 4px; font-size: 11px; font-weight: 600; color: #6b7280;
-  background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 7px;
-  cursor: pointer; white-space: nowrap;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
-.tax-view-btn:hover { background: #e5e7eb; color: #111827; }
-.tax-view-btn.active { background: #16a34a; border-color: #16a34a; color: #fff; }
-/* The Layers toggle button stays lit while the panel is open. */
-#toggle-taxonomy.active { background: #16a34a; color: #fff; }
