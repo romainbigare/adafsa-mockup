@@ -6,24 +6,31 @@ does about it.
 
 ## Start here
 
-1. **`storyboard.md`** — the deck, slide by slide: a cover and eight slides, each
+1. **`storyboard.md`** — the deck, slide by slide: a cover and ten slides, each
    with its visual, its annotations, and spoken speaker notes. The deck is
-   deliberately light: one diagram or one annotated screenshot per slide.
+   deliberately light: one diagram or one annotated image per slide.
 2. **`adafsa-redesign-draft.pptx`** — the draft deck built from the storyboard,
    speaker notes embedded. Annotations are real shapes connected to the screenshots
    with leader lines, so they can be nudged in PowerPoint. To regenerate after
    editing assets: `npm i pptxgenjs sharp && node build_deck.js`.
 
-## The eight slides
+## The ten slides
+
+Problem statement:
 
 1. Three questions, three altitudes (icon diagram)
-2. Can it tell us whether anything is wrong? (annotated current app)
-3. Can it tell us which farms, and what to do? (annotated current app)
-4. The proposal, seen from the menu (wireframe)
-5. The shape of a module page (wireframe)
-6. Altitude 1, in practice (annotated screenshot)
-7. Altitude 2, in practice (annotated screenshot)
-8. Altitude 3, in practice (annotated screenshot)
+2. Start with the menu (real screenshot, nav in focus)
+3. Can it tell us whether anything is wrong? (real overview screenshot, annotated)
+4. Can it tell us what is happening on a farm? (Farm Monitoring wireframe, annotated)
+
+The solution:
+
+5. The proposal, seen from the menu (wireframe)
+6. Three pages, three altitudes (wireframe)
+7. The shape of a module page, with the taxonomy filter (wireframe)
+8. Altitude 1, in practice (annotated screenshot, includes the filter)
+9. Altitude 2, in practice (annotated screenshot)
+10. Altitude 3, in practice (annotated screenshot)
 
 ## Background material (`notes/`)
 

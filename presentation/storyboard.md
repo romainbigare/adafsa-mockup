@@ -86,10 +86,14 @@ Assets live in `assets/`. The deck is `adafsa-redesign-draft.pptx`; regenerate w
   3. → the page as a whole: there is no conclusion anywhere; the page ends where the
      official's question begins.
 - **Notes:** "The closest thing to a farm page today is Farm Monitoring. It works like
-  an instrument: choose a farm, choose a field, choose an index, choose dates, then read
-  the imagery and the chart. That is a remote-sensing analyst's workflow. Our users'
-  question is what is happening on this farm, and whether someone should go there. The
-  data to answer it is all here. The conclusion is not."
+  an instrument. Choose a farm and a map view; nothing has a default. Then find a usable
+  image by reading satellite mission codes and cloud-cover percentages across thirty
+  dated captures. Then a long scroll of readings: weather, soil moisture, growth phase,
+  degree days. That is a remote-sensing analyst's workflow. Even where the page does
+  conclude something, the water scheduler's proceed-with-irrigation call, the reasoning
+  sits in a collapsed panel of raw technical fields. Our users' question is what is
+  happening on this farm, and whether someone should go there. The data to answer it is
+  all here. The conclusion is not."
 
 # The solution
 
@@ -154,7 +158,8 @@ Assets live in `assets/`. The deck is `adafsa-redesign-draft.pptx`; regenerate w
   1. → the KPI strip: "The page holds one question. These are its numbers."
   2. → the module list in the nav: "Changing module changes the question. The map stays
      where it was."
-  3. → the coloured plots: "Each farm takes the colour of its score."
+  3. → the coloured map: "Colour follows the score, from the region glow down to each
+     farm."
   4. → the attention list: "Farms ranked worst first, ready to export."
 - **Notes:** "One click down, into irrigation efficiency. The page belongs to that one
   question. Its numbers are on top, each farm is coloured by its score, and the bottom
