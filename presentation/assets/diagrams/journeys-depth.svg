@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect x="0" y="0" width="1600" height="900" fill="#FAF9F6"/>
+  <g transform="translate(430,0)">
+
+  <!-- ============ BAND 1 : region/area glyph ============ -->
+  <g transform="translate(180,142)">
+    <rect width="76" height="76" rx="18" fill="#EAF3EC"/>
+    <rect x="18" y="18" width="40" height="40" rx="6" fill="none" stroke="#166534" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="30" cy="30" r="3" fill="#166534"/>
+    <circle cx="48" cy="34" r="3" fill="#166534"/>
+    <circle cx="36" cy="48" r="3" fill="#166534"/>
+  </g>
+
+  <text x="280" y="158" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">Depth 1 — the situation</text>
+  <text x="280" y="188" font-family="Helvetica, Arial, sans-serif" font-size="21" font-style="italic" fill="#166534">&#8220;Is anything wrong today?&#8221;</text>
+  <text x="280" y="214" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#6B7280">A quick look, first thing in the morning.</text>
+
+  <!-- connector 1 -->
+  <line x1="218" y1="280" x2="218" y2="350" stroke="#9CA3AF" stroke-width="1.5"/>
+  <text x="240" y="320" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#6B7280">one level deeper</text>
+
+  <!-- ============ BAND 2 : magnifier over ranked bars ============ -->
+  <g transform="translate(180,412)">
+    <rect width="76" height="76" rx="18" fill="#EAF3EC"/>
+    <circle cx="32" cy="30" r="14" fill="none" stroke="#166534" stroke-width="2.5"/>
+    <line x1="22" y1="25" x2="40" y2="25" stroke="#166534" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="22" y1="34" x2="32" y2="34" stroke="#166534" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="42" y1="40" x2="54" y2="54" stroke="#166534" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <text x="280" y="428" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">Depth 2 — the question</text>
+  <text x="280" y="458" font-family="Helvetica, Arial, sans-serif" font-size="21" font-style="italic" fill="#166534">&#8220;Which farms need attention?&#8221;</text>
+  <text x="280" y="484" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#6B7280">A ranked list to work through during the week.</text>
+
+  <!-- connector 2 -->
+  <line x1="218" y1="550" x2="218" y2="620" stroke="#9CA3AF" stroke-width="1.5"/>
+  <text x="240" y="590" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#6B7280">one level deeper</text>
+
+  <!-- ============ BAND 3 : location pin ============ -->
+  <g transform="translate(180,682)">
+    <rect width="76" height="76" rx="18" fill="#EAF3EC"/>
+    <g transform="translate(14,12) scale(2)">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="#166534" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="12" cy="9" r="2.6" fill="none" stroke="#166534" stroke-width="1.25"/>
+    </g>
+  </g>
+
+  <text x="280" y="698" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">Depth 3 — the farm</text>
+  <text x="280" y="728" font-family="Helvetica, Arial, sans-serif" font-size="21" font-style="italic" fill="#166534">&#8220;What is happening on this farm?&#8221;</text>
+  <text x="280" y="754" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#6B7280">The full picture, before a visit or a call.</text>
+  </g>
+</svg>

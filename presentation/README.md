@@ -14,23 +14,31 @@ does about it.
    with leader lines, so they can be nudged in PowerPoint. To regenerate after
    editing assets: `npm i pptxgenjs sharp && node build_deck.js`.
 
-## The ten slides
+## The eleven slides
 
-Problem statement:
+The current app:
 
-1. Three questions, three altitudes (icon diagram)
-2. Start with the menu (real screenshot, nav in focus)
-3. Can it tell us whether anything is wrong? (real overview screenshot, annotated)
-4. Can it tell us what is happening on a farm? (Farm Monitoring wireframe, annotated)
+1. Start with the menu (real screenshot, nav in focus, annotated)
+2. Can it tell us whether anything is wrong? (real overview screenshot, annotated)
 
-The solution:
+The user's journey:
 
-5. The proposal, seen from the menu (wireframe)
-6. Three pages, three altitudes (wireframe)
-7. The shape of a module page, with the taxonomy filter (wireframe)
-8. Altitude 1, in practice (annotated screenshot, includes the filter)
-9. Altitude 2, in practice (annotated screenshot)
-10. Altitude 3, in practice (annotated screenshot)
+3. The user's journey (three-depth icon diagram)
+
+The proposal:
+
+4. Proposed navigation (nav wireframe)
+5. Three pages, three depths (wireframe)
+6. Depth 1 · The situation at a glance (overview wireframe, annotated)
+7. Depth 1 · Example (screenshot, annotated)
+8. Depth 2 · The module in detail (module wireframe, annotated)
+9. Depth 2 · Example (screenshot, annotated)
+10. Depth 3 · The farm in detail (farm wireframe, annotated)
+11. Depth 3 · Example (screenshot, annotated)
+
+Annotations on the screenshot slides are soft floating cards joined to the image by a
+thin leader and a small ring marker — real PowerPoint shapes, so they can be nudged.
+The wireframe slides carry their labels baked into the diagram.
 
 ## Background material (`notes/`)
 
