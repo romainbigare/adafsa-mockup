@@ -1,47 +1,55 @@
-# Presentation kit — "From map viewer to decision tool"
+# Presentation kit — Farm dashboard redesign
 
-Everything needed to build the PowerPoint that argues for the dashboard redesign
-(current app → three-altitude design) ahead of the six-module release.
+Everything needed for the deck that walks through the redesign: how people use the
+tool (three altitudes), where the current app falls short, and what the new layout
+does about it.
 
 ## Start here
 
-1. **`storyboard.md`** — the deck, slide by slide: headline, on-slide content, which
-   asset goes where, and full speaker notes. 19 slides + 6 appendix slides.
-2. **`adafsa-redesign-draft.pptx`** — a draft deck assembled from the storyboard
-   (20 slides: all 19 + appendix pointer slide, visuals placed, speaker notes
-   embedded). Use it as the starting file or rebuild from the storyboard in the
-   house template. To regenerate after editing assets:
-   `npm i pptxgenjs sharp && node build_deck.js` (the script measures each image
-   and re-fits layouts automatically).
+1. **`storyboard.md`** — the deck, slide by slide: a cover and eight slides, each
+   with its visual, its annotations, and spoken speaker notes. The deck is
+   deliberately light: one diagram or one annotated screenshot per slide.
+2. **`adafsa-redesign-draft.pptx`** — the draft deck built from the storyboard,
+   speaker notes embedded. Annotations are real shapes connected to the screenshots
+   with leader lines, so they can be nudged in PowerPoint. To regenerate after
+   editing assets: `npm i pptxgenjs sharp && node build_deck.js`.
 
-## Supporting notes (`notes/`)
+## The eight slides
 
-| File | What it is | Feeds |
-|---|---|---|
-| `current-app-audit.md` | Factual inventory of the production app, extracted from its captured DOM — every claim verifiable, exact strings quoted | Slides 3, 5, 6, 7 + appendix A1 |
-| `user-questions.md` | The five questions government officials bring to the tool, scored against both designs; the altitude rationale | Slides 4, 6, 8 + appendix A2 |
-| `redesign-rationale.md` | The whole argument on one page (altitude model, screen grammar, the two contracts, what's preserved) | Slides 8–14, 16 |
-| `objections.md` | Likely pushback in the meeting, with prepared answers | Q&A prep |
+1. Three questions, three altitudes (icon diagram)
+2. Can it tell us whether anything is wrong? (annotated current app)
+3. Can it tell us which farms, and what to do? (annotated current app)
+4. The proposal, seen from the menu (wireframe)
+5. The shape of a module page (wireframe)
+6. Altitude 1, in practice (annotated screenshot)
+7. Altitude 2, in practice (annotated screenshot)
+8. Altitude 3, in practice (annotated screenshot)
+
+## Background material (`notes/`)
+
+Not slides. Kept for questions and follow-up:
+
+| File | What it is |
+|---|---|
+| `current-app-audit.md` | Factual inventory of the production app, extracted from its captured DOM |
+| `user-questions.md` | The users' questions in full, scored against both designs |
+| `redesign-rationale.md` | The design argument on one page |
+| `objections.md` | Likely pushback, with prepared answers |
 
 ## Assets (`assets/`)
 
-- `current/` — the "before": wireframe of the live app + a high-fidelity mockup of its
-  layout. (A direct render of the captured production DOM was attempted and discarded —
-  the capture has no absolute asset URLs, so it renders unstyled; see `ASSETS.md`.)
-- `new/` — fresh screenshots of the working redesign mockup: the three altitudes,
-  the dial, layers mode, the farm dossier, Farm Analysis, and mobile shots.
-- `diagrams/` — the five argument diagrams (SVG source + PNG for PowerPoint):
-  altitude model, screen grammar, questions matrix, module-scaling breakdown,
-  the two contracts.
-- `process/` — screenshots of the three prototyped layout proposals (A / A2 / B)
-  for the "how we got here" slide.
+- `current/` — the "before": wireframe of the live app and a high-fidelity layout
+  mockup. (The captured production DOM renders unstyled, so no direct render exists.)
+- `new/` — screenshots of the working mockup: the three altitudes, module switching,
+  layers mode, the farm dossier, Farm Analysis, mobile.
+- `diagrams/` — the slide diagrams (SVG source + PNG): `journeys-altitudes`,
+  `wireframe-nav`, `wireframe-module`, plus six earlier argument diagrams kept as
+  background.
+- `process/` — screenshots of the three prototyped layout proposals (A / A2 / B).
 - `ASSETS.md` — per-file manifest.
 
 ## Deeper background (outside this folder)
 
-- `docs/design/ux-review-proposals.md` — the hands-on review of the three proposals
-  (the evidence base; includes the must-fix list).
-- `docs/design/proposal-combined-plan.md` — the implementation plan for the combined
-  design (milestones quoted on slide 18).
-- The mockup itself: open `index.html` (no build, no server needed) — the best
-  appendix is a live demo.
+- `docs/design/ux-review-proposals.md` — hands-on review of the three proposals.
+- `docs/design/proposal-combined-plan.md` — implementation plan of the combined design.
+- The live mockup: open `index.html`. No build, no server.
