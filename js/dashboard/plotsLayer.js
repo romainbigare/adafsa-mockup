@@ -201,9 +201,17 @@
     if (state.highlightLayer) state.highlightLayer.clearLayers();
   }
 
+  // Streaming a dataset spans many frames, so a route change can start a second
+  // load while the first is still pushing features. Every load takes a ticket;
+  // a stream whose ticket is stale abandons itself at its next frame instead of
+  // dribbling its rows into the dataset that replaced it (which is how you get
+  // "900 farms", half of them land-use parcels with no owner).
+  var loadSeq = 0;
+
   function loadDataset(state, name) {
     if (state.currentDataset === name && state.allFeatures.length > 0) return;
     state.currentDataset = name;
+    var seq = ++loadSeq;
     clearAllFeatures(state);
 
     var features = W.data.features(name);
@@ -213,10 +221,11 @@
       var p = loader.querySelector('p');
       if (p) p.textContent = 'Loading ' + features.length + ' features...';
     }
-    streamFeatures(state, features, 0);
+    streamFeatures(state, features, 0, seq);
   }
 
-  function streamFeatures(state, features, index) {
+  function streamFeatures(state, features, index, seq) {
+    if (seq !== loadSeq) return;                  // superseded — stop writing
     var end = Math.min(index + BATCH_SIZE, features.length);
     var geo = W.geo;
     var metrics = W.mock.metrics;
@@ -267,6 +276,7 @@
         state.layerVisibility[type] = true;
         state.markersByType[type] = [];
       }
+      featureData._polys = [];
       for (var r = 0; r < rings.length; r++) {
         var ring = rings[r];
         var poly = L.polygon(ring, {
@@ -274,6 +284,7 @@
           color: featureColor(state, featureData), weight: 1, opacity: 0.8, fillOpacity: 0.35
         });
         poly._featureRef = featureData;
+        featureData._polys.push(poly);      // back-ref so the farm filter can pull it off the map
         // Hover breakdown (only for farm boundaries; taxonomy parcels keep none).
         if (state.currentDataset === 'plots') {
           poly.bindTooltip(tooltipFn, { sticky: true, direction: 'top', className: 'farm-tt', opacity: 1 });
@@ -300,10 +311,40 @@
     if (batchMarkers.length) state.clusterGroup.addLayers(batchMarkers);
 
     if (end < features.length) {
-      requestAnimationFrame(function () { streamFeatures(state, features, end); });
+      requestAnimationFrame(function () { streamFeatures(state, features, end, seq); });
     } else {
       finishLoading(state, features.length);
     }
+  }
+
+  // ---- Farm filter ----------------------------------------------------------
+  // The FILTERING panel narrows the working set to the farms growing the picked
+  // crop / tree types (see farmFilter.js). Excluded farms are REMOVED from the
+  // map — not dimmed — so they vanish from cluster counts and hover too. Kept
+  // separate from layerVisibility (which is per taxonomy TYPE, and owns whether
+  // a whole layer group is on the map) so the two never fight over a shape.
+  function filteredOut(state, ref) {
+    var set = state.farmFilterSet;
+    return !!set && state.currentDataset === 'plots' && !set.has(ref);
+  }
+
+  // Add/remove each farm's polygons, then re-drive the layer mode so clusters
+  // and heat rebuild from the surviving markers.
+  function applyFarmFilter(state) {
+    var fs = state.allFeatures;
+    for (var i = 0; i < fs.length; i++) {
+      var f = fs[i];
+      var group = state.layerGroups[f.type];
+      if (!group || !f._polys) continue;
+      var show = !filteredOut(state, f);
+      for (var j = 0; j < f._polys.length; j++) {
+        var poly = f._polys[j];
+        if (show && !group.hasLayer(poly)) group.addLayer(poly);
+        else if (!show && group.hasLayer(poly)) group.removeLayer(poly);
+      }
+    }
+    updateLayerMode(state);
+    if (W.dashboard.heatLayer && W.dashboard.heatLayer.update) W.dashboard.heatLayer.update(state);
   }
 
   function updateLayerMode(state) {
@@ -315,7 +356,9 @@
       state.clusterGroup.clearLayers();
       for (var type in state.markersByType) {
         if (state.layerVisibility[type]) {
-          state.markersByType[type].forEach(function (m) { state.clusterGroup.addLayer(m); });
+          state.markersByType[type].forEach(function (m) {
+            if (!filteredOut(state, m._featureRef)) state.clusterGroup.addLayer(m);
+          });
         }
       }
       if (!state.map.hasLayer(state.clusterGroup)) state.map.addLayer(state.clusterGroup);
@@ -373,7 +416,9 @@
     state.clusterGroup.clearLayers();
     for (var t in state.markersByType) {
       if (state.layerVisibility[t]) {
-        state.markersByType[t].forEach(function (m) { state.clusterGroup.addLayer(m); });
+        state.markersByType[t].forEach(function (m) {
+          if (!filteredOut(state, m._featureRef)) state.clusterGroup.addLayer(m);
+        });
       }
     }
     state.map.addLayer(state.clusterGroup);
@@ -496,6 +541,12 @@
       // Precompute the six-module mock metrics (tree count, canopy health,
       // cultivar, cultivated fraction, structure tier) behind the mock boundary.
       if (W.mock.metrics.prepareFarmMetrics) W.mock.metrics.prepareFarmMetrics(state.farmFeatures);
+      // Index each farm's crop/tree types, then re-derive the working set: the
+      // reload built new feature objects, so any live filter must be re-matched.
+      if (W.dashboard.farmFilter) {
+        W.dashboard.farmFilter.prepare(state.farmFeatures);
+        W.dashboard.farmFilter.apply(state);
+      }
     }
 
     // Optional panels (present on the classic Overview page, absent on the
@@ -527,6 +578,7 @@
     clearAllFeatures: clearAllFeatures,
     loadDataset: loadDataset,
     updateLayerMode: updateLayerMode,
+    applyFarmFilter: applyFarmFilter,
     selectFarm: selectFarm,
     selectGroup: selectGroup,
     setGhost: setGhost,

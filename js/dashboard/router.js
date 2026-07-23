@@ -100,12 +100,21 @@
     window.scrollTo(0, 0);
   }
 
+  // Re-render the current route's numbers WITHOUT touching the map viewport —
+  // what the FILTERING panel needs when the working set changes (a full apply()
+  // would re-fit the map and yank the view out from under the user).
+  function refreshAnalysis(state) {
+    var r = parse();
+    if (r.name === 'overview') W.dashboard.overview.render(state);
+    else W.dashboard.modulePage.refreshAnalysis(state);
+  }
+
   function init(state) {
     window.addEventListener('hashchange', function () { apply(state); });
     if (!location.hash) location.hash = '#/overview';
     else apply(state);
   }
 
-  W.dashboard.router = { init: init, apply: apply, current: parse };
+  W.dashboard.router = { init: init, apply: apply, refreshAnalysis: refreshAnalysis, current: parse };
 
 })(window.Wafra);

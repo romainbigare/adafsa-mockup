@@ -313,7 +313,7 @@
     return wsum ? (total / wsum) * 100 : null;
   }
   var COMPOSITE = {
-    key: 'composite', label: 'Overall criticality', icon: 'warning', bands: COMPOSITE_BANDS,
+    key: 'composite', label: 'Overall health', icon: 'monitor_heart', bands: COMPOSITE_BANDS,
     valueOf: compositeScore, format: function (v) { return String(Math.round(v)); },
     worstSev: 3
   };

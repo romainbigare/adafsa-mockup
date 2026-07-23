@@ -3,9 +3,11 @@
 A static, **buildless** front-end mockup for a farm-monitoring platform (Abu Dhabi / Al Ain region). Two pages backed by placeholder data, served entirely from static files — no server, no build step, no npm.
 
 - **Farms Overview** (`index.html`) — **Proposal Combined.** Synthesises the three layout proposals into one experience built around **three altitudes**, sharing one screen grammar (verdict on top, map in the centre, ranked list docked below, nav on the left edge):
-  - **Altitude 1 — the Situation** (`#/overview`): the glancer's screen. A plain-language **verdict** ("4 of 6 areas need attention — …"), the region map coloured by an **Overall criticality** composite score (a fee-weighted roll-up of every module's severity — no arbitrary single-module default), with a per-farm **breakdown on hover** and red "N need attention" badges so problems glow through aggregation, and six **calm** status tiles that lead with a status word (On track · Watch · Needs attention) and a plain supporting line.
-  - **Altitude 2 — the Question** (`#/m/<key>`): one module owns the map. KPI strip, a **dial** to switch modules in place (map viewport preserved), one legend, and a ranked attention list. Opening **Map Layers** visibly *pauses* the module chrome instead of contradicting it.
+  - **Altitude 1 — the Situation** (`#/overview`): the glancer's screen. The region map is coloured by one fixed lens — an **Overall health** composite score (a fee-weighted roll-up of every module's severity, so no arbitrary single module drives the landing) — with a per-farm **breakdown on hover** and red "N need attention" badges so problems glow through aggregation. A left-hand panel carries the region's headline statistics and the band breakdown; six **verdict tiles** below lead with a status pill (On track · Watch · Needs attention), a plain supporting line and a band column chart.
+  - **Altitude 2 — the Question** (`#/m/<key>`): one module owns the map. KPI strip, one legend, and a ranked attention list. Land Use & Structures browses the full taxonomy (**Map Layers**), which visibly *pauses* the module chrome instead of contradicting it.
   - **Altitude 3 — the Farm** (`#/farm/<fid>`): a dossier drawer over the zoomed, highlighted farm — the AI's verdict in one sentence, per-module status, and an exit that ends in an **action** (export / open Farm Analysis).
+
+  **FILTERING** (a panel under the legend, minimised until opened) narrows the working set to the farms growing the picked crop / tree types — on the Overview and every analytical module. Each route filters by the taxonomy it is about: Crop Monitoring by field crops, Palms & Fruit Trees by woody perennials, the rest by both. The filter moves the map *and* every number with it, so the two can never disagree.
 
   Two contracts hold throughout, enforced by tests: the **number contract** (every figure comes from `moduleRegistry`, so no two screens disagree) and the **colour contract** (red = needs action, amber = watch, green = fine — everywhere, including cluster badges).
 - **Farm Analysis** (`farm-analysis.html`) — per-farm view with a canvas heatmap (growth / irrigation / phenology / density), weather, soil, growth-phase, water-scheduler and advisory panels.
@@ -77,15 +79,17 @@ warfa-dashboard/
 │   │   ├── modules.js           #   3 banded farm modules (IER / Yield / Water) + per-band severity (sev)
 │   │   ├── moduleRegistry.js    #   the SIX contract modules as one model; tri-state status + criticalCount
 │   │   ├── scorecard.js         #   module card component (big / mini / status tile) — tri-state chip
-│   │   ├── legend.js            #   one legend, scope-aware (In view / All farms)
+│   │   ├── legend.js            #   one legend, scope-aware (In view / All farms) + optional stat grid
+│   │   ├── farmFilter.js        #   the working set — farms joined to their crop/tree types, per-route scope
+│   │   ├── filterPanel.js       #   FILTERING panel (minimised by default) that drives farmFilter
 │   │   ├── attentionList.js     #   ranked per-module farm table helpers (metric labels)
 │   │   ├── plotsLayer.js        #   streaming render, clustering; band-coloured dots + red "N critical" badges
 │   │   ├── dataTable.js         #   shared sortable/reorderable/exportable table factory
 │   │   ├── modulePage.js        #   Altitude 2 — module-page template (KPI strip + dial + legend + attention)
-│   │   ├── situation.js         #   Altitude 1 — the Situation: verdict + calm status tiles + default colour-by
+│   │   ├── situation.js         #   Altitude 1 — the Situation: stats legend + verdict tiles (one fixed map lens)
 │   │   ├── farmDossier.js       #   Altitude 3 — the farm dossier drawer (verdict + module status + actions)
 │   │   ├── newsBell.js          #   activity feed bell (top-right; click / outside / Escape)
-│   │   ├── taxonomyLayers.js    #   Map Layers browser; pauses module chrome in "layers mode"
+│   │   ├── taxonomyLayers.js    #   Map Layers browser (Land Use only); pauses module chrome in "layers mode"
 │   │   └── router.js            #   hash router (#/overview, #/m/<key>, #/farm/<fid>); drives the single map
 │   │
 │   ├── farmAnalysis/heatmap.js  # Farm Analysis canvas heatmap overlay + colour scales

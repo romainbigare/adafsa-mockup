@@ -51,9 +51,14 @@
     return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   }
 
+  // The farms the map is currently drawing — the FILTERING panel's working set
+  // when a filter is on (see farmFilter.js), every farm otherwise. Read straight
+  // off state so the heat surface carries no dependency on the filter module.
+  function workingFarms(state) { return state.filteredFarms || state.farmFeatures || []; }
+
   // Retained for tests: [lat, lng, intensity] per on-map farm.
   function points(state) {
-    var farms = state.farmFeatures || [], pts = [];
+    var farms = workingFarms(state), pts = [];
     for (var i = 0; i < farms.length; i++) {
       var f = farms[i];
       if (!f.centroid || f._offMap) continue;
@@ -331,7 +336,8 @@
       });
       return;
     }
-    layer.setData(state.farmFeatures || [], function (f) { return intensityOf(state, f); });
+    // The working set, so a filtered-out farm leaves no heat behind.
+    layer.setData(workingFarms(state), function (f) { return intensityOf(state, f); });
   }
 
   W.dashboard.heatLayer = { init: init, update: update, points: points, severityFor: severityFor, hexToRgb: hexToRgb };

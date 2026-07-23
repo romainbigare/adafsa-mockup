@@ -2,9 +2,9 @@
 
 // Runnable with plain Node: `node test/situation.test.js` (no build/npm).
 //
-// The Situation model is pure (no DOM): the verdict sentence and the default
-// "Colour by" pick. We load the registry chain so situation.js's IIFE resolves,
-// then exercise verdict()/pickDefaultModule() on fabricated card models.
+// The Situation model is pure (no DOM): which modules are flagged and how badly.
+// We load the registry chain so situation.js's IIFE resolves, then exercise
+// verdict() on fabricated card models.
 
 var assert = require("assert");
 var fs = require("fs");
@@ -46,45 +46,27 @@ function sixWith(kinds) {
   return meta.map(function (x, i) { return m(x[0], x[1], x[2], kinds[i], x[3]); });
 }
 
-console.log("verdict sentence");
-check("all-ok reads 'All six areas are normal.'", function () {
+console.log("verdict");
+check("all-ok is 'ok' and flags nothing", function () {
   var v = sit.verdict(sixWith(["ok", "ok", "ok", "ok", "ok", "ok"]));
   assert.strictEqual(v.kind, "ok");
-  assert.strictEqual(v.sentence, "All six areas are normal.");
   assert.strictEqual(v.keys.length, 0);
+  assert.strictEqual(v.total, 6);
 });
-check("one warn names the module and counts it", function () {
+check("one warn is 'warn' and names the flagged module key", function () {
   var v = sit.verdict(sixWith(["ok", "ok", "ok", "warn", "ok", "ok"]));
   assert.strictEqual(v.kind, "warn");
-  assert.strictEqual(v.sentence, "1 of 6 areas need attention — Irrigation Efficiency.");
-  assert.deepStrictEqual(v.keys.join(","), "ier");
+  assert.deepStrictEqual(v.keys, ["ier"]);
 });
 check("any critical makes the whole verdict critical", function () {
   var v = sit.verdict(sixWith(["warn", "ok", "ok", "critical", "ok", "ok"]));
   assert.strictEqual(v.kind, "critical");
-  assert.ok(/2 of 6 areas need attention/.test(v.sentence));
-  assert.ok(/Crop Monitoring and Irrigation Efficiency/.test(v.sentence), "two names joined with 'and'");
+  assert.deepStrictEqual(v.keys, ["crop", "ier"]);
 });
-check("three+ flagged use commas then 'and'", function () {
+check("keys keep nav order and count every non-ok module", function () {
   var v = sit.verdict(sixWith(["critical", "ok", "ok", "critical", "ok", "warn"]));
-  assert.ok(/Crop Monitoring, Irrigation Efficiency and Water Allocation/.test(v.sentence), v.sentence);
-});
-check("the sentence carries no jargon keys (labels only)", function () {
-  var v = sit.verdict(sixWith(["ok", "ok", "ok", "critical", "ok", "warn"]));
-  ["ier", "yield", "water", "crop", "palms", "structures", "NDVI"].forEach(function (tok) {
-    assert.ok(v.sentence.indexOf(tok) === -1, "sentence must not contain '" + tok + "'");
-  });
-});
-
-console.log("default Colour-by");
-check("prefers critical over warn, then heaviest fee", function () {
-  // ier critical (10.5) vs crop warn (14.9): critical wins despite lower fee.
-  assert.strictEqual(sit.pickDefaultModule(sixWith(["warn", "ok", "ok", "critical", "ok", "ok"])), "ier");
-  // two warns: heavier fee wins (crop 14.9 > water 9.4).
-  assert.strictEqual(sit.pickDefaultModule(sixWith(["warn", "ok", "ok", "ok", "ok", "warn"])), "crop");
-});
-check("falls back to the hero module when nothing is flagged", function () {
-  assert.strictEqual(sit.pickDefaultModule(sixWith(["ok", "ok", "ok", "ok", "ok", "ok"])), "palms");
+  assert.deepStrictEqual(v.keys, ["crop", "ier", "water"]);
+  assert.strictEqual(v.keys.length + " of " + v.total, "3 of 6");
 });
 
 console.log("\nAll " + passed + " checks passed.");
