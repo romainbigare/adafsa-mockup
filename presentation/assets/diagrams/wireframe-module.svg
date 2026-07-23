@@ -6,6 +6,9 @@
     <filter id="softShadowL" x="-30%" y="-30%" width="160%" height="160%">
       <feDropShadow dx="0" dy="1.5" stdDeviation="3" flood-color="#1F2937" flood-opacity="0.12"/>
     </filter>
+    <filter id="chipShadowM" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#1F2937" flood-opacity="0.10"/>
+    </filter>
   </defs>
 
   <rect x="0" y="0" width="1600" height="900" fill="#FAF9F6"/>
@@ -101,41 +104,59 @@
   <rect x="366" y="723" width="350" height="10" rx="3" fill="#E2E0DA"/>
   <rect x="850" y="720" width="54" height="16" rx="8" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
 
-  <!-- ============ RIGHT LABELS + LEADERS ============ -->
-  <circle cx="1000" cy="166" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="166" x2="918" y2="199" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="173" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">The numbers for this question.</text>
+  <!-- ============ RIGHT LABELS + LEADERS (modern ring + chip style) ============ -->
+  <!-- 1 -->
+  <line x1="918" y1="199" x2="1000" y2="170" stroke="#AEB4BC" stroke-width="1.25"/>
+  <circle cx="918" cy="199" r="5.5" fill="#166534"/>
+  <circle cx="918" cy="199" r="2" fill="#FFFFFF"/>
+  <rect x="1000" y="149" width="300" height="42" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowM)"/>
+  <text x="1016" y="175" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">The numbers for this question.</text>
 
-  <circle cx="1000" cy="272" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="272" x2="516" y2="330" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="279" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
-    <tspan x="1020" dy="0">One legend. The same</tspan>
-    <tspan x="1020" dy="26">colours everywhere.</tspan>
+  <!-- 2 -->
+  <line x1="516" y1="330" x2="1000" y2="288" stroke="#AEB4BC" stroke-width="1.25"/>
+  <circle cx="516" cy="330" r="5.5" fill="#166534"/>
+  <circle cx="516" cy="330" r="2" fill="#FFFFFF"/>
+  <rect x="1000" y="257" width="300" height="64" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowM)"/>
+  <text x="1016" y="283" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">
+    <tspan x="1016" dy="0">One legend. The same</tspan>
+    <tspan x="1016" dy="24">colours everywhere.</tspan>
   </text>
 
-  <circle cx="1000" cy="392" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="392" x2="516" y2="468" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="386" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
-    <tspan x="1020" dy="0">Tick a crop or a tree type.</tspan>
-    <tspan x="1020" dy="26">The map and every number</tspan>
-    <tspan x="1020" dy="26">narrow together.</tspan>
+  <!-- 3 -->
+  <line x1="516" y1="468" x2="1000" y2="408" stroke="#AEB4BC" stroke-width="1.25"/>
+  <circle cx="516" cy="468" r="5.5" fill="#166534"/>
+  <circle cx="516" cy="468" r="2" fill="#FFFFFF"/>
+  <rect x="1000" y="367" width="320" height="88" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowM)"/>
+  <text x="1016" y="393" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">
+    <tspan x="1016" dy="0">Tick a crop or a tree type.</tspan>
+    <tspan x="1016" dy="24">The map and every number</tspan>
+    <tspan x="1016" dy="24">narrow together.</tspan>
   </text>
 
-  <circle cx="1000" cy="512" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="512" x2="840" y2="522" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="519" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
-    <tspan x="1020" dy="0">The map, coloured by</tspan>
-    <tspan x="1020" dy="26">this question only.</tspan>
+  <!-- 4 -->
+  <line x1="840" y1="522" x2="1000" y2="520" stroke="#AEB4BC" stroke-width="1.25"/>
+  <circle cx="840" cy="522" r="5.5" fill="#166534"/>
+  <circle cx="840" cy="522" r="2" fill="#FFFFFF"/>
+  <rect x="1000" y="489" width="280" height="64" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowM)"/>
+  <text x="1016" y="515" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">
+    <tspan x="1016" dy="0">The map, coloured by</tspan>
+    <tspan x="1016" dy="24">this question only.</tspan>
   </text>
 
-  <circle cx="1000" cy="628" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="628" x2="904" y2="614" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="635" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
-    <tspan x="1020" dy="0">The list can leave the</tspan>
-    <tspan x="1020" dy="26">app as a file.</tspan>
+  <!-- 5 -->
+  <line x1="904" y1="614" x2="1000" y2="624" stroke="#AEB4BC" stroke-width="1.25"/>
+  <circle cx="904" cy="614" r="5.5" fill="#166534"/>
+  <circle cx="904" cy="614" r="2" fill="#FFFFFF"/>
+  <rect x="1000" y="593" width="280" height="64" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowM)"/>
+  <text x="1016" y="619" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">
+    <tspan x="1016" dy="0">The list can leave the</tspan>
+    <tspan x="1016" dy="24">app as a file.</tspan>
   </text>
 
-  <circle cx="1000" cy="738" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="738" x2="920" y2="686" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="745" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">Farms ranked worst first.</text>
+  <!-- 6 -->
+  <line x1="920" y1="686" x2="1000" y2="733" stroke="#AEB4BC" stroke-width="1.25"/>
+  <circle cx="920" cy="686" r="5.5" fill="#166534"/>
+  <circle cx="920" cy="686" r="2" fill="#FFFFFF"/>
+  <rect x="1000" y="712" width="300" height="42" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowM)"/>
+  <text x="1016" y="738" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">Farms ranked worst first.</text>
 </svg>
