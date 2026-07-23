@@ -8,8 +8,11 @@ Everything needed to build the PowerPoint that argues for the dashboard redesign
 1. **`storyboard.md`** — the deck, slide by slide: headline, on-slide content, which
    asset goes where, and full speaker notes. 19 slides + 6 appendix slides.
 2. **`adafsa-redesign-draft.pptx`** — a draft deck assembled from the storyboard
-   (all slides, visuals placed, speaker notes embedded). Use it as the starting file
-   or rebuild from the storyboard in the house template.
+   (20 slides: all 19 + appendix pointer slide, visuals placed, speaker notes
+   embedded). Use it as the starting file or rebuild from the storyboard in the
+   house template. To regenerate after editing assets:
+   `npm i pptxgenjs sharp && node build_deck.js` (the script measures each image
+   and re-fits layouts automatically).
 
 ## Supporting notes (`notes/`)
 

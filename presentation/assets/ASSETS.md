@@ -1,32 +1,43 @@
-# Presentation Assets Manifest
+# Asset manifest
 
-One line per file, grouped by folder. Format: `filename — what it shows — suggested slide use`.
+One line per file: what it shows → suggested slide use (slide numbers refer to `../storyboard.md`).
 
-## presentation/assets/current/
+## current/ — the "before"
 
-- `current-app-wireframe.jpg` — Clean redesign-style mockup of the production "Farms Overview" screen (sidebar nav, Map Layers toggle panel, three stat cards, two data tables); a caption fragment at the very bottom ("...close in spirit to Proposal C...") is visible, confirming this frame comes from a design-comparison doc rather than a raw current-app screenshot — treat as an idealized/cleaned-up stand-in for current, not a literal capture — use where a tidy "before" reference is needed but a literal DOM screenshot isn't available.
-- `mockup-of-current-layout.jpg` — High-fidelity mockup reproducing the current app's actual GIS-workspace layout: dense left-hand layer-toggle stack over a full-bleed satellite map with clustered farm markers, flat/unfiltered data table docked at the bottom — use as the primary "current state" visual on the problem-statement slide (cluttered toggles, single flat table, no hierarchy).
+- `current-app-wireframe.jpg` — wireframe of the live production "Farms Overview" page (layer toggles, three KPI counters, two distribution tables). Note: this is a cleaned-up wireframe rendition, not a raw screenshot — the raw production DOM is `docs/design/current_website`, audited in `../notes/current-app-audit.md`. Bottom caption sliver cropped out. → slides 3, 5.
+- `mockup-of-current-layout.jpg` — high-fidelity mockup reproducing the current app's GIS-workspace layout (toggle stack over satellite map, flat table below). → slide 5 alternative visual.
+- *(No direct render of the production DOM exists: the capture has only root-relative asset URLs, so it renders unstyled — attempted and discarded.)*
 
-Note: the live production DOM capture (`docs/design/current_website`) could not be rendered — see final report. No `current-app-render.jpg` file exists in this folder; the two files above stand in for it.
+## new/ — the redesign (screenshots of the working mockup, 1600×900 @2×)
 
-## presentation/assets/process/
+- `alt1-situation.jpg` — Altitude 1: verdict sentence, criticality heat map with legend, six status tiles. → slides 1 (background), 10.
+- `alt1-hover-breakdown.jpg` — Altitude 1 with a farm's per-module breakdown tooltip open. → slide 10 inset (optional).
+- `alt2-module-ier.jpg` — Altitude 2, Irrigation Efficiency: KPI strip, legend, coloured boundaries, ranked attention list, Export CSV. → slide 11 main.
+- `alt2-module-water.jpg` — Altitude 2, Water Allocation, same viewport (demonstrates in-place module switching). → slide 11 small.
+- `alt2-layers-mode.jpg` — the taxonomy layer browser open over a module page (the GIS power tool as an explicit mode). → slide 11 small.
+- `alt3-farm-dossier.jpg` — Altitude 3: farm dossier drawer — AI verdict sentence, six-module status, actions. → slide 12 main.
+- `farm-analysis.jpg` — the existing Farm Analysis deep-dive page (heatmap, weather, soil, scheduler). → slide 12 inset, appendix.
+- `mobile-situation.jpg` / `mobile-module.jpg` — Altitudes 1 and 2 at phone width (390×844 @3×). → slide 17 inset, appendix.
 
-- `a-1-overview.jpg` — Proposal-A "Region scorecard" concept: six KPI cards (Crop Monitoring, Palms & Fruit Trees, Structures, Irrigation Efficiency, Yield Forecast, Water Allocation) each with a headline number, status chip, and mini progress bar — use to show the scorecard-first redesign direction.
-- `a-2-palms.jpg` — Proposal-A module drill-down (Palms & Fruit Trees): top metric strip, legend panel (Healthy/Fair/Stressed/Severe Stress bands) over the satellite map, attention-list table below — use to show how a scorecard tile expands into a focused module view.
-- `a-5-farm-selected.jpg` — Same Proposal-A Palms & Fruit Trees module with a single farm/field selected and highlighted on the satellite map, attention-list table still visible — use to show the map-to-record selection interaction.
-- `a2-1-overview.jpg` — Proposal-A2 variant: full-width map with a compact "Region Overview" summary chip and a "Colour by" dropdown (set to Structures) top-right, module tiles condensed into one row at the bottom — use to show a map-forward alternative layout.
-- `a2-2-colourby-ier.jpg` — Same Proposal-A2 layout with "Colour by" set to Irrigation Efficiency, showing farm markers recolored by that metric — use to illustrate the flexible map-colouring concept.
-- `b-1-initial-palms.jpg` — Proposal-B concept: a single "VIEW" selector pill-bar (Farms/Crops/Palms/Structures/Irrigation/Yield/Water) driving one map, with region stats, a legend card, and a Summary/Ranked-farms tab pair at the bottom — use to show the "one map, one question" navigation model.
-- `b-2-water.jpg` — Proposal-B with the VIEW selector switched to Water, showing water-allocation bands on the map and the corresponding ranked-farms table — use to reinforce the single-selector, swappable-lens concept across metrics.
-- `b-5-news.jpg` — Proposal-B with an "Activity" feed panel open (satellite scans, AI assessments, harvest/registration events with timestamps) layered over the map — use to show the proposed activity/notifications concept.
-- `a-7-mobile-module.jpg` — Proposal-A module view (Palms & Fruit Trees) at a narrow mobile viewport, legend and attention-list table stacked vertically — use to show responsive/mobile behaviour of the redesign direction.
-- `wireframe-proposal-a-scorecard.png` — Annotated low-fi wireframe of the Proposal-A scorecard home screen (six KPI cards with headline number/status chip/micro-chart, captioned "the boomer test: six cards, six numbers, six statuses") — use on a process/rationale slide explaining the scorecard concept.
-- `wireframe-proposal-b-dial.png` — Annotated low-fi wireframe of the Proposal-B single-view screen (VIEW pill selector, one legend card, map stripped to "the active view, nothing else", captioned "One selector, one legend, two bottom tabs...") — use on a process/rationale slide explaining the single-selector concept.
+## diagrams/ — the argument diagrams (SVG source + PNG @2× for PowerPoint)
 
-## presentation/assets/new/
+- `altitude-model.(svg|png)` — the three-altitude model with routes, questions, descent arrows. → slide 8.
+- `screen-grammar.(svg|png)` — the four-zone screen grammar + per-altitude mini-skeletons. → slide 9.
+- `questions-vs-apps.(svg|png)` — five official questions × current app × redesign matrix. → slides 4, 6.
+- `module-scaling.(svg|png)` — the breaking point: today's layer panel vs. the same pattern with six modules grafted on. → slide 7.
+- `contracts.(svg|png)` — the number contract (one registry feeding every surface; the 223-vs-105 incident) + the colour contract. → slide 13.
+- `ia-before-after.(svg|png)` — one cramped screen vs. the route tree; modules become navigation. → slide 14.
 
-(empty — populated by other steps; nothing to list yet)
+## process/ — the three prototyped layout proposals
 
-## presentation/assets/diagrams/
-
-(empty — populated by other steps; nothing to list yet)
+- `a-1-overview.jpg` — Proposal A: six-card region scorecard Home. → slide 15.
+- `a-2-palms.jpg` — Proposal A: module-page template (Palms). → spare.
+- `a-5-farm-selected.jpg` — Proposal A: attention-row click zooms to the farm (the review's best interaction). → spare.
+- `a-7-mobile-module.jpg` — Proposal A at phone width (the mobile gap, since fixed). → spare.
+- `a2-1-overview.jpg` — Proposal A2: map-led Home. → slide 15 (alt).
+- `a2-2-colourby-ier.jpg` — Proposal A2: "Colour by Irrigation Efficiency" heat-map moment. → slide 15.
+- `b-1-initial-palms.jpg` — Proposal B: lands in a module view, no summary (its structural flaw). → spare.
+- `b-2-water.jpg` — Proposal B: the one-dial Water view. → slide 15.
+- `b-5-news.jpg` — Proposal B: repetitive activity feed (mock-data credibility example). → spare.
+- `wireframe-proposal-a-scorecard.png` — early wireframe of A's scorecard Home. → spare.
+- `wireframe-proposal-b-dial.png` — early wireframe of B's dial workspace. → spare.

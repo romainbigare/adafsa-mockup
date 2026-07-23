@@ -207,3 +207,4 @@ Asset paths below are relative to `presentation/`. Diagrams exist as SVG (crisp,
 - **A4 — Test coverage** — what `test/*.test.js` pins (registry, verdict, scales, severity, dossier, strings).
 - **A5 — Mobile shots** — `assets/new/mobile-situation.jpg`, `assets/new/mobile-module.jpg`.
 - **A6 — Farm Analysis page** — `assets/new/farm-analysis.jpg` full-size.
+- **A7 — Live demo** — open `index.html`: no build, no server, no install.

@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <filter id="softShadow6" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#1F2937" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="900" fill="#FAF9F6"/>
+
+  <text x="48" y="68" font-family="Helvetica, Arial, sans-serif" font-size="34" font-weight="700" fill="#1F2937">Six modules become navigation, not toggles</text>
+
+  <!-- ============ LEFT PANEL: BEFORE ============ -->
+  <text x="48" y="140" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">BEFORE — one screen, twelve switches</text>
+
+  <rect x="48" y="170" width="600" height="450" rx="10" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1.5" filter="url(#softShadow6)"/>
+
+  <!-- toggle stack -->
+  <text x="68" y="196" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#374151">12&#8211;18 layer toggles (mutually exclusive)</text>
+  <rect x="68" y="204" width="560" height="140" rx="8" fill="#F2F1ED" stroke="#E2E0DA" stroke-width="1"/>
+  <g>
+    <circle cx="76" cy="222.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="219" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+    <circle cx="76" cy="235.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="232" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+    <circle cx="76" cy="248.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="245" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+    <circle cx="76" cy="261.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="258" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+    <circle cx="76" cy="274.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="271" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+    <circle cx="76" cy="287.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="284" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+    <circle cx="76" cy="300.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="297" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+    <circle cx="76" cy="313.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="310" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+    <circle cx="76" cy="326.5" r="3.5" fill="#9CA3AF"/><rect x="88" y="323" width="524" height="7" rx="3.5" fill="#E2E0DA"/>
+  </g>
+
+  <!-- shared map -->
+  <text x="68" y="372" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#374151">one shared map</text>
+  <rect x="68" y="380" width="560" height="110" rx="8" fill="#F2F1ED" stroke="#E2E0DA" stroke-width="1"/>
+  <circle cx="180" cy="425" r="16" fill="#E2E0DA" opacity="0.7"/>
+  <circle cx="360" cy="450" r="12" fill="#E2E0DA" opacity="0.7"/>
+  <circle cx="520" cy="415" r="14" fill="#E2E0DA" opacity="0.7"/>
+  <line x1="88" y1="460" x2="608" y2="460" stroke="#E2E0DA" stroke-width="1"/>
+  <line x1="300" y1="392" x2="300" y2="478" stroke="#E2E0DA" stroke-width="1"/>
+
+  <!-- aggregate tables -->
+  <text x="68" y="518" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#374151">8 aggregate tables</text>
+  <g fill="#EFEEEA" stroke="#E2E0DA" stroke-width="1">
+    <rect x="68" y="526" width="134" height="30" rx="6"/>
+    <rect x="210" y="526" width="134" height="30" rx="6"/>
+    <rect x="352" y="526" width="134" height="30" rx="6"/>
+    <rect x="494" y="526" width="134" height="30" rx="6"/>
+    <rect x="68" y="566" width="134" height="30" rx="6"/>
+    <rect x="210" y="566" width="134" height="30" rx="6"/>
+    <rect x="352" y="566" width="134" height="30" rx="6"/>
+    <rect x="494" y="566" width="134" height="30" rx="6"/>
+  </g>
+
+  <!-- red annotation pills -->
+  <rect x="48" y="654" width="218" height="40" rx="20" fill="#FADBD5" stroke="#D73027" stroke-width="1.3"/>
+  <text x="157" y="679" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#D73027">no routes — nothing linkable</text>
+
+  <rect x="286" y="654" width="286" height="40" rx="20" fill="#FADBD5" stroke="#D73027" stroke-width="1.3"/>
+  <text x="429" y="679" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#D73027">no verdict, no ranking, no per-farm view</text>
+
+  <!-- ============ ARROW ============ -->
+  <text x="750" y="319" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#1F2937">the redesign</text>
+  <polygon points="670,345 790,345 790,333 840,357 790,381 790,369 670,369" fill="#166534"/>
+
+  <!-- ============ RIGHT PANEL: AFTER ============ -->
+  <text x="852" y="140" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">AFTER — a route tree</text>
+
+  <!-- root -->
+  <rect x="1042" y="180" width="320" height="60" rx="12" fill="#166534" filter="url(#softShadow6)"/>
+  <text x="1202" y="217" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="16" font-weight="700" fill="#FFFFFF">#/overview — the Situation</text>
+
+  <!-- root to bus -->
+  <line x1="1202" y1="240" x2="1202" y2="266" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="977" y1="266" x2="1427" y2="266" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="977" y1="266" x2="977" y2="296" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="1202" y1="266" x2="1202" y2="296" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="1427" y1="266" x2="1427" y2="296" stroke="#9CA3AF" stroke-width="1.3"/>
+
+  <!-- row1 -> row2 connectors -->
+  <line x1="977" y1="372" x2="977" y2="408" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="1202" y1="372" x2="1202" y2="408" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="1427" y1="372" x2="1427" y2="408" stroke="#9CA3AF" stroke-width="1.3"/>
+
+  <!-- child nodes row 1 -->
+  <g filter="url(#softShadow6)">
+    <rect x="872" y="296" width="210" height="76" rx="10" fill="#FFFFFF" stroke="#166534" stroke-width="1.5"/>
+    <rect x="1097" y="296" width="210" height="76" rx="10" fill="#FFFFFF" stroke="#166534" stroke-width="1.5"/>
+    <rect x="1322" y="296" width="210" height="76" rx="10" fill="#FFFFFF" stroke="#166534" stroke-width="1.5"/>
+  </g>
+  <text x="977" y="326" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">Crop Monitoring</text>
+  <text x="977" y="347" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#166534">#/m/crop</text>
+  <text x="1202" y="326" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">Palms &amp; Fruit Trees</text>
+  <text x="1202" y="347" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#166534">#/m/palms</text>
+  <text x="1427" y="326" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">Land Use &amp; Structures</text>
+  <text x="1427" y="347" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#166534">#/m/structures</text>
+
+  <!-- child nodes row 2 -->
+  <g filter="url(#softShadow6)">
+    <rect x="872" y="408" width="210" height="76" rx="10" fill="#FFFFFF" stroke="#166534" stroke-width="1.5"/>
+    <rect x="1097" y="408" width="210" height="76" rx="10" fill="#FFFFFF" stroke="#166534" stroke-width="1.5"/>
+    <rect x="1322" y="408" width="210" height="76" rx="10" fill="#FFFFFF" stroke="#166534" stroke-width="1.5"/>
+  </g>
+  <text x="977" y="438" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">Irrigation Efficiency</text>
+  <text x="977" y="459" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#166534">#/m/ier</text>
+  <text x="1202" y="438" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">Yield Forecast</text>
+  <text x="1202" y="459" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#166534">#/m/yield</text>
+  <text x="1427" y="438" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">Water Allocation</text>
+  <text x="1427" y="459" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="12" font-weight="600" fill="#166534">#/m/water</text>
+
+  <!-- row2 -> grandchild fan-in -->
+  <line x1="977" y1="484" x2="977" y2="514" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="1202" y1="484" x2="1202" y2="514" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="1427" y1="484" x2="1427" y2="514" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="977" y1="514" x2="1427" y2="514" stroke="#9CA3AF" stroke-width="1.3"/>
+  <line x1="1202" y1="514" x2="1202" y2="540" stroke="#9CA3AF" stroke-width="1.3"/>
+
+  <!-- grandchild -->
+  <rect x="1062" y="540" width="280" height="58" rx="10" fill="#FFFFFF" stroke="#6B7280" stroke-width="1.5" filter="url(#softShadow6)"/>
+  <text x="1202" y="575" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="14" font-weight="700" fill="#374151">#/farm/&lt;id&gt; — the dossier</text>
+
+  <!-- green annotation tags -->
+  <rect x="925" y="638" width="135" height="40" rx="20" fill="#FFFFFF" stroke="#1A9850" stroke-width="1.3"/>
+  <text x="992.5" y="663" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#166534">one template &#215;6</text>
+
+  <rect x="1080" y="638" width="170" height="40" rx="20" fill="#FFFFFF" stroke="#1A9850" stroke-width="1.3"/>
+  <text x="1165" y="663" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#166534">every level deep-links</text>
+
+  <rect x="1270" y="638" width="209" height="40" rx="20" fill="#FFFFFF" stroke="#1A9850" stroke-width="1.3"/>
+  <text x="1374.5" y="663" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#166534">module #7 = a registry entry</text>
+
+  <text x="48" y="850" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#6B7280">IA before/after — ADAFSA dashboard redesign</text>
+</svg>
