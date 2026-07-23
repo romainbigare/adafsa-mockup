@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <filter id="softShadowM" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#1F2937" flood-opacity="0.10"/>
+    </filter>
+    <filter id="softShadowL" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="3" flood-color="#1F2937" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="900" fill="#FAF9F6"/>
+
+  <!-- ============ APP FRAME ============ -->
+  <rect x="180" y="140" width="760" height="620" rx="14" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1.5" filter="url(#softShadowM)"/>
+
+  <!-- faded nav column -->
+  <line x1="330" y1="140" x2="330" y2="760" stroke="#E2E0DA" stroke-width="1"/>
+  <circle cx="204" cy="176" r="6" fill="#D9DEDA"/>
+  <rect x="220" y="170" width="70" height="12" rx="3" fill="#E2E0DA"/>
+  <line x1="180" y1="196" x2="330" y2="196" stroke="#E2E0DA" stroke-width="1"/>
+  <rect x="196" y="220" width="110" height="10" rx="3" fill="#E9E7E2"/>
+  <rect x="196" y="252" width="95" height="10" rx="3" fill="#E9E7E2"/>
+  <rect x="196" y="284" width="120" height="10" rx="3" fill="#E9E7E2"/>
+  <rect x="196" y="316" width="100" height="10" rx="3" fill="#E9E7E2"/>
+  <rect x="196" y="348" width="90" height="10" rx="3" fill="#E9E7E2"/>
+  <rect x="196" y="380" width="105" height="10" rx="3" fill="#E9E7E2"/>
+  <rect x="196" y="412" width="85" height="10" rx="3" fill="#E9E7E2"/>
+
+  <!-- ============ KPI STRIP ============ -->
+  <rect x="350" y="164" width="130" height="70" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+  <rect x="364" y="180" width="70" height="8" rx="3" fill="#E2E0DA"/>
+  <rect x="364" y="198" width="50" height="16" rx="4" fill="#D9DEDA"/>
+
+  <rect x="496" y="164" width="130" height="70" rx="8" fill="#FDE8CC" stroke="#D97706" stroke-width="1"/>
+  <rect x="510" y="180" width="70" height="8" rx="3" fill="#EFCB99"/>
+  <rect x="510" y="198" width="50" height="16" rx="4" fill="#D9A24B"/>
+
+  <rect x="642" y="164" width="130" height="70" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+  <rect x="656" y="180" width="70" height="8" rx="3" fill="#E2E0DA"/>
+  <rect x="656" y="198" width="50" height="16" rx="4" fill="#D9DEDA"/>
+
+  <rect x="788" y="164" width="130" height="70" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+  <rect x="802" y="180" width="70" height="8" rx="3" fill="#E2E0DA"/>
+  <rect x="802" y="198" width="50" height="16" rx="4" fill="#D9DEDA"/>
+
+  <!-- ============ MAP ============ -->
+  <rect x="350" y="254" width="570" height="322" rx="10" fill="#F2EDE3" stroke="#E2E0DA" stroke-width="1"/>
+  <circle cx="650" cy="300" r="22" fill="#1A9850" opacity="0.55"/>
+  <circle cx="560" cy="460" r="18" fill="#1A9850" opacity="0.55"/>
+  <circle cx="820" cy="360" r="20" fill="#1A9850" opacity="0.55"/>
+  <circle cx="720" cy="430" r="19" fill="#D97706" opacity="0.55"/>
+  <circle cx="480" cy="520" r="16" fill="#D97706" opacity="0.55"/>
+  <circle cx="850" cy="530" r="17" fill="#D73027" opacity="0.55"/>
+
+  <!-- legend card -->
+  <rect x="366" y="270" width="150" height="130" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1" filter="url(#softShadowL)"/>
+  <rect x="378" y="286" width="16" height="10" rx="2" fill="#1A9850"/>
+  <rect x="400" y="287" width="80" height="8" rx="2" fill="#E2E0DA"/>
+  <rect x="378" y="306" width="16" height="10" rx="2" fill="#7A882B"/>
+  <rect x="400" y="307" width="80" height="8" rx="2" fill="#E2E0DA"/>
+  <rect x="378" y="326" width="16" height="10" rx="2" fill="#D97706"/>
+  <rect x="400" y="327" width="80" height="8" rx="2" fill="#E2E0DA"/>
+  <rect x="378" y="346" width="16" height="10" rx="2" fill="#D85417"/>
+  <rect x="400" y="347" width="80" height="8" rx="2" fill="#E2E0DA"/>
+  <rect x="378" y="366" width="16" height="10" rx="2" fill="#D73027"/>
+  <rect x="400" y="367" width="80" height="8" rx="2" fill="#E2E0DA"/>
+
+  <!-- ============ TABLE ============ -->
+  <rect x="350" y="596" width="570" height="36" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+  <rect x="366" y="608" width="200" height="10" rx="3" fill="#E2E0DA"/>
+  <rect x="830" y="603" width="74" height="22" rx="6" fill="#1A9850"/>
+
+  <rect x="366" y="645" width="350" height="10" rx="3" fill="#E2E0DA"/>
+  <rect x="850" y="642" width="54" height="16" rx="8" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
+
+  <rect x="366" y="671" width="350" height="10" rx="3" fill="#E2E0DA"/>
+  <rect x="850" y="668" width="54" height="16" rx="8" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
+
+  <rect x="366" y="697" width="350" height="10" rx="3" fill="#E2E0DA"/>
+  <rect x="850" y="694" width="54" height="16" rx="8" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
+
+  <rect x="366" y="723" width="350" height="10" rx="3" fill="#E2E0DA"/>
+  <rect x="850" y="720" width="54" height="16" rx="8" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
+
+  <!-- ============ RIGHT LABELS + LEADERS ============ -->
+  <circle cx="1000" cy="170" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="170" x2="918" y2="199" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="177" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">The numbers for this question.</text>
+
+  <circle cx="1000" cy="310" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="310" x2="516" y2="335" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="317" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
+    <tspan x="1020" dy="0">One legend. The same</tspan>
+    <tspan x="1020" dy="26">colours everywhere.</tspan>
+  </text>
+
+  <circle cx="1000" cy="450" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="450" x2="920" y2="415" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="457" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
+    <tspan x="1020" dy="0">The map, coloured by</tspan>
+    <tspan x="1020" dy="26">this question only.</tspan>
+  </text>
+
+  <circle cx="1000" cy="590" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="590" x2="904" y2="614" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="597" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
+    <tspan x="1020" dy="0">The list can leave the</tspan>
+    <tspan x="1020" dy="26">app as a file.</tspan>
+  </text>
+
+  <circle cx="1000" cy="730" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="730" x2="920" y2="686" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="737" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">Farms ranked worst first.</text>
+</svg>
