@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <filter id="softShadow3" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#1F2937" flood-opacity="0.10"/>
+    </filter>
+    <clipPath id="tableClip"><rect x="80" y="150" width="1440" height="616" rx="12"/></clipPath>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="1000" fill="#FAF9F6"/>
+
+  <text x="48" y="72" font-family="Helvetica, Arial, sans-serif" font-size="34" font-weight="700" fill="#1F2937">Five questions our users bring — scored against both designs</text>
+
+  <!-- table shadow backing -->
+  <rect x="80" y="150" width="1440" height="616" rx="12" fill="#FFFFFF" filter="url(#softShadow3)"/>
+
+  <g clip-path="url(#tableClip)">
+    <!-- header -->
+    <rect x="80" y="150" width="1440" height="76" fill="#166534"/>
+    <text x="104" y="195" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">The official asks</text>
+    <text x="664" y="195" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">Current app</text>
+    <text x="1104" y="195" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">Redesign</text>
+
+    <!-- zebra rows -->
+    <rect x="80" y="226" width="1440" height="108" fill="#FFFFFF"/>
+    <rect x="80" y="334" width="1440" height="108" fill="#F4F3EF"/>
+    <rect x="80" y="442" width="1440" height="108" fill="#FFFFFF"/>
+    <rect x="80" y="550" width="1440" height="108" fill="#F4F3EF"/>
+    <rect x="80" y="658" width="1440" height="108" fill="#FFFFFF"/>
+
+    <!-- row separators -->
+    <line x1="80" y1="334" x2="1520" y2="334" stroke="#E2E0DA" stroke-width="1"/>
+    <line x1="80" y1="442" x2="1520" y2="442" stroke="#E2E0DA" stroke-width="1"/>
+    <line x1="80" y1="550" x2="1520" y2="550" stroke="#E2E0DA" stroke-width="1"/>
+    <line x1="80" y1="658" x2="1520" y2="658" stroke="#E2E0DA" stroke-width="1"/>
+
+    <!-- column separators -->
+    <line x1="640" y1="226" x2="640" y2="766" stroke="#E2E0DA" stroke-width="1"/>
+    <line x1="1080" y1="226" x2="1080" y2="766" stroke="#E2E0DA" stroke-width="1"/>
+
+    <!-- ============ ROW 1 (center 280) ============ -->
+    <circle cx="118" cy="280" r="14" fill="#F3F4F6" stroke="#E2E0DA" stroke-width="1"/>
+    <text x="118" y="285" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">1</text>
+    <text x="144" y="286" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1F2937">Is the region OK today?</text>
+
+    <circle cx="678" cy="280" r="14" fill="#FADBD5" stroke="#D73027" stroke-width="1.5"/>
+    <text x="678" y="286" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#D73027">&#10005;</text>
+    <text x="704" y="274" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+      <tspan x="704" dy="0">No status exists — three inventory counters</tspan>
+      <tspan x="704" dy="22">never say 'fine' or 'not fine'</tspan>
+    </text>
+
+    <circle cx="1118" cy="280" r="14" fill="#DCEFDD" stroke="#1A9850" stroke-width="1.5"/>
+    <text x="1118" y="286" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1A9850">&#10003;</text>
+    <text x="1144" y="286" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">Altitude 1 — verdict sentence + six status tiles</text>
+
+    <!-- ============ ROW 2 (center 388) ============ -->
+    <circle cx="118" cy="388" r="14" fill="#F3F4F6" stroke="#E2E0DA" stroke-width="1"/>
+    <text x="118" y="393" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">2</text>
+    <text x="144" y="394" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1F2937">Which farms need attention, worst first?</text>
+
+    <circle cx="678" cy="388" r="14" fill="#FADBD5" stroke="#D73027" stroke-width="1.5"/>
+    <text x="678" y="394" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#D73027">&#10005;</text>
+    <text x="704" y="382" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+      <tspan x="704" dy="0">No ranking anywhere; tables aggregate classes,</tspan>
+      <tspan x="704" dy="22">not farms — no export either</tspan>
+    </text>
+
+    <circle cx="1118" cy="388" r="14" fill="#DCEFDD" stroke="#1A9850" stroke-width="1.5"/>
+    <text x="1118" y="394" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1A9850">&#10003;</text>
+    <text x="1144" y="394" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">Altitude 2 — ranked attention list, CSV export</text>
+
+    <!-- ============ ROW 3 (center 496) ============ -->
+    <circle cx="118" cy="496" r="14" fill="#F3F4F6" stroke="#E2E0DA" stroke-width="1"/>
+    <text x="118" y="501" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">3</text>
+    <text x="144" y="502" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1F2937">What's wrong at this farm? What next?</text>
+
+    <circle cx="678" cy="496" r="14" fill="#FDE8CC" stroke="#D97706" stroke-width="1.5"/>
+    <text x="678" y="502" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#D97706">~</text>
+    <text x="704" y="490" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+      <tspan x="704" dy="0">Single-farm layers only; no summary, no severity,</tspan>
+      <tspan x="704" dy="22">no action</tspan>
+    </text>
+
+    <circle cx="1118" cy="496" r="14" fill="#DCEFDD" stroke="#1A9850" stroke-width="1.5"/>
+    <text x="1118" y="502" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1A9850">&#10003;</text>
+    <text x="1144" y="490" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+      <tspan x="1144" dy="0">Altitude 3 — dossier: verdict, six-module status,</tspan>
+      <tspan x="1144" dy="22">actions</tspan>
+    </text>
+
+    <!-- ============ ROW 4 (center 604) ============ -->
+    <circle cx="118" cy="604" r="14" fill="#F3F4F6" stroke="#E2E0DA" stroke-width="1"/>
+    <text x="118" y="609" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">4</text>
+    <text x="144" y="610" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1F2937">Show me X on the map (briefing)</text>
+
+    <circle cx="678" cy="604" r="14" fill="#FDE8CC" stroke="#D97706" stroke-width="1.5"/>
+    <text x="678" y="610" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#D97706">~</text>
+    <text x="704" y="598" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+      <tspan x="704" dy="0">Manual mutually-exclusive toggles; problems</tspan>
+      <tspan x="704" dy="22">invisible at region zoom</tspan>
+    </text>
+
+    <circle cx="1118" cy="604" r="14" fill="#DCEFDD" stroke="#1A9850" stroke-width="1.5"/>
+    <text x="1118" y="610" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1A9850">&#10003;</text>
+    <text x="1144" y="598" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+      <tspan x="1144" dy="0">Criticality map, worst-band clusters, colour-by,</tspan>
+      <tspan x="1144" dy="22">deep links</tspan>
+    </text>
+
+    <!-- ============ ROW 5 (center 712) ============ -->
+    <circle cx="118" cy="712" r="14" fill="#F3F4F6" stroke="#E2E0DA" stroke-width="1"/>
+    <text x="118" y="717" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1F2937">5</text>
+    <text x="144" y="718" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1F2937">Can I quote this number?</text>
+
+    <circle cx="678" cy="712" r="14" fill="#FDE8CC" stroke="#D97706" stroke-width="1.5"/>
+    <text x="678" y="718" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#D97706">~</text>
+    <text x="704" y="706" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+      <tspan x="704" dy="0">Unarchitected — even today two tables label the</tspan>
+      <tspan x="704" dy="22">same % two ways</tspan>
+    </text>
+
+    <circle cx="1118" cy="712" r="14" fill="#DCEFDD" stroke="#1A9850" stroke-width="1.5"/>
+    <text x="1118" y="718" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1A9850">&#10003;</text>
+    <text x="1144" y="706" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+      <tspan x="1144" dy="0">Number contract: one audited registry,</tspan>
+      <tspan x="1144" dy="22">test-enforced</tspan>
+    </text>
+  </g>
+
+  <rect x="80" y="150" width="1440" height="616" rx="12" fill="none" stroke="#E2E0DA" stroke-width="1.5"/>
+
+  <text x="800" y="814" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="18" font-style="italic" fill="#1F2937">The current app makes the user do the analysis. The AI already formed a judgement — the UI just never says it.</text>
+
+  <text x="48" y="904" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#6B7280">Questions vs. apps — ADAFSA dashboard redesign</text>
+</svg>

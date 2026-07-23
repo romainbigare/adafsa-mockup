@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <filter id="softShadow4" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#1F2937" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="900" fill="#FAF9F6"/>
+
+  <text x="48" y="68" font-family="Helvetica, Arial, sans-serif" font-size="34" font-weight="700" fill="#1F2937">The breaking point — six modules do not fit in a layer list</text>
+
+  <!-- ============ LEFT PANEL: TODAY ============ -->
+  <text x="48" y="140" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">Today</text>
+
+  <rect x="48" y="170" width="440" height="268" rx="10" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1.5" filter="url(#softShadow4)"/>
+  <text x="68" y="203" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#1F2937">Map Layers</text>
+  <line x1="48" y1="210" x2="488" y2="210" stroke="#E2E0DA" stroke-width="1"/>
+
+  <!-- row 0: High Res Image — ON -->
+  <text x="68" y="236" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">High Res Image</text>
+  <rect x="432" y="222" width="36" height="18" rx="9" fill="#1A9850"/>
+  <circle cx="459" cy="231" r="7" fill="#FFFFFF"/>
+  <line x1="48" y1="248" x2="488" y2="248" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 1: Land Use — OFF -->
+  <text x="68" y="270" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Land Use</text>
+  <rect x="432" y="256" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="441" cy="265" r="7" fill="#FFFFFF"/>
+  <line x1="48" y1="282" x2="488" y2="282" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 2: Crop Type — OFF -->
+  <text x="68" y="304" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Crop Type</text>
+  <rect x="432" y="290" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="441" cy="299" r="7" fill="#FFFFFF"/>
+  <line x1="48" y1="316" x2="488" y2="316" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 3: Tree Type — OFF -->
+  <text x="68" y="338" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Tree Type</text>
+  <rect x="432" y="324" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="441" cy="333" r="7" fill="#FFFFFF"/>
+  <line x1="48" y1="350" x2="488" y2="350" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 4: Single Farm Land Use — OFF -->
+  <text x="68" y="372" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Single Farm Land Use</text>
+  <rect x="432" y="358" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="441" cy="367" r="7" fill="#FFFFFF"/>
+  <line x1="48" y1="384" x2="488" y2="384" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 5: Single Farm Tree Type — OFF -->
+  <text x="68" y="406" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Single Farm Tree Type</text>
+  <rect x="432" y="392" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="441" cy="401" r="7" fill="#FFFFFF"/>
+
+  <!-- two small grey blocks -->
+  <rect x="48" y="462" width="212" height="50" rx="8" fill="#EFEEEA" stroke="#E2E0DA" stroke-width="1"/>
+  <text x="154" y="492" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#4B5563">Land-use table</text>
+  <rect x="276" y="462" width="212" height="50" rx="8" fill="#EFEEEA" stroke="#E2E0DA" stroke-width="1"/>
+  <text x="382" y="492" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#4B5563">Tree table</text>
+
+  <text x="48" y="542" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#6B7280">6 switches · 2 aggregate tables · one 450px map</text>
+
+  <!-- ============ ARROW ============ -->
+  <text x="618" y="280" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#1F2937">
+    <tspan x="618" dy="0">add the six contracted</tspan>
+    <tspan x="618" dy="19">modules</tspan>
+  </text>
+  <polygon points="518,318 658,318 658,308 718,330 658,352 658,342 518,342" fill="#4B5563"/>
+
+  <!-- ============ RIGHT PANEL: TODAY + THE CONTRACT ============ -->
+  <text x="748" y="140" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">Today + the contract</text>
+
+  <rect x="748" y="170" width="520" height="472" rx="10" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1.5" filter="url(#softShadow4)"/>
+  <text x="768" y="203" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#1F2937">Map Layers</text>
+  <line x1="748" y1="210" x2="1268" y2="210" stroke="#E2E0DA" stroke-width="1"/>
+
+  <!-- row 0: High Res Image — ON -->
+  <text x="768" y="236" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">High Res Image</text>
+  <rect x="1212" y="222" width="36" height="18" rx="9" fill="#1A9850"/>
+  <circle cx="1239" cy="231" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="248" x2="1268" y2="248" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 1: Land Use — OFF -->
+  <text x="768" y="270" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Land Use</text>
+  <rect x="1212" y="256" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="265" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="282" x2="1268" y2="282" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 2: Crop Type — OFF -->
+  <text x="768" y="304" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Crop Type</text>
+  <rect x="1212" y="290" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="299" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="316" x2="1268" y2="316" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 3: Tree Type — OFF -->
+  <text x="768" y="338" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Tree Type</text>
+  <rect x="1212" y="324" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="333" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="350" x2="1268" y2="350" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 4: Single Farm Land Use — OFF -->
+  <text x="768" y="372" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Single Farm Land Use</text>
+  <rect x="1212" y="358" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="367" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="384" x2="1268" y2="384" stroke="#F0EFEA" stroke-width="1"/>
+
+  <!-- row 5: Single Farm Tree Type — OFF -->
+  <text x="768" y="406" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Single Farm Tree Type</text>
+  <rect x="1212" y="392" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="401" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="418" x2="1268" y2="418" stroke="#E2E0DA" stroke-width="1.2"/>
+
+  <!-- ===== new contracted modules (amber-flagged) ===== -->
+  <!-- row 6: Crop Monitoring -->
+  <rect x="748" y="418" width="520" height="34" fill="#FFF7EA"/>
+  <rect x="748" y="418" width="4" height="34" fill="#D97706"/>
+  <text x="768" y="440" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Crop Monitoring</text>
+  <rect x="1212" y="426" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="435" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="452" x2="1268" y2="452" stroke="#F5E3C5" stroke-width="1"/>
+
+  <!-- row 7: Palms & Fruit Trees -->
+  <rect x="748" y="452" width="520" height="34" fill="#FFF7EA"/>
+  <rect x="748" y="452" width="4" height="34" fill="#D97706"/>
+  <text x="768" y="474" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Palms &amp; Fruit Trees</text>
+  <rect x="1212" y="460" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="469" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="486" x2="1268" y2="486" stroke="#F5E3C5" stroke-width="1"/>
+
+  <!-- row 8: Land Use & Structures -->
+  <rect x="748" y="486" width="520" height="34" fill="#FFF7EA"/>
+  <rect x="748" y="486" width="4" height="34" fill="#D97706"/>
+  <text x="768" y="508" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Land Use &amp; Structures</text>
+  <rect x="1212" y="494" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="503" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="520" x2="1268" y2="520" stroke="#F5E3C5" stroke-width="1"/>
+
+  <!-- row 9: Irrigation Efficiency -->
+  <rect x="748" y="520" width="520" height="34" fill="#FFF7EA"/>
+  <rect x="748" y="520" width="4" height="34" fill="#D97706"/>
+  <text x="768" y="542" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Irrigation Efficiency</text>
+  <rect x="1212" y="528" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="537" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="554" x2="1268" y2="554" stroke="#F5E3C5" stroke-width="1"/>
+
+  <!-- row 10: Yield Forecast -->
+  <rect x="748" y="554" width="520" height="34" fill="#FFF7EA"/>
+  <rect x="748" y="554" width="4" height="34" fill="#D97706"/>
+  <text x="768" y="576" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Yield Forecast</text>
+  <rect x="1212" y="562" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="571" r="7" fill="#FFFFFF"/>
+  <line x1="748" y1="588" x2="1268" y2="588" stroke="#F5E3C5" stroke-width="1"/>
+
+  <!-- row 11: Water Allocation -->
+  <rect x="748" y="588" width="520" height="34" fill="#FFF7EA"/>
+  <rect x="748" y="588" width="4" height="34" fill="#D97706"/>
+  <text x="768" y="610" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">Water Allocation</text>
+  <rect x="1212" y="596" width="36" height="18" rx="9" fill="#DADCE0"/>
+  <circle cx="1221" cy="605" r="7" fill="#FFFFFF"/>
+
+  <!-- 2x4 grid of grey table blocks -->
+  <text x="748" y="658" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#4B5563">table ×8</text>
+  <g fill="#EFEEEA" stroke="#E2E0DA" stroke-width="1">
+    <rect x="748" y="668" width="248" height="30" rx="6"/>
+    <rect x="1020" y="668" width="248" height="30" rx="6"/>
+    <rect x="748" y="706" width="248" height="30" rx="6"/>
+    <rect x="1020" y="706" width="248" height="30" rx="6"/>
+    <rect x="748" y="744" width="248" height="30" rx="6"/>
+    <rect x="1020" y="744" width="248" height="30" rx="6"/>
+    <rect x="748" y="782" width="248" height="30" rx="6"/>
+    <rect x="1020" y="782" width="248" height="30" rx="6"/>
+  </g>
+
+  <text x="748" y="840" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#D73027">12+ switches · 8 tables · still no verdict, no ranking, no per-farm view</text>
+
+  <!-- ===== red annotation callouts ===== -->
+  <line x1="1268" y1="299" x2="1288" y2="299" stroke="#D73027" stroke-width="1.2"/>
+  <circle cx="1268" cy="299" r="3" fill="#D73027"/>
+  <rect x="1288" y="273" width="228" height="52" rx="10" fill="#FFFFFF" stroke="#D73027" stroke-width="1.4"/>
+  <text x="1302" y="294" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#D73027">
+    <tspan x="1302" dy="0">mutually exclusive — which one</tspan>
+    <tspan x="1302" dy="17">wins the map?</tspan>
+  </text>
+
+  <line x1="1268" y1="503" x2="1288" y2="503" stroke="#D73027" stroke-width="1.2"/>
+  <circle cx="1268" cy="503" r="3" fill="#D73027"/>
+  <rect x="1288" y="485" width="212" height="36" rx="10" fill="#FFFFFF" stroke="#D73027" stroke-width="1.4"/>
+  <text x="1302" y="508" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#D73027">scores &amp; bands have no home</text>
+
+  <line x1="1268" y1="605" x2="1288" y2="605" stroke="#D73027" stroke-width="1.2"/>
+  <circle cx="1268" cy="605" r="3" fill="#D73027"/>
+  <rect x="1288" y="587" width="174" height="36" rx="10" fill="#FFFFFF" stroke="#D73027" stroke-width="1.4"/>
+  <text x="1302" y="610" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#D73027">rankings have no home</text>
+
+  <text x="48" y="875" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#6B7280">Module scaling — ADAFSA dashboard redesign</text>
+</svg>
