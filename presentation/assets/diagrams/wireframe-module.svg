@@ -49,7 +49,7 @@
   <circle cx="560" cy="460" r="18" fill="#1A9850" opacity="0.55"/>
   <circle cx="820" cy="360" r="20" fill="#1A9850" opacity="0.55"/>
   <circle cx="720" cy="430" r="19" fill="#D97706" opacity="0.55"/>
-  <circle cx="480" cy="520" r="16" fill="#D97706" opacity="0.55"/>
+  <circle cx="545" cy="550" r="16" fill="#D97706" opacity="0.55"/>
   <circle cx="850" cy="530" r="17" fill="#D73027" opacity="0.55"/>
 
   <!-- legend card -->
@@ -64,6 +64,25 @@
   <rect x="400" y="347" width="80" height="8" rx="2" fill="#E2E0DA"/>
   <rect x="378" y="366" width="16" height="10" rx="2" fill="#D73027"/>
   <rect x="400" y="367" width="80" height="8" rx="2" fill="#E2E0DA"/>
+
+  <!-- ============ FILTERING PANEL ============ -->
+  <rect x="366" y="410" width="150" height="118" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1" filter="url(#softShadowL)"/>
+  <text x="380" y="432" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.5" fill="#9CA3AF">FILTERING</text>
+  <line x1="378" y1="440" x2="502" y2="440" stroke="#E2E0DA" stroke-width="1"/>
+  <!-- row 1: ticked -->
+  <rect x="378" y="448" width="12" height="12" rx="2" fill="#1A9850"/>
+  <rect x="400" y="451" width="58" height="8" rx="2" fill="#E2E0DA"/>
+  <rect x="488" y="448" width="14" height="14" rx="3" fill="#166534"/>
+  <path d="M 491.5 455 L 494.5 458 L 499 452" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- row 2: ticked -->
+  <rect x="378" y="474" width="12" height="12" rx="2" fill="#D97706"/>
+  <rect x="400" y="477" width="58" height="8" rx="2" fill="#E2E0DA"/>
+  <rect x="488" y="474" width="14" height="14" rx="3" fill="#166534"/>
+  <path d="M 491.5 481 L 494.5 484 L 499 478" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- row 3: unticked -->
+  <rect x="378" y="500" width="12" height="12" rx="2" fill="#7A882B"/>
+  <rect x="400" y="503" width="58" height="8" rx="2" fill="#E2E0DA"/>
+  <rect x="488" y="500" width="14" height="14" rx="3" fill="#FFFFFF" stroke="#D9DEDA" stroke-width="1.5"/>
 
   <!-- ============ TABLE ============ -->
   <rect x="350" y="596" width="570" height="36" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
@@ -83,32 +102,40 @@
   <rect x="850" y="720" width="54" height="16" rx="8" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
 
   <!-- ============ RIGHT LABELS + LEADERS ============ -->
-  <circle cx="1000" cy="170" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="170" x2="918" y2="199" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="177" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">The numbers for this question.</text>
+  <circle cx="1000" cy="166" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="166" x2="918" y2="199" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="173" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">The numbers for this question.</text>
 
-  <circle cx="1000" cy="310" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="310" x2="516" y2="335" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="317" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
+  <circle cx="1000" cy="272" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="272" x2="516" y2="330" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="279" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
     <tspan x="1020" dy="0">One legend. The same</tspan>
     <tspan x="1020" dy="26">colours everywhere.</tspan>
   </text>
 
-  <circle cx="1000" cy="450" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="450" x2="920" y2="415" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="457" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
+  <circle cx="1000" cy="392" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="392" x2="516" y2="468" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="386" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
+    <tspan x="1020" dy="0">Tick a crop or a tree type.</tspan>
+    <tspan x="1020" dy="26">The map and every number</tspan>
+    <tspan x="1020" dy="26">narrow together.</tspan>
+  </text>
+
+  <circle cx="1000" cy="512" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="512" x2="840" y2="522" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="519" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
     <tspan x="1020" dy="0">The map, coloured by</tspan>
     <tspan x="1020" dy="26">this question only.</tspan>
   </text>
 
-  <circle cx="1000" cy="590" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="590" x2="904" y2="614" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="597" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
+  <circle cx="1000" cy="628" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="628" x2="904" y2="614" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="635" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">
     <tspan x="1020" dy="0">The list can leave the</tspan>
     <tspan x="1020" dy="26">app as a file.</tspan>
   </text>
 
-  <circle cx="1000" cy="730" r="3" fill="#9CA3AF"/>
-  <line x1="1000" y1="730" x2="920" y2="686" stroke="#9CA3AF" stroke-width="2"/>
-  <text x="1020" y="737" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">Farms ranked worst first.</text>
+  <circle cx="1000" cy="738" r="3" fill="#9CA3AF"/>
+  <line x1="1000" y1="738" x2="920" y2="686" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="1020" y="745" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1F2937">Farms ranked worst first.</text>
 </svg>
