@@ -110,7 +110,7 @@ Asset paths below are relative to `presentation/`. Diagrams exist as SVG (crisp,
 - **On slide:** `assets/new/alt2-module-ier.jpg` main, `assets/new/alt2-module-water.jpg` small beside it; callouts:
   1. **One module owns the map** — one subject, one legend, one colouring. No mixed states, ever.
   2. **KPI strip** — the module's headline numbers, straight from the shared registry.
-  3. **The dial** — switch module *in place*: map viewport preserved, KPIs/legend/list swap. "Same farms, different question" is one click. (This is why two screenshots: same viewport, irrigation → water.)
+  3. **Flip the question in place** — switching modules (via the module nav — B's "dial" idea, implemented as navigation) keeps the map viewport; KPIs, legend and list swap. "Same farms, different question" is one click. (This is why two screenshots: same viewport, irrigation → water.)
   4. **The attention list** — the answer, docked below: farms ranked worst-first, exportable to CSV. A civil servant's Monday morning in one click.
 - **Also show (small):** `assets/new/alt2-layers-mode.jpg` — the old layer browser still exists for power users, but opening it visibly *pauses* the module chrome ("Map Layers active — module data paused") instead of contradicting it.
 - **Speaker notes:** "This is where the six modules actually live — each gets the full template: KPIs, legend, ranked list, deep-linkable URL (officials can paste `#/m/water` into an email). Adding module seven is a registry entry, not a design project. And note the layers panel: we didn't delete the GIS power — we demoted it from *the* interface to *a* tool, and made its mode explicit."
