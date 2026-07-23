@@ -1,0 +1,243 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <filter id="softShadow3P" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#1F2937" flood-opacity="0.10"/>
+    </filter>
+    <clipPath id="clipFrame3P">
+      <rect x="0" y="274" width="420" height="420" rx="14"/>
+    </clipPath>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="900" fill="#FAF9F6"/>
+
+  <!-- ======================================================= -->
+  <!-- COLUMN 1 — OVERVIEW                                      -->
+  <!-- ======================================================= -->
+  <g transform="translate(100,0)">
+    <!-- icon: eye -->
+    <circle cx="210" cy="179" r="38" fill="#EAF3EC"/>
+    <path d="M 188 179 Q 210 164 232 179 Q 210 194 188 179 Z" fill="none" stroke="#166534" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="210" cy="179" r="6" fill="#166534"/>
+
+    <text x="210" y="254" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#1F2937">Overview</text>
+
+    <rect x="0" y="274" width="420" height="420" rx="14" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1.5" filter="url(#softShadow3P)"/>
+
+    <g clip-path="url(#clipFrame3P)">
+      <!-- nav rail -->
+      <rect x="0" y="274" width="28" height="420" fill="#F3F1EC"/>
+      <rect x="7" y="300" width="14" height="4" rx="2" fill="#E2E0DA"/>
+      <rect x="7" y="330" width="14" height="4" rx="2" fill="#E2E0DA"/>
+      <rect x="7" y="360" width="14" height="4" rx="2" fill="#E2E0DA"/>
+      <rect x="7" y="390" width="14" height="4" rx="2" fill="#E2E0DA"/>
+
+      <!-- stats panel -->
+      <rect x="38" y="294" width="70" height="6" rx="2" fill="#E2E0DA"/>
+      <rect x="38" y="304" width="45" height="12" rx="3" fill="#D9DEDA"/>
+      <rect x="38" y="332" width="70" height="6" rx="2" fill="#E2E0DA"/>
+      <rect x="38" y="342" width="50" height="12" rx="3" fill="#D9DEDA"/>
+      <rect x="38" y="370" width="70" height="6" rx="2" fill="#E2E0DA"/>
+      <rect x="38" y="380" width="40" height="12" rx="3" fill="#D9DEDA"/>
+      <line x1="38" y1="404" x2="138" y2="404" stroke="#E2E0DA" stroke-width="1"/>
+      <!-- 5-row band breakdown -->
+      <rect x="38" y="410" width="12" height="8" rx="2" fill="#1A9850"/>
+      <rect x="54" y="411" width="58" height="6" rx="2" fill="#E2E0DA"/>
+      <rect x="38" y="428" width="12" height="8" rx="2" fill="#7A882B"/>
+      <rect x="54" y="429" width="58" height="6" rx="2" fill="#E2E0DA"/>
+      <rect x="38" y="446" width="12" height="8" rx="2" fill="#D97706"/>
+      <rect x="54" y="447" width="58" height="6" rx="2" fill="#E2E0DA"/>
+      <rect x="38" y="464" width="12" height="8" rx="2" fill="#D85417"/>
+      <rect x="54" y="465" width="58" height="6" rx="2" fill="#E2E0DA"/>
+      <rect x="38" y="482" width="12" height="8" rx="2" fill="#D73027"/>
+      <rect x="54" y="483" width="58" height="6" rx="2" fill="#E2E0DA"/>
+
+      <!-- vertical divider between stats and map -->
+      <line x1="148" y1="274" x2="148" y2="604" stroke="#E2E0DA" stroke-width="1"/>
+
+      <!-- map -->
+      <rect x="148" y="274" width="272" height="330" fill="#F2EDE3"/>
+      <circle cx="250" cy="350" r="22" fill="#1A9850" opacity="0.55"/>
+      <circle cx="340" cy="420" r="18" fill="#D97706" opacity="0.55"/>
+      <circle cx="270" cy="480" r="16" fill="#D73027" opacity="0.55"/>
+
+      <!-- divider above tiles row -->
+      <line x1="28" y1="604" x2="420" y2="604" stroke="#E2E0DA" stroke-width="1"/>
+
+      <!-- six tiny verdict tiles -->
+      <!-- tile 1 -->
+      <rect x="29" y="612" width="60" height="72" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="35" y="618" width="34" height="8" rx="4" fill="#1A9850"/>
+      <rect x="39" y="666" width="6" height="10" fill="#D9DEDA"/>
+      <rect x="49" y="660" width="6" height="16" fill="#D9DEDA"/>
+      <rect x="59" y="664" width="6" height="12" fill="#D9DEDA"/>
+      <!-- tile 2 -->
+      <rect x="95" y="612" width="60" height="72" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="101" y="618" width="34" height="8" rx="4" fill="#1A9850"/>
+      <rect x="105" y="662" width="6" height="14" fill="#D9DEDA"/>
+      <rect x="115" y="668" width="6" height="8" fill="#D9DEDA"/>
+      <rect x="125" y="658" width="6" height="18" fill="#D9DEDA"/>
+      <!-- tile 3 (attention) -->
+      <rect x="161" y="612" width="60" height="72" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="167" y="618" width="34" height="8" rx="4" fill="#D97706"/>
+      <rect x="171" y="668" width="6" height="8" fill="#D9DEDA"/>
+      <rect x="181" y="656" width="6" height="20" fill="#EFCB99"/>
+      <rect x="191" y="662" width="6" height="14" fill="#D9DEDA"/>
+      <!-- tile 4 -->
+      <rect x="227" y="612" width="60" height="72" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="233" y="618" width="34" height="8" rx="4" fill="#1A9850"/>
+      <rect x="237" y="660" width="6" height="16" fill="#D9DEDA"/>
+      <rect x="247" y="664" width="6" height="12" fill="#D9DEDA"/>
+      <rect x="257" y="670" width="6" height="6" fill="#D9DEDA"/>
+      <!-- tile 5 (critical) -->
+      <rect x="293" y="612" width="60" height="72" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="299" y="618" width="34" height="8" rx="4" fill="#D73027"/>
+      <rect x="303" y="670" width="6" height="6" fill="#D9DEDA"/>
+      <rect x="313" y="664" width="6" height="12" fill="#F4B8AE"/>
+      <rect x="323" y="654" width="6" height="22" fill="#F4B8AE"/>
+      <!-- tile 6 -->
+      <rect x="359" y="612" width="60" height="72" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="365" y="618" width="34" height="8" rx="4" fill="#1A9850"/>
+      <rect x="369" y="664" width="6" height="12" fill="#D9DEDA"/>
+      <rect x="379" y="658" width="6" height="18" fill="#D9DEDA"/>
+      <rect x="389" y="668" width="6" height="8" fill="#D9DEDA"/>
+    </g>
+
+    <text x="210" y="734" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#6B7280">Altitude 1 — the whole region at a glance.</text>
+  </g>
+
+  <!-- ======================================================= -->
+  <!-- COLUMN 2 — A MODULE                                      -->
+  <!-- ======================================================= -->
+  <g transform="translate(590,0)">
+    <!-- icon: ranked list -->
+    <circle cx="210" cy="179" r="38" fill="#EAF3EC"/>
+    <circle cx="188" cy="166" r="3" fill="#166534"/>
+    <line x1="196" y1="166" x2="228" y2="166" stroke="#166534" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="188" cy="179" r="3" fill="#166534"/>
+    <line x1="196" y1="179" x2="220" y2="179" stroke="#166534" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="188" cy="192" r="3" fill="#166534"/>
+    <line x1="196" y1="192" x2="212" y2="192" stroke="#166534" stroke-width="3" stroke-linecap="round"/>
+
+    <text x="210" y="254" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#1F2937">A module</text>
+
+    <rect x="0" y="274" width="420" height="420" rx="14" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1.5" filter="url(#softShadow3P)"/>
+
+    <g clip-path="url(#clipFrame3P)">
+      <!-- nav rail -->
+      <rect x="0" y="274" width="28" height="420" fill="#F3F1EC"/>
+      <rect x="7" y="300" width="14" height="4" rx="2" fill="#E2E0DA"/>
+      <rect x="7" y="330" width="14" height="4" rx="2" fill="#E2E0DA"/>
+      <rect x="7" y="360" width="14" height="4" rx="2" fill="#E2E0DA"/>
+      <rect x="7" y="390" width="14" height="4" rx="2" fill="#E2E0DA"/>
+
+      <!-- KPI strip: 4 boxes, one amber -->
+      <rect x="42" y="292" width="85" height="50" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="52" y="304" width="40" height="5" rx="2" fill="#E2E0DA"/>
+      <rect x="52" y="313" width="28" height="10" rx="3" fill="#D9DEDA"/>
+
+      <rect x="135" y="292" width="85" height="50" rx="6" fill="#FDE8CC" stroke="#D97706" stroke-width="1.5"/>
+      <rect x="145" y="304" width="40" height="5" rx="2" fill="#EFCB99"/>
+      <rect x="145" y="313" width="28" height="10" rx="3" fill="#D9A24B"/>
+
+      <rect x="228" y="292" width="85" height="50" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="238" y="304" width="40" height="5" rx="2" fill="#E2E0DA"/>
+      <rect x="238" y="313" width="28" height="10" rx="3" fill="#D9DEDA"/>
+
+      <rect x="321" y="292" width="85" height="50" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="331" y="304" width="40" height="5" rx="2" fill="#E2E0DA"/>
+      <rect x="331" y="313" width="28" height="10" rx="3" fill="#D9DEDA"/>
+
+      <!-- map with legend chip -->
+      <rect x="28" y="356" width="392" height="230" fill="#F2EDE3"/>
+      <circle cx="200" cy="400" r="10" fill="#1A9850" opacity="0.6"/>
+      <circle cx="300" cy="440" r="9" fill="#D97706" opacity="0.6"/>
+      <circle cx="340" cy="390" r="8" fill="#D73027" opacity="0.6"/>
+      <circle cx="255" cy="505" r="9" fill="#1A9850" opacity="0.6"/>
+
+      <rect x="38" y="366" width="56" height="58" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="46" y="378" width="10" height="7" rx="2" fill="#1A9850"/>
+      <rect x="60" y="379" width="28" height="5" rx="2" fill="#E2E0DA"/>
+      <rect x="46" y="392" width="10" height="7" rx="2" fill="#D97706"/>
+      <rect x="60" y="393" width="28" height="5" rx="2" fill="#E2E0DA"/>
+      <rect x="46" y="406" width="10" height="7" rx="2" fill="#D73027"/>
+      <rect x="60" y="407" width="28" height="5" rx="2" fill="#E2E0DA"/>
+
+      <!-- docked table with red chips -->
+      <rect x="28" y="600" width="392" height="22" rx="6" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="38" y="608" width="140" height="7" rx="2" fill="#E2E0DA"/>
+      <rect x="370" y="604" width="40" height="14" rx="7" fill="#1A9850"/>
+
+      <rect x="38" y="626" width="220" height="7" rx="2" fill="#E2E0DA"/>
+      <rect x="360" y="624" width="50" height="14" rx="7" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
+
+      <rect x="38" y="648" width="220" height="7" rx="2" fill="#E2E0DA"/>
+      <rect x="360" y="646" width="50" height="14" rx="7" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
+
+      <rect x="38" y="670" width="220" height="7" rx="2" fill="#E2E0DA"/>
+      <rect x="360" y="668" width="50" height="14" rx="7" fill="#FADBD5" stroke="#D73027" stroke-width="1"/>
+    </g>
+
+    <text x="210" y="734" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#6B7280">Altitude 2 — one question, ranked answers.</text>
+  </g>
+
+  <!-- ======================================================= -->
+  <!-- COLUMN 3 — FARM ANALYSIS                                 -->
+  <!-- ======================================================= -->
+  <g transform="translate(1080,0)">
+    <!-- icon: magnifier over document -->
+    <circle cx="210" cy="179" r="38" fill="#EAF3EC"/>
+    <rect x="192" y="163" width="24" height="30" rx="2" fill="#FFFFFF" stroke="#166534" stroke-width="2.5"/>
+    <line x1="198" y1="171" x2="212" y2="171" stroke="#166534" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="198" y1="177" x2="212" y2="177" stroke="#166534" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="198" y1="183" x2="212" y2="183" stroke="#166534" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="219" cy="186" r="8" fill="#FFFFFF" stroke="#166534" stroke-width="3"/>
+    <line x1="224.7" y1="191.7" x2="231" y2="198" stroke="#166534" stroke-width="3" stroke-linecap="round"/>
+
+    <text x="210" y="254" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#1F2937">Farm Analysis</text>
+
+    <rect x="0" y="274" width="420" height="420" rx="14" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1.5" filter="url(#softShadow3P)"/>
+
+    <g clip-path="url(#clipFrame3P)">
+      <!-- map with highlighted plot -->
+      <rect x="0" y="274" width="240" height="420" fill="#F2EDE3"/>
+      <polygon points="100,360 160,350 185,420 140,470 80,440" fill="#06B6D4" fill-opacity="0.14" stroke="#06B6D4" stroke-width="3" stroke-linejoin="round"/>
+
+      <!-- right column: three stacked panels -->
+      <rect x="252" y="292" width="168" height="120" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="264" y="310" width="140" height="8" rx="2" fill="#E2E0DA"/>
+      <rect x="264" y="330" width="120" height="8" rx="2" fill="#E2E0DA"/>
+      <rect x="264" y="350" width="100" height="8" rx="2" fill="#E2E0DA"/>
+      <rect x="264" y="370" width="130" height="8" rx="2" fill="#E2E0DA"/>
+
+      <rect x="252" y="424" width="168" height="120" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="264" y="440" width="64" height="18" rx="9" fill="#FDE8CC" stroke="#D97706" stroke-width="1"/>
+      <rect x="264" y="472" width="130" height="8" rx="2" fill="#E2E0DA"/>
+      <rect x="264" y="492" width="110" height="8" rx="2" fill="#E2E0DA"/>
+
+      <rect x="252" y="556" width="168" height="120" rx="8" fill="#FFFFFF" stroke="#E2E0DA" stroke-width="1"/>
+      <rect x="264" y="570" width="80" height="8" rx="2" fill="#E2E0DA"/>
+      <!-- 4x4 heat grid -->
+      <rect x="264" y="586" width="18" height="18" rx="2" fill="#1A9850"/>
+      <rect x="286" y="586" width="18" height="18" rx="2" fill="#1A9850"/>
+      <rect x="308" y="586" width="18" height="18" rx="2" fill="#D97706"/>
+      <rect x="330" y="586" width="18" height="18" rx="2" fill="#1A9850"/>
+
+      <rect x="264" y="608" width="18" height="18" rx="2" fill="#D97706"/>
+      <rect x="286" y="608" width="18" height="18" rx="2" fill="#1A9850"/>
+      <rect x="308" y="608" width="18" height="18" rx="2" fill="#1A9850"/>
+      <rect x="330" y="608" width="18" height="18" rx="2" fill="#1A9850"/>
+
+      <rect x="264" y="630" width="18" height="18" rx="2" fill="#1A9850"/>
+      <rect x="286" y="630" width="18" height="18" rx="2" fill="#1A9850"/>
+      <rect x="308" y="630" width="18" height="18" rx="2" fill="#D97706"/>
+      <rect x="330" y="630" width="18" height="18" rx="2" fill="#1A9850"/>
+
+      <rect x="264" y="652" width="18" height="18" rx="2" fill="#1A9850"/>
+      <rect x="286" y="652" width="18" height="18" rx="2" fill="#D97706"/>
+      <rect x="308" y="652" width="18" height="18" rx="2" fill="#1A9850"/>
+      <rect x="330" y="652" width="18" height="18" rx="2" fill="#1A9850"/>
+    </g>
+
+    <text x="210" y="734" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#6B7280">Altitude 3 — everything about one farm.</text>
+  </g>
+</svg>
