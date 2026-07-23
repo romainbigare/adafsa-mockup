@@ -8,13 +8,9 @@
     <path d="M19 26 L33 22 L47 26 L57 22 L57 54 L47 50 L33 54 L19 50 Z" fill="none" stroke="#166534" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><line x1="33" y1="22" x2="33" y2="54" stroke="#166534" stroke-width="2" stroke-linecap="round"/><line x1="47" y1="26" x2="47" y2="50" stroke="#166534" stroke-width="2" stroke-linecap="round"/><circle cx="41" cy="38" r="2.6" fill="#166534"/>
   </g>
 
-  <text x="280" y="158" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">Depth 1 — the situation</text>
-  <text x="280" y="188" font-family="Helvetica, Arial, sans-serif" font-size="21" font-style="italic" fill="#166534">&#8220;Is anything wrong today?&#8221;</text>
-  <text x="280" y="214" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#6B7280">A quick look, first thing in the morning.</text>
 
   <!-- connector 1 -->
   <line x1="218" y1="280" x2="218" y2="350" stroke="#9CA3AF" stroke-width="1.5"/>
-  <text x="240" y="320" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#6B7280">one level deeper</text>
 
   <!-- ============ BAND 2 : magnifier over ranked bars ============ -->
   <g transform="translate(180,412)">
@@ -24,13 +20,9 @@
     <line x1="42" y1="40" x2="54" y2="54" stroke="#166534" stroke-width="2.5" stroke-linecap="round"/>
   </g>
 
-  <text x="280" y="428" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">Depth 2 — the question</text>
-  <text x="280" y="458" font-family="Helvetica, Arial, sans-serif" font-size="21" font-style="italic" fill="#166534">&#8220;Which farms need attention?&#8221;</text>
-  <text x="280" y="484" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#6B7280">A ranked list to work through during the week.</text>
 
   <!-- connector 2 -->
   <line x1="218" y1="550" x2="218" y2="620" stroke="#9CA3AF" stroke-width="1.5"/>
-  <text x="240" y="590" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#6B7280">one level deeper</text>
 
   <!-- ============ BAND 3 : location pin ============ -->
   <g transform="translate(180,682)">
@@ -41,8 +33,5 @@
     </g>
   </g>
 
-  <text x="280" y="698" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1F2937">Depth 3 — the farm</text>
-  <text x="280" y="728" font-family="Helvetica, Arial, sans-serif" font-size="21" font-style="italic" fill="#166534">&#8220;What is happening on this farm?&#8221;</text>
-  <text x="280" y="754" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#6B7280">The full picture, before a visit or a call.</text>
   </g>
 </svg>

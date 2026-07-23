@@ -70,9 +70,62 @@ function annotate(slide, rect, fx, fy, text, pos) {
     shape: "roundRect", rectRadius: 0.09, x, y, w, h,
     fill: { color: WHITE },
     shadow: { type: "outer", color: "8A8F98", blur: 9, offset: 3, angle: 90, opacity: 0.3 },
-    fontFace: FONT, fontSize: 12, color: INK, align: pos.align || "left",
-    valign: "middle", margin: 0.12, lineSpacingMultiple: 1.05,
+    fontFace: FONT, fontSize: pos.fs || 12, color: INK, align: pos.align || "left",
+    valign: "middle", margin: (pos.margin != null ? pos.margin : 0.12), lineSpacingMultiple: 1.04,
   });
+}
+
+// Map a point in the 1600x900 diagram viewBox to slide inches, using the
+// placed image rect (fitImage returns a rect with the image's exact aspect).
+function sx2in(rect, x) { return rect.x + (x / 1600) * rect.w; }
+function sy2in(rect, y) { return rect.y + (y / 900) * rect.h; }
+
+// Native annotation placed from the diagram's own SVG coordinates, so it lands
+// exactly where the baked label used to sit.
+function annotateAt(slide, rect, a) {
+  annotate(slide, rect, a.tx / 1600, a.ty / 900, a.text, {
+    x: sx2in(rect, a.cx), y: sy2in(rect, a.cy),
+    w: (a.cw / 1600) * rect.w + 0.14,
+    h: (a.ch / 900) * rect.h + 0.10,
+    side: a.side || "right", align: "left", fs: 10.5, margin: 0.07,
+  });
+}
+
+// Annotation data lifted from the diagram SVGs (viewBox coords) so the native
+// callouts match the wireframes' vetted layout. tx,ty = leader target.
+const OVERVIEW_ANN = [
+  { tx: 406, ty: 230, cx: 1000, cy: 150, cw: 330, ch: 62, side: "right", text: "The region's numbers and the bands, in one panel." },
+  { tx: 770, ty: 350, cx: 1000, cy: 280, cw: 340, ch: 62, side: "right", text: "One fixed lens: overall health. Colour shows where the problems are." },
+  { tx: 406, ty: 551, cx: 1000, cy: 410, cw: 360, ch: 86, side: "right", text: "One filter, under the legend. Pick crops or trees and the whole page narrows." },
+  { tx: 575, ty: 626, cx: 1000, cy: 590, cw: 340, ch: 62, side: "right", text: "Six cards, one status word each. Each opens its module." },
+];
+const MODULE_ANN = [
+  { tx: 918, ty: 199, cx: 1000, cy: 149, cw: 300, ch: 42, side: "right", text: "The numbers for this question." },
+  { tx: 516, ty: 330, cx: 1000, cy: 257, cw: 300, ch: 64, side: "right", text: "One legend. The same colours everywhere." },
+  { tx: 516, ty: 468, cx: 1000, cy: 367, cw: 320, ch: 88, side: "right", text: "Tick a crop or a tree type. The map and every number narrow together." },
+  { tx: 840, ty: 522, cx: 1000, cy: 489, cw: 280, ch: 64, side: "right", text: "The map, coloured by this question only." },
+  { tx: 904, ty: 614, cx: 1000, cy: 593, cw: 280, ch: 64, side: "right", text: "The list can leave the app as a file." },
+  { tx: 920, ty: 686, cx: 1000, cy: 712, cw: 300, ch: 42, side: "right", text: "Farms ranked worst first." },
+];
+const FARM_ANN = [
+  { tx: 436, ty: 350, cx: 280, cy: 45, cw: 360, ch: 42, side: "above", text: "The farm, highlighted on the map." },
+  { tx: 972, ty: 258, cx: 1060, cy: 180, cw: 320, ch: 64, side: "right", text: "The system's conclusion, in one sentence." },
+  { tx: 972, ty: 444, cx: 1060, cy: 268, cw: 320, ch: 64, side: "right", text: "Every module's reading for this one farm." },
+  { tx: 972, ty: 637, cx: 1060, cy: 356, cw: 320, ch: 88, side: "right", text: "It ends in an action: export, or open the full analysis." },
+];
+
+// The user's-journey bands, as native text placed over the icon+connector PNG.
+const BANDS = [
+  { y: 139, title: "Depth 1 — the situation", q: "“Is anything wrong today?”", sup: "A quick look, first thing in the morning." },
+  { y: 409, title: "Depth 2 — the question", q: "“Which farms need attention?”", sup: "A ranked list to work through during the week." },
+  { y: 679, title: "Depth 3 — the farm", q: "“What is happening on this farm?”", sup: "The full picture, before a visit or a call." },
+];
+function placeBand(slide, rect, b) {
+  slide.addText([
+    { text: b.title, options: { bold: true, color: INK, fontSize: 13, breakLine: true } },
+    { text: b.q, options: { italic: true, color: FOREST, fontSize: 11.5, breakLine: true } },
+    { text: b.sup, options: { color: MUTED, fontSize: 10 } },
+  ], { x: sx2in(rect, 710), y: sy2in(rect, b.y), w: 5.2, h: 1.0, fontFace: FONT, margin: 0, valign: "top", lineSpacingMultiple: 1.04, paraSpaceAfter: 2 });
 }
 
 (async () => {
@@ -132,7 +185,10 @@ function annotate(slide, rect, fx, fy, text, pos) {
     const s = pres.addSlide();
     s.background = { color: PAPER };
     title(s, "The user's journey");
-    await fitImage(s, A("diagrams/journeys-depth.png"), { x: 1.2, y: 1.05, w: 10.93, h: 6.1 });
+    const jr = await fitImage(s, A("diagrams/journeys-depth.png"), { x: 1.2, y: 1.05, w: 10.93, h: 6.1 });
+    BANDS.forEach((b) => placeBand(s, jr, b));
+    s.addText("one level deeper", { x: sx2in(jr, 668), y: sy2in(jr, 306), w: 1.7, h: 0.3, fontFace: FONT, fontSize: 9, color: MUTED, margin: 0, valign: "top" });
+    s.addText("one level deeper", { x: sx2in(jr, 668), y: sy2in(jr, 576), w: 1.7, h: 0.3, fontFace: FONT, fontSize: 9, color: MUTED, margin: 0, valign: "top" });
     s.addNotes("Three people, three habits. A director glances in the morning and wants one thing: is anything wrong. An operator wants a list: which farms, worst first. An inspector wants everything about one farm. Same tool, three depths. The redesign takes each one seriously and gives it its own screen.");
   }
 
@@ -159,7 +215,8 @@ function annotate(slide, rect, fx, fy, text, pos) {
     const s = pres.addSlide();
     s.background = { color: PAPER };
     title(s, "Depth 1 · The situation at a glance");
-    await fitImage(s, A("diagrams/wireframe-overview.png"), { x: 0.9, y: 1.1, w: 11.53, h: 6.05 });
+    const r6 = await fitImage(s, A("diagrams/wireframe-overview.png"), { x: 0.9, y: 1.1, w: 11.53, h: 6.05 });
+    OVERVIEW_ANN.forEach((a) => annotateAt(s, r6, a));
     s.addNotes("The morning page. The region's numbers and the band breakdown sit in one panel. The map has a single fixed lens, overall health, so nobody chooses a layer to see trouble. Six verdict cards answer for each module with a plain word. And a filter waits under the legend: tick a crop or a tree, and the map, the panel and the cards all narrow to those farms.");
   }
 
@@ -183,7 +240,8 @@ function annotate(slide, rect, fx, fy, text, pos) {
     const s = pres.addSlide();
     s.background = { color: PAPER };
     title(s, "Depth 2 · The module in detail");
-    await fitImage(s, A("diagrams/wireframe-module.png"), { x: 0.9, y: 1.1, w: 11.53, h: 6.05 });
+    const r8 = await fitImage(s, A("diagrams/wireframe-module.png"), { x: 0.9, y: 1.1, w: 11.53, h: 6.05 });
+    MODULE_ANN.forEach((a) => annotateAt(s, r8, a));
     s.addNotes("Every module page has the same shape. The numbers on top, one legend, the map coloured by that question, the ranked list at the bottom with an export. The full crop and tree taxonomy is here as a filter: tick date palms, and the map, the counts and the ranking all narrow to farms growing date palms. Each module filters by the taxonomy it is about. The filter drives everything at once, so the numbers and the map can never disagree.");
   }
 
@@ -207,7 +265,8 @@ function annotate(slide, rect, fx, fy, text, pos) {
     const s = pres.addSlide();
     s.background = { color: PAPER };
     title(s, "Depth 3 · The farm in detail");
-    await fitImage(s, A("diagrams/wireframe-farm.png"), { x: 0.9, y: 1.1, w: 11.53, h: 6.05 });
+    const r10 = await fitImage(s, A("diagrams/wireframe-farm.png"), { x: 0.9, y: 1.1, w: 11.53, h: 6.05 });
+    FARM_ANN.forEach((a) => annotateAt(s, r10, a));
     s.addNotes("One farm. The map zooms to it and highlights it. The panel gives the system's conclusion in a sentence, then each module's reading for this farm. And it ends in an action: export the farm, or open the full analysis, which keeps the depth the old monitoring page offered — one level down, where it belongs.");
   }
 

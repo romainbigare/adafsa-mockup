@@ -134,46 +134,4 @@
     <rect x="30" y="90" width="8" height="30" rx="2" fill="#D9DEDA"/>
     <rect x="44" y="100" width="8" height="20" rx="2" fill="#D9DEDA"/>
   </g>
-
-  <!-- ============ ANNOTATIONS (modern ring + chip style) ============ -->
-  <!-- A: stats / band panel -->
-  <line x1="406" y1="230" x2="1000" y2="181" stroke="#AEB4BC" stroke-width="1.25"/>
-  <circle cx="406" cy="230" r="5.5" fill="#166534"/>
-  <circle cx="406" cy="230" r="2" fill="#FFFFFF"/>
-  <rect x="1000" y="150" width="330" height="62" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowO)"/>
-  <text x="1016" y="176" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">
-    <tspan x="1016" dy="0">The region's numbers and the</tspan>
-    <tspan x="1016" dy="24">bands, in one panel.</tspan>
-  </text>
-
-  <!-- B: map -->
-  <line x1="770" y1="350" x2="1000" y2="311" stroke="#AEB4BC" stroke-width="1.25"/>
-  <circle cx="770" cy="350" r="5.5" fill="#166534"/>
-  <circle cx="770" cy="350" r="2" fill="#FFFFFF"/>
-  <rect x="1000" y="280" width="340" height="62" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowO)"/>
-  <text x="1016" y="306" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">
-    <tspan x="1016" dy="0">One fixed lens: overall health.</tspan>
-    <tspan x="1016" dy="24">Colour shows where the problems are.</tspan>
-  </text>
-
-  <!-- C: filtering panel -->
-  <line x1="406" y1="551" x2="1000" y2="453" stroke="#AEB4BC" stroke-width="1.25"/>
-  <circle cx="406" cy="551" r="5.5" fill="#166534"/>
-  <circle cx="406" cy="551" r="2" fill="#FFFFFF"/>
-  <rect x="1000" y="410" width="360" height="86" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowO)"/>
-  <text x="1016" y="436" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">
-    <tspan x="1016" dy="0">One filter, under the legend.</tspan>
-    <tspan x="1016" dy="24">Pick crops or trees and the</tspan>
-    <tspan x="1016" dy="24">whole page narrows.</tspan>
-  </text>
-
-  <!-- D: verdict cards row -->
-  <line x1="575" y1="626" x2="1000" y2="621" stroke="#AEB4BC" stroke-width="1.25"/>
-  <circle cx="575" cy="626" r="5.5" fill="#166534"/>
-  <circle cx="575" cy="626" r="2" fill="#FFFFFF"/>
-  <rect x="1000" y="590" width="340" height="62" rx="6" fill="#FFFFFF" stroke="#E8EAE6" stroke-width="1" filter="url(#chipShadowO)"/>
-  <text x="1016" y="616" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#1F2937">
-    <tspan x="1016" dy="0">Six cards, one status word each.</tspan>
-    <tspan x="1016" dy="24">Each opens its module.</tspan>
-  </text>
 </svg>

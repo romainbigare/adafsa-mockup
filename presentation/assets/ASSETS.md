@@ -24,12 +24,12 @@ One line per file: what it shows → slide use (numbers refer to `../storyboard.
 Used by the deck (all share one depth-icon set: an area map, a magnifier over ranked
 bars, a location pin):
 
-- `journeys-depth.(svg|png)` — the three questions and depths, with the depth icons. → slide 3.
-- `wireframe-nav.(svg|png)` — the new navigation, mapped to the three depths. → slide 4.
+- `journeys-depth.(svg|png)` — the depth icons + connectors only; the band text is native PPT (slide 3).
+- `wireframe-nav.(svg|png)` — the new navigation, mapped to the three depths (labels baked in). → slide 4.
 - `wireframe-three-pages.(svg|png)` — the three destinations, one mini wireframe per depth. → slide 5.
-- `wireframe-overview.(svg|png)` — the Overview (Depth 1) page anatomy, annotated. → slide 6.
-- `wireframe-module.(svg|png)` — the module (Depth 2) page anatomy, with the FILTERING panel. → slide 8.
-- `wireframe-farm.(svg|png)` — the farm (Depth 3) page anatomy, annotated. → slide 10.
+- `wireframe-overview.(svg|png)` — the Overview (Depth 1) page, wireframe only; callouts are native PPT (slide 6).
+- `wireframe-module.(svg|png)` — the module (Depth 2) page with the FILTERING panel, wireframe only; callouts native (slide 8).
+- `wireframe-farm.(svg|png)` — the farm (Depth 3) page, wireframe only; callouts native (slide 10).
 
 Superseded / background diagrams (from earlier iterations, no longer on slides):
 `journeys-altitudes`, `altitude-model`, `screen-grammar`, `questions-vs-apps`,

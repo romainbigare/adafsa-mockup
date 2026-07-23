@@ -36,9 +36,11 @@ The proposal:
 10. Depth 3 · The farm in detail (farm wireframe, annotated)
 11. Depth 3 · Example (screenshot, annotated)
 
-Annotations on the screenshot slides are soft floating cards joined to the image by a
-thin leader and a small ring marker — real PowerPoint shapes, so they can be nudged.
-The wireframe slides carry their labels baked into the diagram.
+Every annotation — on the screenshot slides and the wireframe/journey slides alike — is
+a native PowerPoint shape: a soft floating card joined to the image by a thin leader and
+a small ring marker, so any label can be edited or nudged in PowerPoint. The diagram
+PNGs carry only the wireframe art and icons; their callouts and the journey's text are
+placed natively by `build_deck.js` (from the coordinates in `*_ANN` / `BANDS`).
 
 ## Background material (`notes/`)
 
