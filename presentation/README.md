@@ -4,6 +4,17 @@ Everything needed for the deck that walks through the redesign: how people use t
 tool (three altitudes), where the current app falls short, and what the new layout
 does about it.
 
+## Two deliverables
+
+- **`Farm_Monitoring_Wafra_Review.pdf`** — the review document, in the Wafra Review
+  house style (A4, Poppins, white cover with the logo). Eight pages: six findings, each
+  written as *what we found* then *what we suggest* with a drawn snippet, then a closing
+  page on the shared frame. Source and build script in `review/`; rebuild with
+  `pip install weasyprint pillow && python3 review/build.py`.
+- **`adafsa-redesign-draft.pptx`** — the same argument as slides, for presenting live.
+
+Both are built from the same findings; the PDF is the one to send ahead or leave behind.
+
 ## Start here
 
 1. **`storyboard.md`** — the deck, slide by slide: a cover and ten slides, each

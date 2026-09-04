@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Farm monitoring platform — Wafra Review</title>
+<style>
+  @font-face { font-family: Poppins; font-weight: 300; src: url(fonts/Poppins-300.ttf); }
+  @font-face { font-family: Poppins; font-weight: 400; src: url(fonts/Poppins-400.ttf); }
+  @font-face { font-family: Poppins; font-weight: 500; src: url(fonts/Poppins-500.ttf); }
+  @font-face { font-family: Poppins; font-weight: 600; src: url(fonts/Poppins-600.ttf); }
+  @font-face { font-family: Poppins; font-weight: 700; src: url(fonts/Poppins-700.ttf); }
+
+  :root{
+    --ink:#1C211F; --red:#A8362A; --green:#2B7048; --rule:#3D7A56;
+    --eyebrow:#9AA19D; --caption:#5D6663; --meta:#8B938E;
+    --border:#D9DEDB; --border-lt:#E6E9E7; --panel:#F3F5F4; --tint:#F6FAF7;
+    --pagenum:#A8AEAA;
+  }
+
+  @page{
+    size: A4; margin: 20mm;
+    @bottom-right{
+      content: counter(page);
+      font-family: Poppins; font-weight: 300; font-size: 8pt; color: #A8AEAA;
+      margin-bottom: 8mm;
+    }
+  }
+  @page:first{ @bottom-right{ content: none; } }
+
+  body{ font-family: Poppins; font-weight: 300; font-size: 10.5pt; line-height: 17pt;
+        color: var(--ink); margin: 0; }
+  p{ margin: 0 0 10pt; }
+  p:last-child{ margin-bottom: 0; }
+
+  /* ---------- cover ---------- */
+  .cover{ height: 250mm; position: relative; }
+  .cover h1{ font-weight: 700; font-size: 27pt; line-height: 34pt; letter-spacing: -.01em;
+             margin: 0 0 9pt; }
+  .cover .sub{ font-weight: 500; font-size: 13pt; line-height: 18pt; margin: 0 0 8pt; }
+  .cover .by{ font-weight: 300; font-size: 10pt; color: var(--caption); margin: 0; }
+  .cover img{ position: absolute; bottom: 0; left: 0; width: 47mm; }
+
+  /* ---------- section furniture ---------- */
+  .section{ break-before: page; }
+  .eyebrow{ font-weight: 400; font-size: 8pt; line-height: 11pt; letter-spacing: .22em;
+            text-transform: uppercase; color: var(--eyebrow); margin: 0 0 9pt; }
+  h2{ font-weight: 500; font-size: 15.5pt; line-height: 21pt; margin: 0 0 20pt; }
+  .label{ font-weight: 500; font-size: 9pt; line-height: 12pt; letter-spacing: .12em;
+          text-transform: uppercase; margin: 0 0 11pt; }
+  .found .label{ color: var(--red); }
+
+  .suggest{ border-left: 2pt solid var(--rule); padding-left: 16pt; margin-top: 24pt; }
+  .suggest .label{ color: var(--green); }
+
+  .cap{ font-weight: 300; font-size: 8.5pt; line-height: 12pt; color: var(--caption);
+        margin: 5pt 0 0; }
+  .suggest .cap{ margin-top: 7pt; }
+
+  /* ---------- evidence ---------- */
+  .ev{ margin-top: 14pt; break-inside: avoid; }
+  .ev img{ display: block; border: 1px solid var(--border-lt); }
+  .ev-row{ margin-top: 14pt; display: flex; gap: 12pt; align-items: flex-start;
+           break-inside: avoid; }
+  .ev-row .item{ flex: 0 0 52mm; }
+  .ev-row img{ width: 100%; }
+  table.rec td{ padding: 2.5pt 6pt; }
+
+  /* ---------- snippets (drawn, not screenshotted) ---------- */
+  .snip{ border: 1px solid var(--border); border-radius: 3px; margin-top: 14pt;
+         overflow: hidden; break-inside: avoid; }
+  .snip-hd{ background: var(--panel); border-bottom: 1px solid var(--border-lt);
+            padding: 6pt 10pt; font-weight: 400; font-size: 8.5pt; line-height: 11pt;
+            color: var(--caption); }
+  .snip-bd{ padding: 10pt; }
+  .snip-2{ display: flex; gap: 12pt; }
+  .snip-2 > *{ flex: 1; }
+
+  .mini{ font-size: 8pt; line-height: 12pt; }
+  .mini .grp{ font-weight: 500; font-size: 7pt; letter-spacing: .14em;
+              text-transform: uppercase; color: var(--meta); margin: 8pt 0 3pt; }
+  .mini .grp:first-child{ margin-top: 0; }
+  .mini .it{ color: var(--ink); padding: 1.5pt 0; }
+  .mini .it.dim{ color: var(--meta); }
+
+  /* nav mock */
+  .navitem{ border: 1px solid var(--border-lt); border-radius: 3px; padding: 5pt 7pt;
+            margin-bottom: 4pt; }
+  .navitem.on{ background: var(--tint); border-color: #CFE3D6; }
+  .navitem .t{ font-weight: 500; font-size: 8.5pt; line-height: 11pt; }
+  .navitem .d{ font-size: 7.5pt; line-height: 10pt; color: var(--meta); }
+  .navsub{ padding: 2pt 0 0 12pt; }
+  .navsub .r{ display: flex; justify-content: space-between; font-size: 7.5pt;
+              line-height: 12pt; color: var(--ink); }
+  .navsub .r .n{ color: var(--meta); }
+
+  /* verdict cards */
+  .cards{ display: flex; gap: 5pt; }
+  .card{ flex: 1; border: 1px solid var(--border-lt); border-radius: 3px; padding: 6pt; }
+  .card .m{ font-size: 6.5pt; line-height: 9pt; color: var(--meta); }
+  .card .s{ font-weight: 500; font-size: 8pt; line-height: 12pt; margin-top: 2pt; }
+  .card .n{ font-size: 7pt; line-height: 10pt; color: var(--caption); }
+  .ok{ color: #2B7048; } .watch{ color: #B07515; } .bad{ color: #A8362A; }
+  .dot{ display: inline-block; width: 4pt; height: 4pt; border-radius: 50%;
+        margin-right: 3pt; vertical-align: middle; }
+  .dot.ok{ background: #2B7048; } .dot.watch{ background: #D08A1E; }
+  .dot.bad{ background: #A8362A; }
+
+  /* stat strip */
+  .strip{ display: flex; border: 1px solid var(--border-lt); border-radius: 3px; }
+  .strip div{ flex: 1; padding: 7pt 9pt; border-right: 1px solid var(--border-lt); }
+  .strip div:last-child{ border-right: 0; }
+  .strip .k{ font-size: 6.5pt; line-height: 9pt; color: var(--meta); }
+  .strip .v{ font-weight: 500; font-size: 9pt; line-height: 13pt; }
+
+  /* tables */
+  table{ width: 100%; border-collapse: collapse; font-size: 8pt; line-height: 12pt; }
+  th{ text-align: left; font-weight: 500; font-size: 7.5pt; color: var(--caption);
+      border-bottom: 1px solid var(--border-lt); padding: 4pt 6pt; }
+  td{ padding: 4pt 6pt; border-bottom: 1px solid #F0F2F1; }
+  tr:last-child td{ border-bottom: 0; }
+  td.num{ text-align: right; }
+
+  /* map mock */
+  .maprow{ display: flex; gap: 10pt; }
+  .mapbox{ flex: 2; background: #F2EDE3; border-radius: 3px; height: 108pt;
+           position: relative; }
+  .plot{ position: absolute; border-radius: 50%; }
+  .legend{ flex: 1; }
+  .legend .lr{ display: flex; align-items: center; font-size: 7.5pt; line-height: 13pt; }
+  .sw{ width: 7pt; height: 7pt; border-radius: 2px; margin-right: 5pt; }
+
+  /* filter mock */
+  .filt .fr{ display: flex; align-items: center; justify-content: space-between;
+             font-size: 8pt; line-height: 14pt; }
+  .filt .lhs{ display: flex; align-items: center; }
+  .box{ width: 7pt; height: 7pt; border: 1px solid #9AA19D; border-radius: 2px;
+        margin-right: 6pt; }
+  .box.on{ background: #2B7048; border-color: #2B7048; }
+
+  /* frame mock */
+  .frame{ display: flex; border: 1px solid var(--border); border-radius: 3px;
+          overflow: hidden; margin-top: 14pt; }
+  .frame .rail{ width: 78pt; background: #FBFCFB; border-right: 1px solid var(--border-lt);
+                padding: 8pt; font-size: 7.5pt; line-height: 14pt; }
+  .frame .main{ flex: 1; }
+  .frame .bar{ border-bottom: 1px solid var(--border-lt); padding: 6pt 9pt;
+               font-size: 7.5pt; color: var(--caption); }
+  .frame .stage{ padding: 9pt; }
+  .ph{ border: 1px dashed #D2D8D5; border-radius: 3px; padding: 8pt; font-size: 7.5pt;
+       line-height: 11pt; color: var(--meta); }
+  .depths{ display: flex; gap: 8pt; margin-top: 3pt; }
+  .depths .d{ flex: 1; }
+  .depths .h{ font-weight: 500; font-size: 8pt; line-height: 12pt; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- ============================= COVER ============================= -->
+<div class="cover">
+  <h1>Farm monitoring platform</h1>
+  <div class="sub">Wafra Review</div>
+  <div class="by">Reviewed 4 September 2026 by Romain Bigare, Director of Digital Systems</div>
+  <img src="img/wafra-logo.png" alt="Wafra Greentech">
+</div>
+
+<!-- ============================= ONE ============================= -->
+<div class="section">
+  <div class="eyebrow">One</div>
+  <h2>The menu does not say what the product is for</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The side menu holds 10 items. Three of them are the work — Farms, Farm Monitoring
+    and Violations — and the remaining seven are support and settings. Farms and Farm
+    Monitoring sit next to each other, and neither name says which question it answers.</p>
+    <p>The six analyses we are contracted to deliver do not appear in the menu at all,
+    because the current layout has nowhere to put them. The items are also not links, so
+    no view can be bookmarked, sent to a colleague, or pasted into a report.</p>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would name every entry after the question it answers, and let the menu carry the
+    work rather than the plumbing. Overview sits at the top and answers whether anything
+    needs attention today. The six modules follow, each by name, so the menu lists exactly
+    what the client is buying. Farm Analysis sits below them for the single-farm view, and
+    account, help and settings move to the foot of the rail where people expect to find
+    them. Nothing is removed. Each entry becomes a page with its own address, so any view
+    can be linked in an email or a report.</p>
+
+    <div class="snip snip-2">
+      <div>
+        <div class="snip-hd">Current — one list of 10 items</div>
+        <div class="snip-bd mini">
+          <div class="grp">Farm management</div>
+          <div class="it">Farms</div>
+          <div class="it">Farm Monitoring</div>
+          <div class="it">Enterprise Information</div>
+          <div class="grp">Analytics &amp; insights</div>
+          <div class="it">Violations</div>
+          <div class="grp">Support</div>
+          <div class="it dim">Raise Ticket</div>
+          <div class="it dim">FAQ</div>
+          <div class="it dim">Status</div>
+          <div class="it dim">Contact Us</div>
+          <div class="it dim">Feedback</div>
+          <div class="grp">Settings</div>
+          <div class="it dim">Account and Settings</div>
+        </div>
+      </div>
+      <div>
+        <div class="snip-hd">Suggested — the work, by name</div>
+        <div class="snip-bd">
+          <div class="navitem on">
+            <div class="t">Overview</div>
+            <div class="d">Is anything wrong today?</div>
+          </div>
+          <div class="navsub">
+            <div class="r"><span>Crop Monitoring</span><span class="n">93 fallow</span></div>
+            <div class="r"><span>Palms &amp; Fruit Trees</span><span class="n">279.2k trees</span></div>
+            <div class="r"><span>Land Use &amp; Structures</span><span class="n">323 open-ag</span></div>
+            <div class="r"><span>Irrigation Efficiency</span><span class="n">104 critical</span></div>
+            <div class="r"><span>Yield Forecast</span><span class="n">baseline</span></div>
+            <div class="r"><span>Water Allocation</span><span class="n">124 over</span></div>
+          </div>
+          <div class="navitem" style="margin-top:6pt">
+            <div class="t">Farm Analysis</div>
+            <div class="d">Everything about one farm</div>
+          </div>
+          <div class="mini" style="margin-top:7pt">
+            <div class="it dim">Account · Help · Settings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">The six modules become the menu, so the product lists what it does.</p>
+  </div>
+</div>
+
+<!-- ============================= TWO ============================= -->
+<div class="section">
+  <div class="eyebrow">Two</div>
+  <h2>Nothing on the first screen says whether anything is wrong</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The first screen answers what exists, not how it is doing. Three counters report 494
+    farms, 3,331 fields and 17,236 dunums. They are correct, and they never change colour:
+    they count the inventory rather than its condition, so they cannot say whether today is
+    a normal day.</p>
+    <p>Six switches sit beside them and ask the user what they would like displayed, which
+    assumes somebody already knows what to ask for. Until a switch is chosen, the map shows
+    nothing about the farms at all.</p>
+  </div>
+
+  <div class="ev">
+    <img src="img/ev-stats.png" style="width:100%" alt="Three counters">
+    <p class="cap">The three counters: an inventory, not a condition.</p>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would lead with a verdict. One line saying how many areas need attention and
+    which, then a card for each module carrying a plain status word and the number behind
+    it. The map would take a single fixed colouring, so trouble appears without anybody
+    choosing a layer first. The switches remain for the people who want them, one level
+    further in.</p>
+
+    <div class="snip">
+      <div class="snip-hd">Suggested — a verdict, then the six modules</div>
+      <div class="snip-bd">
+        <p style="font-size:9pt;line-height:13pt;font-weight:500;margin:0 0 8pt">
+          4 of 6 areas need attention — Crop Monitoring, Palms &amp; Fruit Trees,
+          Irrigation Efficiency and Water Allocation.</p>
+        <div class="cards">
+          <div class="card"><div class="m">Crop Monitoring</div>
+            <div class="s bad"><span class="dot bad"></span>Needs attention</div>
+            <div class="n">93 farms fully fallow</div></div>
+          <div class="card"><div class="m">Palms &amp; Fruit Trees</div>
+            <div class="s watch"><span class="dot watch"></span>Watch</div>
+            <div class="n">34% canopy stress</div></div>
+          <div class="card"><div class="m">Land Use</div>
+            <div class="s ok"><span class="dot ok"></span>On track</div>
+            <div class="n">323 open-ag</div></div>
+          <div class="card"><div class="m">Irrigation</div>
+            <div class="s bad"><span class="dot bad"></span>Needs attention</div>
+            <div class="n">104 critical</div></div>
+          <div class="card"><div class="m">Yield Forecast</div>
+            <div class="s ok"><span class="dot ok"></span>On track</div>
+            <div class="n">baseline period</div></div>
+          <div class="card"><div class="m">Water Allocation</div>
+            <div class="s bad"><span class="dot bad"></span>Needs attention</div>
+            <div class="n">124 over-allocated</div></div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">The same six modules, each answering with a word before a number.</p>
+  </div>
+</div>
+
+<!-- ============================= THREE ============================= -->
+<div class="section">
+  <div class="eyebrow">Three</div>
+  <h2>No farm is ever named, and nothing is ranked</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The two tables total the region by category: 490 farms of open agriculture, 396 of
+    barren land, 137,812 date palms, 941 olives. The totals are useful in a report, but no
+    individual farm appears in them and nothing is ordered by urgency.</p>
+    <p>An official who wants to know which farms to visit this week cannot produce that
+    list from this screen. There is also no export anywhere in the product, so the answer
+    cannot leave the browser.</p>
+  </div>
+
+  <div class="ev">
+    <img src="img/ev-tables.png" style="width:100%" alt="Distribution tables">
+    <p class="cap">Both tables aggregate by class. Neither names a farm or orders one above another.</p>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would add one ranked list, worst first, naming the farm. The table already exists
+    in the product; what it needs is an order and an identity. A row would open that farm
+    beside the map rather than on a separate page, so somebody keeps their place, and the
+    list would export to a file so it can be circulated or worked through away from the
+    screen.</p>
+
+    <div class="snip">
+      <div class="snip-hd">Suggested — farms needing attention, worst first</div>
+      <div class="snip-bd" style="padding:0 10pt 6pt">
+        <table>
+          <tr><th>Farm</th><th>Owner</th><th class="num">Area (dun)</th>
+              <th class="num">Score</th><th>Status</th></tr>
+          <tr><td>#347</td><td>Farm Owner 297</td><td class="num">40.1</td>
+              <td class="num">35</td><td class="bad">Critical</td></tr>
+          <tr><td>#275</td><td>Farm Owner 274</td><td class="num">34.5</td>
+              <td class="num">35</td><td class="bad">Critical</td></tr>
+          <tr><td>#141</td><td>Farm Owner 255</td><td class="num">26.1</td>
+              <td class="num">35</td><td class="bad">Critical</td></tr>
+          <tr><td>#371</td><td>Farm Owner 175</td><td class="num">40.4</td>
+              <td class="num">36</td><td class="bad">Critical</td></tr>
+          <tr><td>#139</td><td>Farm Owner 122</td><td class="num">34.0</td>
+              <td class="num">36</td><td class="watch">Poor</td></tr>
+        </table>
+      </div>
+    </div>
+    <p class="cap">The same data, ordered by who needs attention, and able to leave as a file.</p>
+  </div>
+</div>
+
+<!-- ============================= FOUR ============================= -->
+<div class="section">
+  <div class="eyebrow">Four</div>
+  <h2>There is no page about a single farm</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>Two of the six map switches are named for a single farm, yet no page about a farm
+    exists anywhere in the product. The nearest is Farm Monitoring, which works like an
+    instrument: choose a farm, choose a map view, find a usable image among thirty dated
+    captures by reading satellite codes and cloud cover, then scroll a long page of
+    readings.</p>
+    <p>The one panel named like an answer, Advisory, reports that no advisories exist and
+    asks the user to check again later.</p>
+  </div>
+
+  <div class="ev ev-row" style="max-width:120mm">
+    <div class="item">
+      <img src="img/ev-monitoring-top.png" alt="Farm Monitoring controls">
+      <p class="cap">Farm Monitoring opens on choices: a farm, a map view, a capture.</p>
+    </div>
+    <div class="item">
+      <img src="img/ev-monitoring-advisory.png" alt="Advisory panel">
+      <p class="cap">The panel named like an answer asks the user to check back later.</p>
+    </div>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would give a farm a record. It opens beside the map with the farm highlighted,
+    states the conclusion in one sentence, then lists each module's reading. It ends with
+    something to do — export the farm, or open the full analysis — so a visit starts from
+    the screen rather than from somebody's own notes. The depth Farm Monitoring offers is
+    kept, one level further in.</p>
+
+    <div class="snip">
+      <div class="snip-hd">Suggested — the farm record</div>
+      <div class="snip-bd" style="display:flex;gap:14pt">
+       <div style="flex:0 0 58mm">
+        <div style="font-weight:500;font-size:9pt;line-height:13pt">Farm #347</div>
+        <div style="font-size:7.5pt;line-height:11pt;color:var(--meta);margin-bottom:7pt">
+          Farm Owner 297 · 40.1 dunums</div>
+        <div style="background:var(--tint);border-radius:3px;padding:6pt 8pt;font-size:8pt;
+                    line-height:12pt;margin-bottom:8pt">
+          Irrigation efficiency is critical (35), and crop water allocation is
+          water-stressed.</div>
+        <div style="font-size:8pt;line-height:12pt">
+          <span style="background:#2B7048;color:#fff;border-radius:3px;padding:3pt 8pt">
+            Open Farm Analysis</span>
+          <span style="border:1px solid var(--border);border-radius:3px;padding:3pt 8pt;
+                       margin-left:5pt">Export farm</span>
+        </div>
+       </div>
+       <div style="flex:1">
+        <table class="rec">
+          <tr><td>Irrigation Efficiency</td><td class="bad">Critical</td><td class="num">35</td></tr>
+          <tr><td>Water Allocation</td><td class="watch">Water-stressed</td><td class="num">70%</td></tr>
+          <tr><td>Palms &amp; Fruit Trees</td><td class="watch">Fair</td><td class="num">77</td></tr>
+          <tr><td>Crop Monitoring</td><td class="ok">Cultivated</td><td class="num">72%</td></tr>
+          <tr><td>Land Use &amp; Structures</td><td class="ok">Open agriculture</td><td class="num">—</td></tr>
+          <tr><td>Yield Forecast</td><td class="ok">Above expected</td><td class="num">+13%</td></tr>
+        </table>
+       </div>
+      </div>
+    </div>
+    <p class="cap">The conclusion first, then every module's reading, then something to do.</p>
+  </div>
+</div>
+
+<!-- ============================= FIVE ============================= -->
+<div class="section">
+  <div class="eyebrow">Five</div>
+  <h2>The map shows what is where, not what matters</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The map is the largest element on the page, and it carries classification only:
+    switch on a layer and it draws the class. It never carries condition, so nothing on it
+    indicates which farms are doing badly.</p>
+    <p>At regional zoom the problem compounds. Farms are drawn as one aggregate, and a
+    handful of critical farms inside a healthy group disappear into the average — which is
+    the thing somebody opened the map to find.</p>
+  </div>
+
+  <div class="ev">
+    <img src="img/ev-map.png" style="width:42mm" alt="Current map">
+    <p class="cap">The map at rest: boundaries and a basemap, with no reading of condition.</p>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would colour each farm by its condition, and let the worst case win where farms
+    are grouped, with a count of how many need attention. One legend, and the same three
+    colours everywhere in the product: red needs action, amber watch, green fine. The map
+    then answers where the problem is before anybody reads a number.</p>
+
+    <div class="snip">
+      <div class="snip-hd">Suggested — one lens, one legend</div>
+      <div class="snip-bd">
+        <div class="maprow">
+          <div class="mapbox">
+            <div class="plot" style="left:14%;top:18%;width:34pt;height:34pt;background:#7FBF95"></div>
+            <div class="plot" style="left:52%;top:12%;width:26pt;height:26pt;background:#E0A458"></div>
+            <div class="plot" style="left:33%;top:52%;width:22pt;height:22pt;background:#7FBF95"></div>
+            <div class="plot" style="left:66%;top:48%;width:30pt;height:30pt;background:#C4553F"></div>
+            <div class="plot" style="left:82%;top:22%;width:18pt;height:18pt;background:#E0A458"></div>
+          </div>
+          <div class="legend">
+            <div class="lr"><span class="sw" style="background:#2B7048"></span>Healthy</div>
+            <div class="lr"><span class="sw" style="background:#7FBF95"></span>Watch</div>
+            <div class="lr"><span class="sw" style="background:#E0A458"></span>Elevated</div>
+            <div class="lr"><span class="sw" style="background:#C4553F"></span>Critical</div>
+            <div class="lr" style="color:var(--meta);margin-top:5pt">Shares are of farms
+              across the whole region.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">Colour carries the condition, so a problem is visible before it is read.</p>
+  </div>
+</div>
+
+<!-- ============================= SIX ============================= -->
+<div class="section">
+  <div class="eyebrow">Six</div>
+  <h2>The crop and tree taxonomy can be looked at, but not used</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The full crop and tree taxonomy is a display mode. Switch it on and the map redraws
+    by class; switch it off and it goes away. It cannot be used to narrow anything: there
+    is no way to ask the product to show only the farms growing date palms and then read
+    the rest of the screen against that question.</p>
+    <p>That taxonomy is a substantial part of the analysis being delivered, and at the
+    moment it is something to look at once.</p>
+  </div>
+
+  <div class="ev">
+    <img src="img/ev-layers.png" style="width:30mm" alt="Map Layers panel">
+    <p class="cap">The taxonomy is offered as something to switch on, not something to ask with.</p>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would turn it into a filter. It sits under the legend, closed by default so the
+    screen stays quiet. Ticking date palms narrows the map, the counts, the cards and the
+    ranked list together, so every number on screen answers the same question. Each module
+    filters by the taxonomy it is about — crop monitoring by field crops, palms by trees.
+    The taxonomy stops being a view and becomes the way somebody asks a question.</p>
+
+    <div class="snip snip-2">
+      <div>
+        <div class="snip-hd">Filtering</div>
+        <div class="snip-bd filt">
+          <div class="fr"><span class="lhs"><span class="box on"></span>Date Palm</span>
+            <span class="n" style="color:var(--meta);font-size:7.5pt">312</span></div>
+          <div class="fr"><span class="lhs"><span class="box on"></span>Fodder</span>
+            <span class="n" style="color:var(--meta);font-size:7.5pt">105</span></div>
+          <div class="fr"><span class="lhs"><span class="box"></span>Open-field produce</span>
+            <span class="n" style="color:var(--meta);font-size:7.5pt">62</span></div>
+          <div class="fr"><span class="lhs"><span class="box"></span>Cereals</span>
+            <span class="n" style="color:var(--meta);font-size:7.5pt">21</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="snip-hd">Everything narrows together</div>
+        <div class="snip-bd">
+          <div style="font-size:6.5pt;line-height:9pt;color:var(--meta)">Farms in view</div>
+          <div style="font-weight:500;font-size:9pt;line-height:13pt">417
+            <span style="color:var(--meta);font-weight:300;font-size:7.5pt">of 500</span></div>
+          <div style="font-size:8pt;line-height:13pt;margin-top:6pt">
+            <div><span class="dot bad"></span>Irrigation — 88 critical</div>
+            <div><span class="dot watch"></span>Palms — 31% canopy stress</div>
+            <div><span class="dot ok"></span>Yield — on track</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">One tick moves the map, the counts, the cards and the list at the same time.</p>
+  </div>
+</div>
+
+<!-- ============================= TOGETHER ============================= -->
+<div class="section">
+  <div class="eyebrow">Bringing it together</div>
+  <h2>The six modules need three depths</h2>
+
+  <p>The six points above have one cause. The product was built as a single workspace, and
+  every new analysis has to arrive in it as another switch and another table. With six
+  modules coming, that screen cannot hold them, and building each module its own page would
+  produce six products rather than one.</p>
+
+  <p>We would give the product three depths, and put every module inside the same frame.</p>
+
+  <div class="frame">
+    <div class="rail">
+      <div style="font-weight:500">Overview</div>
+      <div>Crop Monitoring</div>
+      <div>Palms &amp; Trees</div>
+      <div>Land Use</div>
+      <div>Irrigation</div>
+      <div>Yield</div>
+      <div>Water</div>
+      <div style="color:var(--meta);margin-top:6pt">Farm Analysis</div>
+    </div>
+    <div class="main">
+      <div class="bar">4 of 6 areas need attention — Irrigation, Water, Crop Monitoring,
+        Palms</div>
+      <div class="stage">
+        <div class="ph" style="height:52pt">The map, coloured by the question on this page</div>
+        <div class="ph" style="height:30pt;margin-top:7pt">The farms that need attention,
+          worst first</div>
+      </div>
+    </div>
+  </div>
+  <p class="cap">The same frame at every depth: the menu on the left, the answer on top, the
+  map in the middle, the list docked below.</p>
+
+  <div class="depths" style="margin-top:16pt">
+    <div class="d">
+      <div class="h">Depth 1 — the situation</div>
+      <p style="font-size:8.5pt;line-height:13pt;margin:2pt 0 0">Is anything wrong today?
+      One screen, answered in a sentence and six words.</p>
+    </div>
+    <div class="d">
+      <div class="h">Depth 2 — the question</div>
+      <p style="font-size:8.5pt;line-height:13pt;margin:2pt 0 0">Which farms need
+      attention? One module owns the page and ranks its answer.</p>
+    </div>
+    <div class="d">
+      <div class="h">Depth 3 — the farm</div>
+      <p style="font-size:8.5pt;line-height:13pt;margin:2pt 0 0">What is happening here?
+      Everything about one holding, ending in an action.</p>
+    </div>
+  </div>
+
+  <p style="margin-top:16pt">Somebody learns the frame once and then knows all six modules.
+  Adding the seventh means adding a set of columns and a map colouring, rather than
+  designing another page — so the next module becomes cheaper to build rather than more
+  expensive.</p>
+</div>
+
+</body>
+</html>
