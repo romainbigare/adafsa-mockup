@@ -41,3 +41,17 @@ Superseded / background diagrams (from earlier iterations, no longer on slides):
 `a2-1-overview.jpg`, `a2-2-colourby-ier.jpg`, `b-1-initial-palms.jpg`, `b-2-water.jpg`,
 `b-5-news.jpg`, `wireframe-proposal-a-scorecard.png`, `wireframe-proposal-b-dial.png` —
 screenshots and wireframes of proposals A / A2 / B. All background material.
+
+## Added for the July 2026 review deck
+
+- `brand/wafra-logo.png` — Wafra Greentech logo (transparent) used on the cover.
+- `current/current-app-overview-map.jpg` — the current overview page with the map fully
+  loaded (base screenshot composited with the wide map capture recovered from the
+  reviewed PDF). → slide 3.
+- `new/farm-analysis-water.jpg` — the Farm Analysis page on the Crop Water Allocation
+  tab, recovered from the reviewed PDF. → slide 9.
+- `new/sidebar-real.jpg` — the real sidebar, cropped from the Level 1 screenshot. → slide 4.
+- `diagrams/navframe.png` / `nav-panel.png` — the nav wireframe with no chips or leaders,
+  rendered from `navframe.svg` (frame-only copy of `wireframe-nav.svg`). → slides 4, 5, 13-15.
+- `diagrams/icon-1..3.png` — the three level icons, cropped for native placement.
+- `diagrams/mini-overview|module|farm.png` — the three mini page wireframes. → slide 5.

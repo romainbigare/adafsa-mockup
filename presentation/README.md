@@ -25,27 +25,25 @@ Both are built from the same findings; the PDF is the one to send ahead or leave
    with leader lines, so they can be nudged in PowerPoint. To regenerate after
    editing assets: `npm i pptxgenjs sharp && node build_deck.js`.
 
-## The eleven slides
+## The fifteen slides
 
-The current app:
+The current platform (2–3), the proposal in two steps (4–5), the three level layouts
+(6–9), the journey and a live demo (10–11), then wireframes in an appendix (12–15).
 
-1. Start with the menu (real screenshot, nav in focus, annotated)
-2. Can it tell us whether anything is wrong? (real overview screenshot, annotated)
+1. Cover — ADAFSA Platform · UX / UI Review
+2. Analysis of Current Solution — Confusing navigation
+3. Analysis of Current Solution — Page morphology
+4. Step 1 : A better use of the navigation pane
+5. Step 2 : A thoughtful layout for each level
+6. Level 1 layout : Overview page
+7. Level 2 layout : The module view
+8. Level 2 layout : Zooming in
+9. Level 3 layout : The full farm analytics
+10. We follow the user's journey
+11. See live demo
+12. Extra — Diagrams for the New Proposal
+13-15. Proposal Diagrams — Level 1 / Level 2 / Level 2b
 
-The user's journey:
-
-3. The user's journey (three-depth icon diagram)
-
-The proposal:
-
-4. Proposed navigation (nav wireframe)
-5. Three pages, three depths (wireframe)
-6. Depth 1 · The situation at a glance (overview wireframe, annotated)
-7. Depth 1 · Example (screenshot, annotated)
-8. Depth 2 · The module in detail (module wireframe, annotated)
-9. Depth 2 · Example (screenshot, annotated)
-10. Depth 3 · The farm in detail (farm wireframe, annotated)
-11. Depth 3 · Example (screenshot, annotated)
 
 Every annotation — on the screenshot slides and the wireframe/journey slides alike — is
 a native PowerPoint shape: a soft floating card joined to the image by a thin leader and
