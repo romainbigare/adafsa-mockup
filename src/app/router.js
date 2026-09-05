@@ -43,6 +43,7 @@ export function selection(params = currentParams()) {
     comparison: comparisonById(params.get('cmp') || DEFAULT_COMPARISON).id,
     search: params.get('q') || '',
     sort: params.get('sort') || '',
+    direction: params.get('dir1') || 'increased',
     dir: params.get('dir') || '',
     page: Math.max(1, Number(params.get('p') || 1))
   };

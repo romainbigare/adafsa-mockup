@@ -16,6 +16,6 @@ export function barList(rows, { format = (v) => String(v), color = '#2a78d6', ma
       h('span', { text: row.label, title: row.label })),
     h('span', { class: 'track' },
       h('span', { class: 'fill', style: { width: `${Math.max(1.5, ((row.value || 0) / top) * 100)}%`, background: row.color || color } })),
-    h('span', { class: 'amount', text: format(row.value) })
+    h('span', { class: 'amount', text: row.amount ?? format(row.value) })
   )));
 }

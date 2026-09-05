@@ -1,0 +1,121 @@
+/* Crop Water Calculator — seasonal water budget.
+ *
+ * The planning half of the module, and the one the review called an amazing
+ * tool for policy design: if this many farms are authorised to grow tomatoes
+ * over a three-month cycle, this is what it costs in water and this is what it
+ * produces.
+ *
+ * Cubic metres per kilo is the number worth quoting, and it is searchable by
+ * farm as well as reported by crop. Crop coverage sits here as a supporting
+ * figure rather than a deliverable of its own. */
+
+import { h } from '../../app/dom.js';
+import { section, intro, infoPopover } from '../../components/section.js';
+import { figures } from '../../components/figures.js';
+import { barList } from '../../charts/barList.js';
+import { columns as columnChart } from '../../charts/columns.js';
+import { dataTable } from '../../components/dataTable.js';
+import { filterRail, typeCounts } from '../../components/filterRail.js';
+import { query, taxonomyTree, cropRows } from '../../data/store.js';
+import { FORMULA_NOTES, monthlyDemand } from '../../domain/waterModel.js';
+import { CYCLE_MONTHS, monthlyCurve } from '../../domain/cropCalendar.js';
+import { categoryColor, COMPARE } from '../../domain/palette.js';
+import { int, dec, compact } from '../../domain/format.js';
+import { regionById } from '../../domain/regions.js';
+import { TODAY, MONTHS } from '../../domain/periods.js';
+
+export function render({ selection }) {
+  const all = query({ region: selection.region });
+  const farms = query({ region: selection.region, types: selection.types });
+  const rows = cropRows(farms, { types: selection.types });
+
+  /* The policy table: one row per crop, with what the whole crop costs the
+   * emirate over its cycle and what it returns. */
+  const byCrop = new Map();
+  for (const row of rows) {
+    if (!byCrop.has(row.type)) {
+      byCrop.set(row.type, {
+        type: row.type, category: row.category, farms: new Set(),
+        area: 0, water: 0, kilos: 0, cycle: CYCLE_MONTHS[row.category] || 12
+      });
+    }
+    const crop = byCrop.get(row.type);
+    crop.farms.add(row.farm.fid);
+    crop.area += row.area;
+    crop.water += row.seasonalWater;
+    crop.kilos += row.expectedKg;
+  }
+  const crops = [...byCrop.values()].map((crop) => ({
+    ...crop,
+    farmCount: crop.farms.size,
+    perKilo: crop.kilos > 0 ? crop.water / crop.kilos : null
+  })).sort((a, b) => b.water - a.water);
+
+  const water = crops.reduce((a, c) => a + c.water, 0);
+  const kilos = crops.reduce((a, c) => a + c.kilos, 0);
+  const area = crops.reduce((a, c) => a + c.area, 0);
+
+  /* Crop coverage across the year — the supporting figure, as a chart rather
+   * than a map. */
+  const monthly = MONTHS.map((_, month) =>
+    rows.reduce((total, row) => total + monthlyDemand(row.category, row.area * monthlyCurve(row.category, row.type)[month], month), 0));
+
+  return {
+    asOf: TODAY,
+    tools: [infoPopover('How this is worked out', 'Water model inputs', FORMULA_NOTES)],
+    rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
+    content: [
+      figures([
+        { value: compact(water), unit: 'm³', label: 'Water over a full cycle' },
+        { value: compact(kilos / 1000), unit: 't', label: 'Expected production' },
+        { value: kilos ? dec(water / kilos, 2) : '—', unit: 'm³/kg', label: 'Water per kilo produced' },
+        { value: int(area), unit: 'dun', label: 'Crop coverage surveyed' }
+      ]),
+
+      intro('If ADAFSA authorises a crop across this many farms and this much land, this is the water it commits to over the growing cycle. That is the calculation the allocation plan rests on, and it is why a crop with a high figure in the last column is worth a conversation.'),
+
+      section('What each crop costs in water', { note: 'Over one full growing cycle, for the current selection.', flush: true },
+        dataTable(crops, {
+          selection,
+          csvName: 'seasonal-water-budget',
+          columns: [
+            { key: 'type', label: 'Crop', strong: true, value: (c) => c.type,
+              cell: (c) => h('span', { class: 'bar-cell' }, h('span', { class: 'swatch', style: { background: categoryColor(c.category) } }), c.type) },
+            { key: 'category', label: 'Group', value: (c) => c.category },
+            { key: 'farms', label: 'Farms', align: 'num', value: (c) => c.farmCount, cell: (c) => int(c.farmCount) },
+            { key: 'area', label: 'Dunums', align: 'num', value: (c) => c.area, cell: (c) => dec(c.area, 1) },
+            { key: 'cycle', label: 'Cycle (months)', align: 'num', value: (c) => c.cycle },
+            { key: 'water', label: 'Water (m³)', align: 'num', defaultSort: true, value: (c) => c.water, cell: (c) => int(c.water) },
+            { key: 'kilos', label: 'Production (t)', align: 'num', value: (c) => c.kilos / 1000, cell: (c) => dec(c.kilos / 1000, 1) },
+            { key: 'perkilo', label: 'm³ per kilo', align: 'num', value: (c) => c.perKilo, cell: (c) => (c.perKilo == null ? '—' : dec(c.perKilo, 2)) }
+          ]
+        })),
+
+      section('Thirstiest crops per kilo produced', { note: 'The number worth quoting in a policy conversation.' },
+        barList(crops.filter((c) => c.perKilo != null).sort((a, b) => b.perKilo - a.perKilo)
+          .map((crop) => ({ label: crop.type, value: crop.perKilo, color: categoryColor(crop.category) })),
+          { format: (v) => `${dec(v, 2)} m³/kg`, limit: 12 })),
+
+      section('Crop coverage through the year', { note: 'Modelled demand by month, following what the farms actually plant.' },
+        columnChart(MONTHS, [{ label: 'Water demand (m³)', color: COMPARE.current, values: monthly }], { format: compact })),
+
+      section('Water per kilo, by farm', { note: 'Searchable, as asked — the ratio matters at farm level too.', flush: true },
+        dataTable(farms.filter((farm) => farm.expectedKg > 0), {
+          selection,
+          searchable: true,
+          csvName: 'water-per-kilo',
+          hrefFor: (farm) => `#/farm/${farm.fid}`,
+          columns: [
+            { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
+            { key: 'owner', label: 'Owner', value: (f) => f.owner },
+            { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+            { key: 'water', label: 'Seasonal water (m³)', align: 'num', value: (f) => f.seasonalWater, cell: (f) => int(f.seasonalWater) },
+            { key: 'kilos', label: 'Production (t)', align: 'num', value: (f) => f.expectedKg / 1000, cell: (f) => dec(f.expectedKg / 1000, 1) },
+            { key: 'perkilo', label: 'm³ per kilo', align: 'num', defaultSort: true, value: (f) => f.seasonalWater / f.expectedKg, cell: (f) => dec(f.seasonalWater / f.expectedKg, 2) }
+          ]
+        })),
+
+      intro('Fruit trees are included throughout this module. Forest stands are not — they produce nothing to weigh, so a figure per kilo would be meaningless for them.')
+    ]
+  };
+}

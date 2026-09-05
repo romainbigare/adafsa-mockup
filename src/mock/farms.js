@@ -12,7 +12,7 @@
 
 import { seeded, around, between, pick, weighted, clamp } from './rng.js';
 import { QUARTERS } from '../domain/periods.js';
-import { CYCLE_MONTHS, monthlyCurve, peakMonthOf } from '../domain/cropCalendar.js';
+import { CYCLE_MONTHS, windowFor } from '../domain/cropCalendar.js';
 import { monthlyDemand, seasonalDemand, expectedProductionKg, cubicMetresPerKilo, YIELD_TONNES_PER_DUNUM } from '../domain/waterModel.js';
 import { typeKey, TREE_CATEGORIES } from '../domain/taxonomy.js';
 
@@ -100,9 +100,20 @@ export function enrichFarm(farm, { fieldCropPool = [] } = {}) {
       for (let i = 0; i < 3; i++) series[i] = 0;
     }
 
-    const curve = monthlyCurve(entry.category, entry.type);
+    /* Each holding plants on its own schedule. A few go early and a few late,
+     * which is why the calendar reads as a curve rather than a block — and why
+     * the count of farms in the ground rises and falls the same way the area
+     * does. The window comes from the crop; the offset is this farm's. */
     const cycle = CYCLE_MONTHS[entry.category] || 12;
-    const start = peakMonthOf(entry.category, entry.type);
+    const win = windowFor(entry.category, entry.type);
+    const offset = win ? Math.round(around(cropRand, 0, 2.6)) : 0;
+    const start = win ? (((win.from + offset) % 12) + 12) % 12 : 0;
+    const monthsInGround = new Set();
+    if (win) {
+      for (let i = 0; i < cycle; i++) monthsInGround.add((start + i) % 12);
+    } else {
+      for (let i = 0; i < 12; i++) monthsInGround.add(i);
+    }
     const water = seasonalDemand(entry.category, entry.area, cycle, start);
     const production = expectedProductionKg(entry.category, entry.area);
     const yieldFactor = clamp(around(cropRand, 1, 0.95), 0.3, 1.8);
@@ -114,7 +125,8 @@ export function enrichFarm(farm, { fieldCropPool = [] } = {}) {
       area: entry.area,
       former: !!entry.former,
       series,
-      monthly: curve.map((weight) => Math.round(entry.area * weight * 100) / 100),
+      monthly: Array.from({ length: 12 }, (_, month) => (monthsInGround.has(month) ? entry.area : 0)),
+      startMonth: start,
       demandThisMonth: monthlyDemand(entry.category, entry.area, month),
       cycleMonths: cycle,
       seasonalWater: water,

@@ -36,8 +36,8 @@
    even where the colour cannot be told apart. */
 .bar-list { display: grid; gap: 7px; }
 .bar-list .row { display: grid; grid-template-columns: minmax(90px, 30%) 1fr auto; align-items: center; gap: 10px; font-size: 12.5px; }
-.bar-list .track { height: 12px; background: var(--none-bg); border-radius: 4px; overflow: hidden; }
-.bar-list .fill { height: 100%; border-radius: 4px; }
+.bar-list .track { display: block; height: 12px; background: var(--none-bg); border-radius: 4px; overflow: hidden; }
+.bar-list .fill { display: block; height: 100%; border-radius: 4px; }
 .bar-list .amount { font-variant-numeric: tabular-nums; color: var(--ink-2); min-width: 74px; text-align: end; }
 .bar-list .name { display: flex; align-items: center; gap: 7px; }
 

@@ -103,10 +103,52 @@ export function mapBand(id, options) {
     }
   }
 
+  let parcelCache = null;
+  async function drawParcels() {
+    const { parcels } = current;
+    if (!parcels) return;
+    if (!parcelCache) {
+      const { landuseGeometry, ringsOf } = await import('../data/geometry.js');
+      const collection = await landuseGeometry();
+      parcelCache = collection.features.map((feature) => ({
+        rings: ringsOf(feature),
+        category: feature.properties.Category,
+        type: feature.properties.Type
+      }));
+    }
+    if (!current.parcels) return;
+    const drawnNow = current;
+    for (const parcel of parcelCache) {
+      if (drawnNow !== current) return;
+      if (drawnNow.parcelFilter && !drawnNow.parcelFilter(parcel)) continue;
+      const colour = drawnNow.parcelColor(parcel);
+      const polygon = window.L.polygon(parcel.rings, {
+        color: colour, weight: 0.6, fillColor: colour, fillOpacity: 0.72
+      });
+      polygon.bindTooltip(`<strong>${parcel.type}</strong>${parcel.category}`);
+      markerLayer.addLayer(polygon);
+    }
+  }
+
+  async function drawFarm() {
+    const { farms: [farm], boundaryColor = '#2a78d6' } = current;
+    if (!farm) return;
+    const drawnNow = current;
+    const { farmBoundaries } = await import('../data/geometry.js');
+    const rings = (await farmBoundaries()).get(String(farm.fid));
+    if (drawnNow !== current || !rings) return;
+    const polygon = window.L.polygon(rings, { color: boundaryColor, weight: 2, fillColor: boundaryColor, fillOpacity: 0.2 });
+    markerLayer.addLayer(polygon);
+    map.fitBounds(polygon.getBounds().pad(0.6));
+  }
+
   function draw() {
     markerLayer.clearLayers();
     if (!current) return;
     const { mode, farms, colorOf, labelOf } = current;
+
+    if (mode === 'parcels') { drawParcels(); return; }
+    if (mode === 'farm') { drawFarm(); return; }
 
     if (mode === 'counts') {
       const cell = CELL_FOR_ZOOM(map.getZoom());

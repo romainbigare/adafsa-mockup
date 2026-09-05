@@ -171,8 +171,8 @@ table.grid td.name { font-weight: 550; }
 .disclose[aria-expanded="true"] .icon { transform: rotate(90deg); }
 
 .bar-cell { display: flex; align-items: center; gap: 8px; }
-.bar-cell .track { flex: 1; min-width: 40px; height: 6px; background: var(--none-bg); border-radius: 3px; overflow: hidden; }
-.bar-cell .fill { height: 100%; border-radius: 3px; }
+.bar-cell .track { display: block; flex: 1; min-width: 40px; height: 6px; background: var(--none-bg); border-radius: 3px; overflow: hidden; }
+.bar-cell .fill { display: block; height: 100%; border-radius: 3px; }
 
 .table-foot { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--ink-3); flex-wrap: wrap; }
 .table-foot .spacer { margin-inline-start: auto; }
