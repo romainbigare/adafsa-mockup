@@ -3,12 +3,14 @@
  *   node tools/screendeck.mjs [--out docs/ADAFSA_Platform_Screens.pptx]
  *
  * Everything on the pages is read out of the live app: the screen list, the
- * sections, the titles, the speaker notes and even the wordmark. Nothing is
- * maintained twice, so nothing drifts.
+ * sections, the titles, the notes and even the wordmark. Nothing is maintained
+ * twice, so nothing drifts.
  *
  * The deck exists to be printed, written on and handed back, which decides the
  * layout:
  *   - One screen per page, so a comment has something to attach to.
+ *   - A plain-English note under the title, for a reader who will not work out
+ *     what a screen is for from the picture alone.
  *   - Nothing is ever drawn on top of a screenshot, and nothing is drawn beside
  *     it either: the picture is the page.
  *   - A screen too tall for one shot gets a second, smaller one in the
@@ -377,7 +379,8 @@ const FONT = 'Calibri';
 
 const COL_W = 2.55;                            // the second shot, when a screen needs one
 const COL_X = W - MARGIN - COL_W;
-const SHOT_X = MARGIN, SHOT_Y = 1.62;
+const SHOT_X = MARGIN, SHOT_Y = 2.02;          // under the title and the note
+const NOTE_W = 8.9;                            // a line length that stays comfortable to read
 const FOOT_Y = 7.72;
 
 /* The screenshot starts at the same corner on every page and grows into
@@ -385,7 +388,7 @@ const FOOT_Y = 7.72;
  * width that shot takes; a screen that fits in one picture uses the height
  * instead, and the white pools in the bottom-right corner either way. */
 const WIDE_W = COL_X - 0.62 - SHOT_X;          // beside a second shot
-const TALL_W = (7.30 - SHOT_Y) / RATIO;        // on its own, down to the footer's air
+const TALL_W = (7.32 - SHOT_Y) / RATIO;        // on its own, down to the footer's air
 const shotSize = (tail) => {
   const w = tail ? WIDE_W : TALL_W;
   return { w, h: w * RATIO };
@@ -516,14 +519,20 @@ for (const item of plan) {
   s.background = { color: PAPER };
 
   s.addText(section.name.toUpperCase(), {
-    x: MARGIN, y: 0.46, w: 8.0, h: 0.26, fontFace: FONT, fontSize: 10,
+    x: MARGIN, y: 0.44, w: 8.0, h: 0.26, fontFace: FONT, fontSize: 10,
     bold: true, color: BRAND, charSpacing: 1.6, margin: 0
   });
   s.addText([
     { text: screen.id, options: { bold: true, color: INK } },
     { text: '  ·  ', options: { bold: false, color: FAINT } },
     { text: screen.title, options: { bold: true, color: INK } }
-  ], { x: MARGIN, y: 0.78, w: 9.5, h: 0.5, fontFace: FONT, fontSize: 24, margin: 0 });
+  ], { x: MARGIN, y: 0.74, w: 9.5, h: 0.5, fontFace: FONT, fontSize: 24, margin: 0 });
+
+  /* What the screen is, in plain words, printed where it is read first. */
+  s.addText(screen.note, {
+    x: MARGIN, y: 1.28, w: NOTE_W, h: 0.66,
+    fontFace: FONT, fontSize: 10.5, color: MUTED, valign: 'top', lineSpacing: 14, margin: 0
+  });
 
   /* The picture is wider than the screenshot by the band its shadow falls
    * into, so it is hung off SHOT_X/SHOT_Y by that band and the screenshot
