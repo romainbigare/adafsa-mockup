@@ -62,19 +62,19 @@ export function render({ selection }) {
     rail: filterRail(taxonomyTree(), { scope: 'field', selected: selection.types, counts: typeCounts(all) }),
     content: [
       figures([
-        { value: signed(net.net, 1), unit: 'dun', label: `Net change ${period.label}`, tone: net.net < 0 ? 'watch' : null },
-        { value: `+${dec(net.gained, 1)}`, unit: 'dun', label: 'Land taken into production' },
-        { value: `−${dec(net.lost, 1)}`, unit: 'dun', label: 'Land taken out', tone: net.lost > net.gained ? 'watch' : null },
-        { value: int(net.counts.started + net.counts.stopped), label: 'Farms that started or stopped a crop' }
+        { value: signed(net.net, 1), unit: 'dun', label: `Net change ${period.label}`, icon: 'trend', tone: net.net < 0 ? 'watch' : null },
+        { value: `+${dec(net.gained, 1)}`, unit: 'dun', label: 'New land planted', icon: 'arrowUp' },
+        { value: `−${dec(net.lost, 1)}`, unit: 'dun', label: 'Land no longer planted', icon: 'arrowDown', tone: net.lost > net.gained ? 'watch' : null },
+        { value: int(net.counts.started + net.counts.stopped), label: 'Farms that started or stopped', icon: 'farms' }
       ]),
 
-      section(`Cultivated area, ${QUARTERS[0].label} to ${QUARTERS[QUARTERS.length - 1].label}`, {
-        note: 'Every quarter in the record, for the current selection.'
+      section('Area planted, quarter by quarter', {
+        icon: 'trend', note: 'Dunums in the ground.'
       }, trendLine(QUARTERS.map((q) => q.label), [
         { label: 'Field crops (dunums)', color: COMPARE.current, values: drawn.map((point) => point.value) }
       ], { format: (v) => int(v) })),
 
-      section('Which crops moved', { note: `Net change in dunums, ${period.label}.` },
+      section('Which crops moved', { icon: 'crop', half: true, note: 'Gain or loss in dunums.' },
         movers.length
           ? barList(movers.map((crop) => ({
               label: crop.label,
@@ -82,9 +82,9 @@ export function render({ selection }) {
               amount: signed(crop.value, 1) + ' dun',
               color: crop.value >= 0 ? COMPARE.gain : COMPARE.loss
             })), { limit: 12 })
-          : intro('No crop moved by a measurable amount over this period.')),
+          : intro('No crop changed over this period.')),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
+      section('By province', { icon: 'land', half: true, flush: true }, provinceBlock(farms, [
         { key: 'net', label: `Net change (dun)`, value: provinceNet, format: (v) => signed(v, 1) },
         { key: 'now', label: 'Now (dun)', value: (set) => {
             const ids = new Set(set.map((f) => f.fid));
@@ -93,7 +93,8 @@ export function render({ selection }) {
       ])),
 
       section('Which farms', {
-        note: 'The four movements the season is made of.',
+        icon: 'table',
+        note: 'Pick a movement to see the farms.',
         tools: [directionTabs(moves, direction)],
         flush: true
       }, h('div', { style: { padding: '0 0 0' } },

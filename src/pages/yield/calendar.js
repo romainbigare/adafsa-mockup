@@ -60,31 +60,28 @@ export function render({ selection }) {
   const quiet = MONTHS[dunumsByMonth.indexOf(Math.min(...dunumsByMonth))];
 
   return {
-    asOf: TODAY,
     rail: filterRail(taxonomyTree(), {
       scope: 'all', selected: selection.types, counts: typeCounts(all),
-      note: 'Pick a crop to see its year on its own.'
+      note: 'Pick one crop to see its own year.'
     }),
     content: [
       figures([
-        { value: int(crops.length), label: 'Crops in the selection' },
-        { value: peak, label: 'Busiest month by area' },
-        { value: quiet, label: 'Quietest month' },
-        { value: int(Math.max(...farmsByMonth)), label: 'Farms growing at the peak' }
+        { value: int(crops.length), label: 'Crops selected', icon: 'crop' },
+        { value: peak, label: 'Busiest month', icon: 'calendar' },
+        { value: quiet, label: 'Quietest month', icon: 'calendar' },
+        { value: int(Math.max(...farmsByMonth)), label: 'Farms at the busiest month', icon: 'farms' }
       ]),
 
-      section(`Dunums by month — ${heading}`, { note: 'A curve rather than a block: a few growers plant early and a few late.' },
+      section(`Area planted — ${heading}`, { icon: 'calendar', note: 'Dunums in the ground each month.' },
         columnChart(MONTHS, [{ label: 'Dunums in the ground', color: COMPARE.current, values: dunumsByMonth }], { format: (v) => dec(v, 0) })),
 
-      section(`Farms by month — ${heading}`, {},
+      section(`Farms growing — ${heading}`, { icon: 'farms', note: 'Some plant early, some plant late.' },
         columnChart(MONTHS, [{ label: 'Farms growing', color: categoryColor('Fodder'), values: farmsByMonth }], { format: int })),
 
-      section('The year at a glance', { note: 'Every crop in the selection, month by month.' },
+      section('The year at a glance', { icon: 'calendar', note: 'When each crop is in the ground.' },
         crops.length
           ? calendarStrip(crops)
-          : intro('No crops in the current selection.')),
-
-      intro('Cycle lengths sit behind these curves: three months for an open-field vegetable, four for a cereal, and the whole year for fodder and the trees. They are what the seasonal water budget is costed on.')
+          : intro('No crops selected.'))
     ]
   };
 }

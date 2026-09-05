@@ -52,27 +52,29 @@ export function render({ selection }) {
     tools: [comparisonSelect(selection.comparison)],
     content: [
       figures([
-        { value: now == null ? '—' : Math.round(now), label: 'Average score now' },
-        { value: signed((now || 0) - (before || 0), 1), label: `Movement ${period.label}`, tone: (now || 0) < (before || 0) ? 'watch' : null },
-        { value: int(fell.length), label: 'Farms that deteriorated', tone: fell.length ? 'watch' : null },
-        { value: int(rose.length), label: 'Farms that improved' }
+        { value: now == null ? '—' : Math.round(now), label: 'Average score now', icon: 'ruler' },
+        { value: signed((now || 0) - (before || 0), 1), label: `Change ${period.label}`, icon: 'trend', tone: (now || 0) < (before || 0) ? 'watch' : null },
+        { value: int(fell.length), label: 'Farms that got worse', icon: 'arrowDown', tone: fell.length ? 'watch' : null },
+        { value: int(rose.length), label: 'Farms that improved', icon: 'arrowUp' }
       ]),
 
       fell.length
-        ? callout('watch', `${int(fell.length)} farms scored lower than they did in the comparison quarter. The largest fall was ${signed(fell[0].delta, 1)} points, at farm #${fell[0].record.fid}.`)
-        : callout('info', 'No farm scored materially lower than in the comparison quarter.'),
+        ? callout('watch', `${int(fell.length)} farms scored lower than before. The biggest drop was ${signed(fell[0].delta, 1)} points, at farm #${fell[0].record.fid}.`)
+        : callout('info', 'No farm scored lower than before.'),
 
-      section('Average efficiency by quarter', {
-        note: selection.region === 'emirate' ? 'One line per province.' : 'The selected province.'
+      section('Average score, quarter by quarter', {
+        icon: 'trend',
+        note: selection.region === 'emirate' ? 'One line for each province.' : 'The selected province.'
       }, trendLine(QUARTERS.map((q) => q.label), series, { format: (v) => Math.round(v), zeroBased: false })),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
+      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
         { key: 'now', label: 'Average now', value: (set) => mean(set, (f) => f.efficiency), format: (v) => (v == null ? '—' : Math.round(v)) },
         { key: 'fell', label: 'Deteriorated', value: (set) => set.filter((f) => (moveOf.get(f.fid)?.delta ?? 0) < -0.5).length, format: int }
       ])),
 
-      section('Every farm, quarter against quarter', {
-        note: 'Last quarter, this quarter, and the movement in points and per cent.',
+      section('Every farm', {
+        icon: 'table',
+        note: 'Click a column title to sort.',
         flush: true
       }, dataTable(farms, {
         selection,
@@ -89,9 +91,7 @@ export function render({ selection }) {
           { key: 'pct', label: 'Per cent', align: 'num', value: (f) => moveOf.get(f.fid)?.pct ?? null, cell: (f) => signedPct(moveOf.get(f.fid)?.pct ?? 0, 1) },
           { key: 'band', label: 'Band now', value: (f) => classify(EFFICIENCY, f.efficiency)?.label || '—' }
         ]
-      })),
-
-      intro('Sorted ascending, the points column puts the biggest falls at the top; sorting the score column instead puts the worst absolute scores there. Both were asked for.')
+      }))
     ]
   };
 }

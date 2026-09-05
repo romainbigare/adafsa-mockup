@@ -34,7 +34,7 @@ export function render({ selection }) {
     return {
       tools: [comparisonSelect(selection.comparison)],
       content: emptyState('Not enough history yet.',
-        'Structures are captured once a quarter. This comparison needs more quarters than the record holds — it will fill in as they arrive.')
+        'Structures are surveyed once a quarter. This comparison needs more quarters than we have.')
     };
   }
 
@@ -49,22 +49,22 @@ export function render({ selection }) {
     tools: [comparisonSelect(selection.comparison)],
     content: [
       figures([
-        { value: signed(net.net, 0), label: `Net structures ${period.label}`, tone: net.net < 0 ? 'watch' : null },
-        { value: `+${int(net.gained)}`, label: 'Appeared' },
-        { value: `−${int(net.lost)}`, label: 'Removed', tone: net.lost > 0 ? 'watch' : null },
-        { value: signed(areaNet.net, 1), unit: 'dun', label: 'Net footprint' }
+        { value: signed(net.net, 0), label: `Net change ${period.label}`, icon: 'trend', tone: net.net < 0 ? 'watch' : null },
+        { value: `+${int(net.gained)}`, label: 'New structures', icon: 'arrowUp' },
+        { value: `−${int(net.lost)}`, label: 'Structures removed', icon: 'arrowDown', tone: net.lost > 0 ? 'watch' : null },
+        { value: signed(areaNet.net, 1), unit: 'dun', label: 'Change in area covered', icon: 'ruler' }
       ]),
 
       movers.length
-        ? callout('watch', `${int(movers.length)} holdings changed their built footprint over this period. A handful of structures is still worth knowing about the week it happens, so this list is short by design rather than by accident.`)
-        : callout('info', 'No holding changed its built footprint over this period.'),
+        ? callout('watch', `${int(movers.length)} farms built or removed something in this period.`)
+        : callout('info', 'No farm built or removed anything in this period.'),
 
-      section('Structures across the record', { note: 'Every quarter the survey holds.' },
+      section('Structures counted, quarter by quarter', { icon: 'trend', note: 'Total in the selection.' },
         trendLine(QUARTERS.map((q) => q.label), [
           { label: 'Structures counted', color: COMPARE.current, values: drawn.map((point) => point.value) }
         ], { format: int, zeroBased: false })),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
+      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
         { key: 'now', label: 'Structures now', value: (set) => set.reduce((a, f) => a + f.structures.length, 0), format: int },
         { key: 'net', label: `Net ${period.label}`, value: (set) => {
             const ids = new Set(set.map((f) => f.fid));
@@ -72,8 +72,9 @@ export function render({ selection }) {
           }, format: (v) => signed(v, 0) }
       ])),
 
-      section('Which holdings', {
-        note: 'Counts, not footprint — a warehouse coming down reads the same size as one going up.',
+      section('Which farms', {
+        icon: 'table',
+        note: 'Pick a movement to see the farms.',
         tools: [directionTabs(moves, selection.direction)],
         flush: true
       }, contributorTable(moves, selection, {
@@ -81,9 +82,7 @@ export function render({ selection }) {
         unit: 'no.',
         csvName: `structure-change-${selection.direction}`,
         nameOf: () => 'Structures'
-      })),
-
-      intro('Everything on this page is generated history. In the live platform these comparisons stay empty until two quarters of capture exist, and the page will say so rather than draw a chart of zeroes.')
+      }))
     ]
   };
 }

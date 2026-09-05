@@ -36,18 +36,17 @@ export function render({ selection }) {
   const peak = Math.max(1, ...built.map((farm) => farm.structures.length));
 
   return {
-    asOf: TODAY,
     content: [
       figures([
-        { value: int(structures.length), label: 'Structures detected' },
-        { value: int(built.length), label: 'Farms carrying structures' },
-        { value: dec(totalArea, 1), unit: 'dun', label: 'Built footprint' },
-        { value: int(rows.length), label: 'Tier 1 classes' }
+        { value: int(structures.length), label: 'Structures found', icon: 'land' },
+        { value: int(built.length), label: 'Farms with structures', icon: 'farms' },
+        { value: dec(totalArea, 1), unit: 'dun', label: 'Area covered', icon: 'ruler' },
+        { value: int(rows.length), label: 'Main classes', icon: 'layers' }
       ]),
 
-      callout('info', `Tier 2 — the type of each structure — is what the survey classifies today and what the October rollout targets. Tier 3, separating a pump room from a filtration or desalination unit, is not delivered: on these holdings they sit together under one cover. ${int(pending.length)} irrigation utilities are waiting on it.`),
+      callout('info', `Tier 2 gives the type of each structure. Tier 3, which splits irrigation buildings further, is not available yet — ${int(pending.length)} of them are waiting for it.`),
 
-      section('Where the structures are', { note: 'Sized by how many structures a holding carries.', flush: true },
+      section('Where the structures are', { icon: 'pin', note: 'Bigger dots have more structures.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('land-structures', {
           mode: 'category',
           farms: built,
@@ -59,24 +58,24 @@ export function render({ selection }) {
           legendTitle: 'Structures per holding'
         }))),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
+      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
         { key: 'count', label: 'Structures', value: (set) => set.reduce((a, f) => a + f.structures.length, 0), format: int },
-        { key: 'area', label: 'Footprint (dun)', value: (set) => set.reduce((a, f) => a + f.structureArea, 0), format: (v) => dec(v, 1) }
+        { key: 'area', label: 'Area covered (dun)', value: (set) => set.reduce((a, f) => a + f.structureArea, 0), format: (v) => dec(v, 1) }
       ])),
 
-      section('Tier 1 and tier 2', { note: 'Open a class to see the types inside it.', flush: true },
+      section('Area by structure type', { icon: 'land', half: true, note: 'Click a class to see its types.', flush: true },
         summaryTable(rows, {
           measure: 'area', measureLabel: 'Footprint (dun)', format: (v) => dec(v, 2),
           totalLabel: 'All structures', colorOf: (row) => landuseColor(row.name)
         })),
 
-      section('Count by type', { flush: true },
+      section('Number of each type', { icon: 'table', half: true, note: 'How many were found.', flush: true },
         summaryTable(rows, {
           measure: 'farms', measureLabel: 'Structures', format: int,
           totalLabel: 'All structures', colorOf: (row) => landuseColor(row.name)
         })),
 
-      section('Every farm', { flush: true },
+      section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(built, {
           selection,
           searchable: true,
@@ -87,9 +86,9 @@ export function render({ selection }) {
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
             { key: 'count', label: 'Structures', align: 'num', defaultSort: true, value: (f) => f.structures.length, cell: (f) => int(f.structures.length) },
-            { key: 'built', label: 'Footprint (dun)', align: 'num', value: (f) => f.structureArea, cell: (f) => dec(f.structureArea, 2) },
+            { key: 'built', label: 'Area covered (dun)', align: 'num', value: (f) => f.structureArea, cell: (f) => dec(f.structureArea, 2) },
             { key: 'types', label: 'Types', value: (f) => [...new Set(f.structures.map((s) => s.tier2))].sort().join(', ') },
-            { key: 'pending', label: 'Awaiting tier 3', align: 'num', value: (f) => f.structures.filter((s) => s.tier3 === null).length, cell: (f) => int(f.structures.filter((s) => s.tier3 === null).length) }
+            { key: 'pending', label: 'Waiting for tier 3', align: 'num', value: (f) => f.structures.filter((s) => s.tier3 === null).length, cell: (f) => int(f.structures.filter((s) => s.tier3 === null).length) }
           ]
         }))
     ]

@@ -24,10 +24,4 @@ export const signedPct = (n, places = 0) => (n == null || Number.isNaN(n) ? '—
 export const signed = (n, places = 0) => (n == null || Number.isNaN(n) ? '—' : (n > 0 ? '+' : '') + n.toFixed(places));
 export const m3 = (n) => int(n) + NBSP + 'm³';
 
-/* The review asked for dates rather than clock times on the "as of" stamp — a
- * satellite pass is a day, not a minute. */
-export function asOfDate(d) {
-  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-
 export const share = (part, whole) => (whole ? (part / whole) * 100 : 0);

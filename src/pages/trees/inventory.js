@@ -53,18 +53,17 @@ export function render({ selection }) {
   })).filter((entry) => entry.count > 0);
 
   return {
-    asOf: TODAY,
     rail: filterRail(taxonomyTree(), { scope: 'tree', selected: selection.types, counts: typeCounts(all) }),
     content: [
       figures([
-        { value: compact(palms + fruit + forest), label: 'Trees counted' },
-        { value: compact(palms), label: 'Date palms' },
-        { value: compact(fruit), label: 'Fruit trees' },
-        { value: compact(forest), label: 'Forest trees' },
-        { value: int(cultivars.size), label: 'Palm cultivars identified' }
+        { value: compact(palms + fruit + forest), label: 'Trees counted', icon: 'trees' },
+        { value: compact(palms), label: 'Date palms', icon: 'trees' },
+        { value: compact(fruit), label: 'Fruit trees', icon: 'trees' },
+        { value: compact(forest), label: 'Forest trees', icon: 'trees' },
+        { value: int(cultivars.size), label: 'Palm varieties found', icon: 'layers' }
       ]),
 
-      section('Where the trees are', { note: 'Coloured by the stand that dominates the holding.', flush: true },
+      section('Where the trees are', { icon: 'pin', note: 'Colour shows the main tree group.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('trees-inventory', {
           mode: 'category',
           farms: treed,
@@ -73,34 +72,34 @@ export function render({ selection }) {
           labelOf: (farm) => `${compact(farm.trees)} trees · ${dominantTree(farm)}`,
           legend,
           legendTitle: 'Main stand',
-          note: 'Click a farm to open its profile.'
+          note: 'Click a farm to open it.'
         }))),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
+      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
         { key: 'palms', label: 'Date palms', value: (set) => set.reduce((a, f) => a + f.palms, 0), format: int },
         { key: 'fruit', label: 'Fruit trees', value: (set) => set.reduce((a, f) => a + f.fruitTrees, 0), format: int },
         { key: 'forest', label: 'Forest trees', value: (set) => set.reduce((a, f) => a + f.forestTrees, 0), format: int }
       ])),
 
-      section('Standing area by tree group', { note: 'Open a group to see the species inside it.', flush: true },
+      section('Area by tree group', { icon: 'trees', half: true, note: 'Click a group to see its species.', flush: true },
         summaryTable(breakdown.rows, { measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1), totalLabel: 'All tree stands' })),
 
-      section('Farms carrying each group', { flush: true },
+      section('Farms with each group', { icon: 'farms', half: true, note: 'A farm can have several groups.', flush: true },
         summaryTable(breakdown.rows, { measure: 'farms', measureLabel: 'Farms', format: countFormat, totalLabel: 'Farms with trees' })),
 
-      section('Date palm varieties', { note: 'Palm count by cultivar, across the current selection.' },
+      section('Date palm varieties', { icon: 'trees', half: true, note: 'Number of palms of each variety.' },
         cultivars.size
           ? barList([...cultivars.entries()].map(([name, trees]) => ({ label: name, value: trees }))
               .sort((a, b) => b.value - a.value), { format: compact, color: categoryColor('Date Palm') })
-          : intro('No palm stands in the current selection.')),
+          : intro('No palms selected.')),
 
-      section('Fruit tree species', {},
+      section('Fruit tree species', { icon: 'trees', half: true, note: 'Number of trees of each species.' },
         species.size
           ? barList([...species.entries()].map(([name, trees]) => ({ label: name, value: trees }))
               .sort((a, b) => b.value - a.value), { format: compact, color: categoryColor('Fruit Trees') })
-          : intro('No fruit tree stands in the current selection.')),
+          : intro('No fruit trees selected.')),
 
-      section('Every farm with trees', { flush: true },
+      section('Every farm with trees', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(treed, {
           selection,
           searchable: true,

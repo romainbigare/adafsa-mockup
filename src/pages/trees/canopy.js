@@ -31,44 +31,43 @@ export function render({ selection }) {
   const severe = worstCount(CANOPY, scored, (farm) => farm.canopy);
 
   return {
-    asOf: TODAY,
     content: [
       figures([
-        { value: palmMean == null ? '—' : Math.round(palmMean), label: 'Palm canopy index, average' },
-        { value: fruitMean == null ? '—' : Math.round(fruitMean), label: 'Fruit canopy index, average' },
-        { value: int(stressed.length), label: 'Farms showing stress', tone: stressed.length ? 'watch' : null },
-        { value: int(severe), label: 'Farms in severe stress', tone: severe ? 'act' : null }
+        { value: palmMean == null ? '—' : Math.round(palmMean), label: 'Average palm score', icon: 'trees' },
+        { value: fruitMean == null ? '—' : Math.round(fruitMean), label: 'Average fruit tree score', icon: 'trees' },
+        { value: int(stressed.length), label: 'Farms with stressed trees', icon: 'alert', tone: stressed.length ? 'watch' : null },
+        { value: int(severe), label: 'Farms in the lowest band', icon: 'alert', tone: severe ? 'act' : null }
       ]),
 
       severe
-        ? callout('act', `${int(severe)} farms sit in the lowest canopy band. These are the visits worth making first.`)
-        : callout('info', 'No farm is in the lowest canopy band in this selection.'),
+        ? callout('act', `${int(severe)} farms are in the lowest band. Visit these first.`)
+        : callout('info', 'No farm is in the lowest band.'),
 
-      section('Palm canopy', { note: `${int(withPalms.length)} farms carry palm stands.` },
-        withPalms.length ? bandBar(distribution(CANOPY, withPalms, (f) => f.canopyPalms)) : intro('No palm stands here.')),
+      section('Palm trees', { icon: 'trees', half: true, note: `${int(withPalms.length)} farms have palms.` },
+        withPalms.length ? bandBar(distribution(CANOPY, withPalms, (f) => f.canopyPalms)) : intro('No palms here.')),
 
-      section('Fruit tree canopy', { note: `${int(withFruit.length)} farms carry fruit stands.` },
-        withFruit.length ? bandBar(distribution(CANOPY, withFruit, (f) => f.canopyFruit)) : intro('No fruit stands here.')),
+      section('Fruit trees', { icon: 'trees', half: true, note: `${int(withFruit.length)} farms have fruit trees.` },
+        withFruit.length ? bandBar(distribution(CANOPY, withFruit, (f) => f.canopyFruit)) : intro('No fruit trees here.')),
 
-      section('Where the stress is', { note: 'One score per farm, not per tree.', flush: true },
+      section('Where the stressed trees are', { icon: 'pin', note: 'One score per farm.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('trees-canopy', {
           mode: 'band',
           farms: scored,
           region: selection.region,
           size: 'short',
           colorOf: (farm) => colorFor(CANOPY, farm.canopy),
-          labelOf: (farm) => `Canopy ${Math.round(farm.canopy)} · ${compact(farm.trees)} trees`,
+          labelOf: (farm) => `Health ${Math.round(farm.canopy)} · ${compact(farm.trees)} trees`,
           legend: CANOPY.bands.map((band) => ({ label: `${band.label} (${band.range})`, color: band.color })),
-          legendTitle: 'Canopy health index'
+          legendTitle: 'Tree health score'
         }))),
 
-      section('By province', { flush: true }, provinceBlock(scored, [
-        { key: 'palm', label: 'Palm index', value: (set) => mean(set.filter((f) => f.canopyPalms != null), (f) => f.canopyPalms), format: (v) => (v == null ? '—' : Math.round(v)) },
-        { key: 'fruit', label: 'Fruit index', value: (set) => mean(set.filter((f) => f.canopyFruit != null), (f) => f.canopyFruit), format: (v) => (v == null ? '—' : Math.round(v)) },
+      section('By province', { icon: 'land', flush: true }, provinceBlock(scored, [
+        { key: 'palm', label: 'Palm score', value: (set) => mean(set.filter((f) => f.canopyPalms != null), (f) => f.canopyPalms), format: (v) => (v == null ? '—' : Math.round(v)) },
+        { key: 'fruit', label: 'Fruit tree score', value: (set) => mean(set.filter((f) => f.canopyFruit != null), (f) => f.canopyFruit), format: (v) => (v == null ? '—' : Math.round(v)) },
         { key: 'stress', label: 'Farms stressed', value: (set) => set.filter((f) => (classify(CANOPY, f.canopy)?.sev || 0) >= 2).length, format: int }
       ])),
 
-      section('Every farm with trees', { note: 'Sort by either index to find the stands under pressure.', flush: true },
+      section('Every farm with trees', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(scored, {
           selection,
           searchable: true,
@@ -79,8 +78,8 @@ export function render({ selection }) {
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
             { key: 'trees', label: 'Trees', align: 'num', value: (f) => f.trees, cell: (f) => int(f.trees) },
-            { key: 'palm', label: 'Palm index', align: 'num', defaultSort: true, defaultDir: 'asc', value: (f) => f.canopyPalms, cell: (f) => (f.canopyPalms == null ? '—' : f.canopyPalms) },
-            { key: 'fruit', label: 'Fruit index', align: 'num', value: (f) => f.canopyFruit, cell: (f) => (f.canopyFruit == null ? '—' : f.canopyFruit) },
+            { key: 'palm', label: 'Palm score', align: 'num', defaultSort: true, defaultDir: 'asc', value: (f) => f.canopyPalms, cell: (f) => (f.canopyPalms == null ? '—' : f.canopyPalms) },
+            { key: 'fruit', label: 'Fruit tree score', align: 'num', value: (f) => f.canopyFruit, cell: (f) => (f.canopyFruit == null ? '—' : f.canopyFruit) },
             { key: 'band', label: 'Status', value: (f) => classify(CANOPY, f.canopy)?.label || '—',
               cell: (f) => { const band = classify(CANOPY, f.canopy); return band ? h('span', { class: 'chip', style: { background: band.color + '22', color: band.color } }, band.label) : '—'; } }
           ]

@@ -10,17 +10,22 @@ import { icon } from './icons.js';
 import { NAV, NAV_FOOTER, locate } from './nav.js';
 import { href, currentParams } from './router.js';
 import { regionSelect } from '../components/regionSelect.js';
-import { asOfDate } from '../domain/format.js';
-import { TODAY } from '../domain/periods.js';
 
-function navLink(entry, activeId, isChild = false) {
+function navLink(entry, activeId, { child = false, section = false, expandable = false } = {}) {
   const params = currentParams();
   return h('a', {
+    class: [child ? 'nav-child' : 'nav-top', section ? 'is-section' : null],
     href: href(entry.segments, params),
-    'aria-current': entry.id === activeId ? 'page' : null
-  }, isChild ? null : icon(entry.icon, { size: 17 }), h('span', { text: entry.label }));
+    'aria-current': entry.id === activeId ? 'page' : null,
+    'aria-expanded': expandable ? String(section) : null
+  },
+    child ? null : icon(entry.icon, { size: 17 }),
+    h('span', { class: 'nav-label', text: entry.label }),
+    expandable ? h('span', { class: 'nav-chevron' }, icon('chevronDown', { size: 14 })) : null);
 }
 
+/* A module opens when you are inside it and closes when you leave, so the menu
+ * stays short. The chevron says the entry has more underneath. */
 export function renderNav(root, place) {
   clear(root);
   append(root, [
@@ -28,11 +33,12 @@ export function renderNav(root, place) {
       h('strong', { text: 'ADAFSA' }),
       h('span', { text: 'Agricultural Monitoring Platform' })),
     h('ul', { class: 'nav-list' }, ...NAV.map((entry) => {
-      const item = h('li', { class: 'nav-item' }, navLink(entry, place?.navId));
-      const open = entry.children && entry.id === place?.navId;
-      if (open) {
+      const inSection = !!entry.children && entry.id === place?.navId;
+      const item = h('li', { class: ['nav-item', entry.children ? 'has-children' : null, inSection ? 'is-open' : null] },
+        navLink(entry, place?.navId, { section: inSection, expandable: !!entry.children }));
+      if (inSection) {
         item.append(h('ul', { class: 'nav-sub' },
-          ...entry.children.map((child) => h('li', {}, navLink(child, place?.childId, true)))));
+          ...entry.children.map((child) => h('li', {}, navLink(child, place?.childId, { child: true })))));
       }
       return item;
     })),
@@ -40,7 +46,7 @@ export function renderNav(root, place) {
   ]);
 }
 
-export function renderHeader(root, { place, selection, tools = [], asOf = TODAY, showRegion = true }) {
+export function renderHeader(root, { place, selection, tools = [], showRegion = true }) {
   clear(root);
   append(root, [
     h('button', {
@@ -53,9 +59,7 @@ export function renderHeader(root, { place, selection, tools = [], asOf = TODAY,
       h('h1', { text: place?.title || '' })),
     h('div', { class: 'header-tools' },
       ...tools,
-      showRegion ? regionSelect(selection.region) : null,
-      h('span', { class: 'as-of', title: 'Date of the most recent satellite pass' },
-        icon('clock', { size: 13 }), ' ', asOfDate(asOf)))
+      showRegion ? regionSelect(selection.region) : null)
   ]);
 }
 

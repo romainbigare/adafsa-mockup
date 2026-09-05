@@ -56,27 +56,27 @@ export function render({ selection }) {
     rail: filterRail(taxonomyTree(), { scope: 'tree', selected: selection.types, counts: typeCounts(all) }),
     content: [
       figures([
-        { value: signed(treeNet.net, 0), label: `Net trees ${period.label}`, tone: treeNet.net < 0 ? 'watch' : null },
-        { value: `+${compact(treeNet.gained)}`, label: 'Trees planted' },
-        { value: `−${compact(treeNet.lost)}`, label: 'Trees removed', tone: treeNet.lost > treeNet.gained ? 'watch' : null },
-        { value: int(treeNet.counts.increased + treeNet.counts.decreased), label: 'Farms whose count moved' }
+        { value: signed(treeNet.net, 0), label: `Net change ${period.label}`, icon: 'trend', tone: treeNet.net < 0 ? 'watch' : null },
+        { value: `+${compact(treeNet.gained)}`, label: 'Trees planted', icon: 'arrowUp' },
+        { value: `−${compact(treeNet.lost)}`, label: 'Trees removed', icon: 'arrowDown', tone: treeNet.lost > treeNet.gained ? 'watch' : null },
+        { value: int(treeNet.counts.increased + treeNet.counts.decreased), label: 'Farms that changed', icon: 'farms' }
       ]),
 
-      section('Tree count across the record', { note: 'Every quarter held, for the current selection.' },
+      section('Trees counted, quarter by quarter', { icon: 'trend', note: 'Total trees in the selection.' },
         trendLine(QUARTERS.map((q) => q.label), [
           { label: 'Trees counted', color: COMPARE.current, values: drawn.map((point) => point.value) }
         ], { format: compact, zeroBased: false })),
 
-      section('Which stands moved', { note: `Net change in standing area, ${period.label}.` },
+      section('Which trees changed', { icon: 'trees', half: true, note: 'Gain or loss in dunums.' },
         movers.length
           ? barList(movers.map((entry) => ({
               label: entry.label, value: Math.abs(entry.value),
               amount: signed(entry.value, 1) + ' dun',
               color: entry.value >= 0 ? COMPARE.gain : COMPARE.loss
             })), { limit: 12 })
-          : intro('No stand moved by a measurable amount over this period.')),
+          : intro('No tree group changed over this period.')),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
+      section('By province', { icon: 'land', half: true, flush: true }, provinceBlock(farms, [
         { key: 'now', label: 'Trees now', value: (set) => set.reduce((a, f) => a + f.trees, 0), format: int },
         { key: 'net', label: `Net ${period.label}`, value: (set) => {
             const ids = new Set(set.map((f) => f.fid));
@@ -85,7 +85,8 @@ export function render({ selection }) {
       ])),
 
       section('Which farms', {
-        note: 'Standing area by species, so a movement can be traced to a farm.',
+        icon: 'table',
+        note: 'Pick a movement to see the farms.',
         tools: [directionTabs(standMoves, selection.direction)],
         flush: true
       }, contributorTable(standMoves, selection, { direction: selection.direction, csvName: `tree-change-${selection.direction}` }))

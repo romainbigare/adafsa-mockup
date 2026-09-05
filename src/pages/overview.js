@@ -11,7 +11,7 @@
  * by dunum and by farm, each opening from a category down to the crop. */
 
 import { h } from '../app/dom.js';
-import { section, intro, callout } from '../components/section.js';
+import { section } from '../components/section.js';
 import { figures } from '../components/figures.js';
 import { summaryTable, countFormat } from '../components/summaryTable.js';
 import { filterRail, typeCounts } from '../components/filterRail.js';
@@ -52,49 +52,49 @@ export function render({ selection }) {
     farms,
     region: selection.region,
     size: null,
-    note: 'Each bubble carries the number of farms. Zoom in and it breaks into smaller ones.'
+    note: 'Zoom in to split the bubbles.'
   });
 
   return {
-    asOf: TODAY,
     rail,
     content: [
       figures([
-        { value: int(farms.length), label: filtering ? `Farms growing the selection in ${regionName}` : `Farms in ${regionName}` },
-        { value: int(dunums), unit: 'dun', label: 'Total holding area' },
-        { value: int(cultivated), unit: 'dun', label: 'Land in production' },
-        { value: int(inSeason), label: 'Crops in the ground this month' }
+        { value: int(farms.length), label: filtering ? `Farms with these crops` : `Farms in ${regionName}`, icon: 'farms' },
+        { value: int(dunums), unit: 'dun', label: 'Total farm area', icon: 'land' },
+        { value: int(cultivated), unit: 'dun', label: 'Land in production', icon: 'crop' },
+        { value: int(inSeason), label: 'Crops growing this month', icon: 'calendar' }
       ]),
 
       section('Where the farms are', {
-        note: 'Counts only — no scoring on this map.',
+        icon: 'pin',
+        note: 'Bubbles show how many farms.',
         flush: true
       }, h('div', { style: { padding: '0 16px 16px' } }, map)),
 
       section('By province', {
-        note: 'Every figure on this page follows the selector in the header.',
+        icon: 'land',
+        note: 'Click a province name to open it.',
         flush: true
       }, provinceBlock(farms, [
-        { key: 'area', label: 'Holding (dun)', value: (set) => set.reduce((a, f) => a + f.area, 0), format: (v) => int(v) },
+        { key: 'area', label: 'Farm area (dun)', value: (set) => set.reduce((a, f) => a + f.area, 0), format: (v) => int(v) },
         { key: 'cultivated', label: 'In production (dun)', value: (set) => set.reduce((a, f) => a + f.cultivatedArea, 0), format: (v) => int(v) }
       ], { total: { farms: farms.length } })),
 
-      section('Crop distribution by dunum', {
-        note: 'Open a category to see the crops inside it.',
+      section('Crops by area', {
+        icon: 'crop', half: true,
+        note: 'Click a group to see its crops.',
         flush: true
       }, summaryTable(breakdown.rows, {
         measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1), totalLabel: 'All land in production'
       })),
 
-      section('Crop distribution by farm', {
-        note: 'A farm growing three cereals counts once against cereals and once against each crop, so this column is not a total of farms.',
+      section('Crops by number of farms', {
+        icon: 'farms', half: true,
+        note: 'A farm can grow several crops.',
         flush: true
       }, summaryTable(breakdown.rows, {
-        measure: 'farms', measureLabel: 'Farms', format: countFormat, totalLabel: 'Farms with land in production'
-      })),
-
-      section('Production', {}, 
-        intro('Expected production by crop is a later addition. It was wanted in review and deferred until the measurement window is agreed — a season that spans a quarter boundary makes "this year" an ambiguous thing to report.'))
+        measure: 'farms', measureLabel: 'Farms', format: countFormat, totalLabel: 'Farms with crops'
+      }))
     ]
   };
 }

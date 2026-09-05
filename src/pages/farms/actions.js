@@ -40,41 +40,34 @@ export function render({ place }) {
 
   return {
     showRegion: false,
-    asOf: TODAY,
     tools: [
       h('a', { class: 'btn', href: `#/farm/${farm.fid}` }, icon('chevron', { size: 14 }), h('span', { text: 'Farm profile' })),
       h('button', { class: 'btn', onclick: () => window.print() }, icon('print', { size: 14 }), h('span', { text: 'Print for a visit' }))
     ],
     content: [
       figures([
-        { value: `#${farm.fid}`, label: farm.owner },
-        { value: regionById(farm.province).label, label: 'Province' },
-        { value: int(issues.length), label: 'Open items', tone: issues.some((i) => i.severity === 'act') ? 'act' : issues.length ? 'watch' : null },
-        { value: int(alerts.length), label: 'Would reach the farmer' }
+        { value: `#${farm.fid}`, label: farm.owner, icon: 'farms' },
+        { value: regionById(farm.province).label, label: 'Province', icon: 'land' },
+        { value: int(issues.length), label: 'Things to look at', icon: 'alert', tone: issues.some((i) => i.severity === 'act') ? 'act' : issues.length ? 'watch' : null },
+        { value: int(alerts.length), label: 'Alerts for the farmer', icon: 'water' }
       ]),
 
       section('What needs attention', {
-        note: issues.length ? 'Ordered with the most urgent first.' : null
+        icon: 'alert',
+        note: issues.length ? 'Most urgent first.' : null
       }, issues.length
         ? h('div', {}, ...issues.map(issueCard))
-        : callout('info', 'Nothing on this holding is outside its expected range. No visit is indicated by the data.')),
+        : callout('info', 'Everything on this farm is within its normal range.')),
 
-      section('Water this month', { note: `Allocation and metered use for ${month}.` },
-        h('div', {},
-          h('p', { class: 'section-intro' },
-            `Allocated ${int(farm.waterDemand)} m³, metered ${int(farm.waterActual)} m³ — ${pct(farm.waterUsePct)} of allocation, which reads as ${(classify(WATER_USE, farm.waterUsePct)?.label || 'no reading').toLowerCase()}.`),
-          farm.overAllocated
-            ? h('div', { style: { marginTop: '10px' } }, callout('act',
-                'The over-allocation flag is raised against this month rather than the season. By the time a season closes there is nothing left to do about it, which is why the monthly figure is the one that carries the flag.'))
-            : null)),
+      section(`Water in ${month}`, { icon: 'water', half: true },
+        h('p', { class: 'section-intro' },
+          `Allowed ${int(farm.waterDemand)} m³, used ${int(farm.waterActual)} m³ — ${pct(farm.waterUsePct)} of the allowance.`)),
 
-      section('What the farmer would be told', {},
+      section('What the farmer would be told', { icon: 'support', half: true },
         alerts.length
           ? h('ul', { style: { margin: 0, paddingInlineStart: '18px', display: 'grid', gap: '6px' } },
               ...alerts.map((alert) => h('li', {}, h('strong', { text: alert.title + '. ' }), alert.detail)))
-          : intro('Nothing on this holding would generate a message to the farmer.')),
-
-      intro('Inspectors already carry a tablet questionnaire that feeds a report generator. This sheet is shaped to be handed to that process later — a short list of findings, each with something to do about it.')
+          : intro('Nothing would be sent to the farmer.'))
     ]
   };
 }

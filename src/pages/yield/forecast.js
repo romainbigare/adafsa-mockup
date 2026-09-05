@@ -47,18 +47,18 @@ export function render({ selection }) {
   const wellBelow = rows.filter((row) => classify(YIELD_DEVIATION, row.yieldDeviation)?.id === 'well_below').length;
 
   return {
-    asOf: TODAY,
     rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
     content: [
       figures([
-        { value: compact(production / 1000), unit: 't', label: 'Forecast production' },
-        { value: int(rows.length), label: 'Crop plantings forecast' },
-        { value: pct(rows.length ? (belowAverage / rows.length) * 100 : 0), label: 'Below their crop average' },
-        { value: int(wellBelow), label: 'More than a quarter below', tone: wellBelow ? 'watch' : null }
+        { value: compact(production / 1000), unit: 't', label: 'Expected harvest', icon: 'yieldup' },
+        { value: int(rows.length), label: 'Crops planted', icon: 'crop' },
+        { value: pct(rows.length ? (belowAverage / rows.length) * 100 : 0), label: 'Below the crop average', icon: 'arrowDown' },
+        { value: int(wellBelow), label: 'Far below the average', icon: 'alert', tone: wellBelow ? 'watch' : null }
       ]),
 
-      section('Average yield by crop, and how many fall below it', {
-        note: 'The average is taken across every farm growing that crop.',
+      section('Average yield by crop', {
+        icon: 'yieldup',
+        note: 'And how many farms are below it.',
         flush: true
       }, dataTable(crops, {
         selection,
@@ -66,37 +66,38 @@ export function render({ selection }) {
         columns: [
           { key: 'type', label: 'Crop', strong: true, value: (c) => c.type,
             cell: (c) => h('span', { class: 'bar-cell' }, h('span', { class: 'swatch', style: { background: categoryColor(c.category) } }), c.type) },
-          { key: 'category', label: 'Group', value: (c) => c.category },
           { key: 'farms', label: 'Plantings', align: 'num', value: (c) => c.farms, cell: (c) => int(c.farms) },
           { key: 'area', label: 'Dunums', align: 'num', value: (c) => c.area, cell: (c) => dec(c.area, 1) },
           { key: 'avg', label: 'Average (t/dun)', align: 'num', value: (c) => c.average, cell: (c) => dec(c.average, 2) },
-          { key: 'production', label: 'Forecast (t)', align: 'num', defaultSort: true, value: (c) => c.kilos / 1000, cell: (c) => dec(c.kilos / 1000, 1) },
-          { key: 'below', label: 'Below average', align: 'num', value: (c) => c.belowShare, cell: (c) => `${int(c.below)} · ${pct(c.belowShare)}` }
+          { key: 'production', label: 'Expected harvest (t)', align: 'num', defaultSort: true, value: (c) => c.kilos / 1000, cell: (c) => dec(c.kilos / 1000, 1) },
+          { key: 'below', label: 'Farms below', align: 'num', value: (c) => c.belowShare, cell: (c) => `${int(c.below)} · ${pct(c.belowShare)}` }
         ]
       })),
 
-      section('How plantings sit against their crop average', {}, bandBar(distribution(YIELD_DEVIATION, rows, (row) => row.yieldDeviation, (row) => row.area))),
+      section('Against the crop average', { icon: 'ruler', half: true, note: 'How the plantings compare.' },
+        bandBar(distribution(YIELD_DEVIATION, rows, (row) => row.yieldDeviation, (row) => row.area))),
 
-      section('Production forecast by province', {
-        note: 'Read as province — the proposal’s "district" has no agreed meaning here.',
+      section('Expected harvest by province', {
+        icon: 'land', half: true,
         flush: true
       }, provinceBlock(farms, [
-        { key: 'production', label: 'Forecast (t)', value: (set) => {
+        { key: 'production', label: 'Expected harvest (t)', value: (set) => {
             const ids = new Set(set.map((f) => f.fid));
             return rows.filter((r) => ids.has(r.farm.fid)).reduce((a, r) => a + r.expectedKg, 0) / 1000;
           }, format: (v) => dec(v, 1) },
-        { key: 'below', label: 'Below average', value: (set) => {
+        { key: 'below', label: 'Farms below', value: (set) => {
             const ids = new Set(set.map((f) => f.fid));
             return rows.filter((r) => ids.has(r.farm.fid) && r.yieldDeviation < 0).length;
           }, format: int }
       ])),
 
-      section('Largest forecast producers', {},
+      section('Biggest crops by harvest', { icon: 'yieldup', note: 'Expected tonnes.' },
         barList(crops.slice(0, 12).map((crop) => ({ label: crop.type, value: crop.kilos / 1000, color: categoryColor(crop.category) })),
           { format: (v) => `${dec(v, 1)} t` })),
 
       section('Every planting', {
-        note: 'Sort ascending for the weakest, descending for the strongest.',
+        icon: 'table',
+        note: 'Click a column title to sort.',
         flush: true
       }, dataTable(rows, {
         selection,
@@ -112,12 +113,10 @@ export function render({ selection }) {
           { key: 'area', label: 'Dunums', align: 'num', value: (r) => r.area, cell: (r) => dec(r.area, 1) },
           { key: 'yield', label: 'Yield (t/dun)', align: 'num', value: (r) => r.tonnesPerDunum, cell: (r) => dec(r.tonnesPerDunum, 2) },
           { key: 'avg', label: 'Crop average', align: 'num', value: (r) => r.cropAverage, cell: (r) => dec(r.cropAverage, 2) },
-          { key: 'dev', label: 'Against average', align: 'num', defaultSort: true, defaultDir: 'asc', value: (r) => r.yieldDeviation, cell: (r) => signedPct(r.yieldDeviation) },
+          { key: 'dev', label: 'vs average', align: 'num', defaultSort: true, defaultDir: 'asc', value: (r) => r.yieldDeviation, cell: (r) => signedPct(r.yieldDeviation) },
           { key: 'band', label: 'Status', value: (r) => classify(YIELD_DEVIATION, r.yieldDeviation)?.label || '—' }
         ]
-      })),
-
-      intro('Yield optimisation is one metric. The accuracy of the model against ground truth is validated separately and off the platform, so it is not reported here.')
+      }))
     ]
   };
 }

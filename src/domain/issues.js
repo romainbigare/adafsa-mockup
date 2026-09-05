@@ -23,18 +23,18 @@ export function openIssues(farm, { comparison = 'quarter' } = {}) {
     issues.push({
       id: 'water',
       severity: 'act',
-      title: 'Using more water than allocated',
-      detail: `Metered use is ${Math.round(farm.waterUsePct)}% of this month's allocation.`
-        + (worst ? ` Most of the excess sits in ${worst.type}.` : ''),
-      action: 'Confirm the meter reading, then discuss the irrigation schedule for the crop carrying the excess.'
+      title: 'Using more water than allowed',
+      detail: `This farm used ${Math.round(farm.waterUsePct)}% of the water allowed this month.`
+        + (worst ? ` Most of the extra water went to ${worst.type}.` : ''),
+      action: 'Check the meter reading, then talk to the farmer about watering that crop.'
     });
   } else if (farm.waterUsePct < 80) {
     issues.push({
       id: 'under-water',
       severity: 'watch',
-      title: 'Irrigating below the modelled requirement',
-      detail: `Metered use is ${Math.round(farm.waterUsePct)}% of this month's allocation, which usually shows up later as yield.`,
-      action: 'Check whether the shortfall is a supply problem or a scheduling one.'
+      title: 'Using less water than the crops need',
+      detail: `This farm used only ${Math.round(farm.waterUsePct)}% of the water allowed this month. The harvest usually suffers.`,
+      action: 'Find out whether the water supply is short, or the watering times are wrong.'
     });
   }
 
@@ -45,9 +45,9 @@ export function openIssues(farm, { comparison = 'quarter' } = {}) {
     issues.push({
       id: 'fallow',
       severity: 'watch',
-      title: 'Land has come out of production',
-      detail: `${(before - after).toFixed(1)} dunums fewer than the comparison quarter.`,
-      action: 'Ask whether the ground is resting between crops or has been abandoned.'
+      title: 'Less land is planted than before',
+      detail: `${(before - after).toFixed(1)} dunums less than the quarter we are comparing with.`,
+      action: 'Ask if the land is resting between crops, or has been left.'
     });
   }
 
@@ -56,9 +56,9 @@ export function openIssues(farm, { comparison = 'quarter' } = {}) {
     issues.push({
       id: 'canopy',
       severity: canopy.sev >= 3 ? 'act' : 'watch',
-      title: `Canopy is ${canopy.label.toLowerCase()}`,
-      detail: `The stand scores ${Math.round(farm.canopy)} against a healthy floor of 80.`,
-      action: 'Inspect the stand for water stress, salinity or pest damage.'
+      title: `Trees look ${canopy.label.toLowerCase()}`,
+      detail: `The trees score ${Math.round(farm.canopy)} out of 100. Healthy trees score 80 or more.`,
+      action: 'Visit the trees and look for lack of water, salt in the soil, or pests.'
     });
   }
 
@@ -67,9 +67,9 @@ export function openIssues(farm, { comparison = 'quarter' } = {}) {
     issues.push({
       id: 'efficiency',
       severity: efficiency.sev >= 4 ? 'act' : 'watch',
-      title: `Irrigation efficiency is ${efficiency.label.toLowerCase()}`,
-      detail: `Scoring ${farm.efficiency} against a province that averages higher.`,
-      action: 'A site visit to look at the delivery system is usually what moves this score.'
+      title: `Watering is ${efficiency.label.toLowerCase()}`,
+      detail: `This farm scores ${farm.efficiency}, below the average for its province.`,
+      action: 'Visit the farm and look at the pipes, drippers and watering times.'
     });
   }
 

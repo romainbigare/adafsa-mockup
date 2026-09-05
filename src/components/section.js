@@ -1,11 +1,17 @@
-/* Page furniture: a titled card with optional note and tools. */
+/* Page furniture: a titled card.
+ *
+ * `half` puts the card in one column of a two-column grid, so a narrow chart
+ * does not stretch across the whole page. `icon` is a quiet glyph beside the
+ * title — enough to tell one card from another at a glance. */
 
 import { h } from '../app/dom.js';
-import { icon } from '../app/icons.js';
+import { icon as glyph } from '../app/icons.js';
 
-export function section(title, { note = null, tools = [], flush = false } = {}, ...content) {
-  return h('section', { class: 'card' },
+export function section(title, options = {}, ...content) {
+  const { note = null, tools = [], flush = false, half = false, icon = null } = options;
+  return h('section', { class: ['card', half ? 'half' : null] },
     h('div', { class: 'card-head' },
+      icon ? glyph(icon, { size: 15 }) : null,
       h('h2', { text: title }),
       note ? h('span', { class: 'card-note', text: note }) : null,
       tools.length ? h('div', { class: 'card-tools' }, ...tools) : null),
@@ -15,8 +21,7 @@ export function section(title, { note = null, tools = [], flush = false } = {}, 
 export const intro = (text) => h('p', { class: 'section-intro', text });
 
 export function callout(kind, text, { title = null } = {}) {
-  const glyph = kind === 'act' ? 'alert' : kind === 'watch' ? 'alert' : 'info';
-  return h('div', { class: `callout callout-${kind}` }, icon(glyph),
+  return h('div', { class: `callout callout-${kind}` }, glyph(kind === 'info' ? 'info' : 'alert'),
     h('div', {}, title ? h('strong', { text: title }) : null, h('p', { text })));
 }
 
@@ -25,9 +30,7 @@ export function emptyState(title, ...lines) {
     typeof line === 'string' ? h('p', { text: line }) : line));
 }
 
-/* A small "how this is worked out" panel. The review put the model's formula
- * inputs behind one of these rather than on the page — they are parameters, not
- * deliverables. */
+/* A small "how this is worked out" panel for the model's inputs. */
 export function infoPopover(label, title, entries) {
   const panel = h('div', { class: 'popover', hidden: true },
     h('h3', { text: title }),
@@ -40,7 +43,7 @@ export function infoPopover(label, title, entries) {
       panel.hidden = !open;
       button.setAttribute('aria-expanded', String(open));
     }
-  }, icon('info', { size: 14 }), h('span', { text: label }));
+  }, glyph('info', { size: 14 }), h('span', { text: label }));
 
   const host = h('span', { class: 'popover-host' }, button, panel);
   document.addEventListener('click', (event) => {

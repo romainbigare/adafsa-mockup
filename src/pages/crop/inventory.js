@@ -52,17 +52,16 @@ export function render({ selection }) {
   })).filter((entry) => entry.count > 0);
 
   return {
-    asOf: TODAY,
     rail: filterRail(taxonomyTree(), { scope: 'field', selected: selection.types, counts: typeCounts(all) }),
     content: [
       figures([
-        { value: int(withField.length), label: 'Farms with field crops' },
-        { value: int(cultivated), unit: 'dun', label: 'Under field crops' },
-        { value: int(cropCount), label: 'Distinct crops classified' },
-        { value: pct(meanShare), label: 'Average share of a holding' }
+        { value: int(withField.length), label: 'Farms with field crops', icon: 'farms' },
+        { value: int(cultivated), unit: 'dun', label: 'Area under field crops', icon: 'crop' },
+        { value: int(cropCount), label: 'Different crops found', icon: 'layers' },
+        { value: pct(meanShare), label: 'Average share of a farm', icon: 'ruler' }
       ]),
 
-      section('Where the crops are', { note: 'Coloured by the category covering most of the holding.', flush: true },
+      section('Where the crops are', { icon: 'pin', note: 'Colour shows the main crop group.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('crop-inventory', {
           mode: 'category',
           farms: withField,
@@ -71,24 +70,24 @@ export function render({ selection }) {
           labelOf: (farm) => `${dominantCategory(farm)} · ${dec(farm.fieldArea, 1)} dun`,
           legend,
           legendTitle: 'Main field crop',
-          note: 'Click a farm to open its profile.'
+          note: 'Click a farm to open it.'
         }))),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
-        { key: 'field', label: 'Field crops (dun)', value: (set) => set.reduce((a, f) => a + f.fieldArea, 0), format: int },
-        { key: 'share', label: 'Share of holding', value: (set) => {
+      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
+        { key: 'field', label: 'Crops (dun)', value: (set) => set.reduce((a, f) => a + f.fieldArea, 0), format: int },
+        { key: 'share', label: 'Share of farm', value: (set) => {
             const area = set.reduce((a, f) => a + f.area, 0);
             return area ? (set.reduce((a, f) => a + f.fieldArea, 0) / area) * 100 : 0;
           }, format: (v) => pct(v) }
       ])),
 
-      section('Cultivated area by crop', { note: 'Open a category to see the crops inside it.', flush: true },
+      section('Area by crop', { icon: 'crop', half: true, note: 'Click a group to see its crops.', flush: true },
         summaryTable(breakdown.rows, { measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1), totalLabel: 'All field crops' })),
 
-      section('Farms growing each crop', { flush: true },
+      section('Farms growing each crop', { icon: 'farms', half: true, note: 'A farm can grow several crops.', flush: true },
         summaryTable(breakdown.rows, { measure: 'farms', measureLabel: 'Farms', format: countFormat, totalLabel: 'Farms with field crops' })),
 
-      section('Every farm', { note: 'Sort on any column. The export carries the whole list, not the page on screen.', flush: true },
+      section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(farms, {
           selection,
           searchable: true,
@@ -98,8 +97,8 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
-            { key: 'area', label: 'Holding (dun)', align: 'num', value: (f) => f.area, cell: (f) => dec(f.area, 1) },
-            { key: 'field', label: 'Field crops (dun)', align: 'num', defaultSort: true, value: (f) => f.fieldArea, cell: (f) => dec(f.fieldArea, 1) },
+            { key: 'area', label: 'Farm area (dun)', align: 'num', value: (f) => f.area, cell: (f) => dec(f.area, 1) },
+            { key: 'field', label: 'Crops (dun)', align: 'num', defaultSort: true, value: (f) => f.fieldArea, cell: (f) => dec(f.fieldArea, 1) },
             { key: 'share', label: 'Share', align: 'num', value: (f) => (f.area ? (f.fieldArea / f.area) * 100 : 0), cell: (f) => pct(f.area ? (f.fieldArea / f.area) * 100 : 0) },
             { key: 'crops', label: 'Crops', value: (f) => f.crops.filter((c) => !c.former && FIELD_CATEGORIES.includes(c.category)).map((c) => c.type).sort().join(', ') || '—' }
           ]

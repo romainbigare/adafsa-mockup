@@ -5,7 +5,7 @@
  * crosshair, so any point can be read exactly. */
 
 import { h } from '../app/dom.js';
-import { s, niceScale } from './svg.js';
+import { s, niceScale, niceRange } from './svg.js';
 import { attachTooltip } from './tooltip.js';
 import { INK } from '../domain/palette.js';
 
@@ -19,9 +19,10 @@ export function trendLine(labels, series, { format = (v) => String(Math.round(v)
   const plotH = height - PAD.top - PAD.bottom;
 
   const values = series.flatMap((set) => set.values.filter((v) => v != null));
-  const top = niceScale(Math.max(...values, 1));
-  const floor = zeroBased ? 0 : Math.max(0, Math.floor((Math.min(...values) * 0.9) / 10) * 10);
-  const y = (value) => PAD.top + plotH - ((value - floor) / (top.max - floor)) * plotH;
+  const scale = zeroBased
+    ? { min: 0, ...niceScale(Math.max(...values, 1)) }
+    : niceRange(Math.min(...values), Math.max(...values));
+  const y = (value) => PAD.top + plotH - ((value - scale.min) / (scale.max - scale.min)) * plotH;
   const x = (i) => PAD.left + (plotW / Math.max(1, labels.length - 1)) * i;
 
   if (series.length > 1) {
@@ -32,7 +33,7 @@ export function trendLine(labels, series, { format = (v) => String(Math.round(v)
   const svg = s('svg', { viewBox: `0 0 ${W} ${height}`, role: 'img', 'aria-label': series.map((set) => set.label).join(' and ') });
   const grid = s('g', { class: 'grid' });
   const axis = s('g', { class: 'axis' });
-  for (const tick of top.ticks.filter((t) => t >= floor)) {
+  for (const tick of scale.ticks.filter((t) => t >= scale.min && t <= scale.max)) {
     grid.append(s('line', { x1: PAD.left, x2: W - PAD.right, y1: y(tick), y2: y(tick) }));
     axis.append(s('text', { x: PAD.left - 8, y: y(tick) + 4, 'text-anchor': 'end', text: format(tick) }));
   }

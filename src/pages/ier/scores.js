@@ -44,23 +44,29 @@ export function render({ selection }) {
   const critical = farms.filter((farm) => classify(EFFICIENCY, farm.efficiency)?.id === 'critical');
 
   return {
-    asOf: TODAY,
     rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
     content: [
       figures([
-        { value: int(farms.length), label: 'Farms scored' },
-        { value: average == null ? '—' : Math.round(average), label: 'Average efficiency score' },
-        { value: int(priority.length), label: 'Flagged for priority intervention', tone: priority.length ? 'watch' : null },
-        { value: int(critical.length), label: 'In the lowest band', tone: critical.length ? 'act' : null }
+        { value: int(farms.length), label: 'Farms scored', icon: 'farms' },
+        { value: average == null ? '—' : Math.round(average), label: 'Average score', icon: 'ruler' },
+        { value: int(priority.length), label: 'Need attention', icon: 'alert', tone: priority.length ? 'watch' : null },
+        { value: int(critical.length), label: 'In the lowest band', icon: 'alert', tone: critical.length ? 'act' : null }
       ]),
 
       priority.length
-        ? callout('watch', `${int(priority.length)} farms score poor or worse. Sorting the table below by score puts them at the top; the export takes the whole list rather than the page on screen.`)
-        : callout('info', 'No farm in this selection scores below acceptable.'),
+        ? callout('watch', `${int(priority.length)} farms score poor or worse.`)
+        : callout('info', 'No farm scores below acceptable.'),
 
-      section('How the scores divide', {}, bandBar(distribution(EFFICIENCY, farms, (farm) => farm.efficiency))),
+      section('Scores', { icon: 'ruler', half: true, note: 'Farms in each band.' },
+        bandBar(distribution(EFFICIENCY, farms, (farm) => farm.efficiency))),
 
-      section('Where the weak scores are', { note: 'One of the few genuinely spatial questions here.', flush: true },
+      section('Province averages', { icon: 'land', half: true, note: 'A farm is compared to its own province.', flush: true },
+        provinceBlock(farms, [
+          { key: 'score', label: 'Average score', value: (set) => mean(set, (f) => f.efficiency), format: (v) => (v == null ? '—' : Math.round(v)) },
+          { key: 'priority', label: 'Need attention', value: (set) => set.filter((f) => (classify(EFFICIENCY, f.efficiency)?.sev || 0) >= 3).length, format: int }
+        ])),
+
+      section('Where the weak scores are', { icon: 'pin', note: 'Colour shows the score band.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('ier-scores', {
           mode: 'band',
           farms,
@@ -72,13 +78,7 @@ export function render({ selection }) {
           legendTitle: 'Efficiency score'
         }))),
 
-      section('Zone averages', { note: 'Zone means province. A farm is measured against its own.', flush: true },
-        provinceBlock(farms, [
-          { key: 'score', label: 'Average score', value: (set) => mean(set, (f) => f.efficiency), format: (v) => (v == null ? '—' : Math.round(v)) },
-          { key: 'priority', label: 'Priority farms', value: (set) => set.filter((f) => (classify(EFFICIENCY, f.efficiency)?.sev || 0) >= 3).length, format: int }
-        ])),
-
-      section('Every farm', { note: 'Sort by score, or by distance from the province average.', flush: true },
+      section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(farms, {
           selection,
           searchable: true,
@@ -92,12 +92,10 @@ export function render({ selection }) {
             { key: 'band', label: 'Band', value: (f) => classify(EFFICIENCY, f.efficiency)?.label || '—',
               cell: (f) => { const band = classify(EFFICIENCY, f.efficiency); return h('span', { class: 'chip', style: { background: band.color + '22', color: band.color } }, band.label); } },
             { key: 'zone', label: 'Province average', align: 'num', value: (f) => zones.get(f.province), cell: (f) => Math.round(zones.get(f.province)) },
-            { key: 'delta', label: 'Against zone', align: 'num', value: (f) => f.efficiency - zones.get(f.province), cell: (f) => signed(f.efficiency - zones.get(f.province), 0) },
-            { key: 'water', label: 'Water use', align: 'num', value: (f) => f.waterUsePct, cell: (f) => pct(f.waterUsePct) }
+            { key: 'delta', label: 'vs province', align: 'num', value: (f) => f.efficiency - zones.get(f.province), cell: (f) => signed(f.efficiency - zones.get(f.province), 0) },
+            { key: 'water', label: 'Water used', align: 'num', value: (f) => f.waterUsePct, cell: (f) => pct(f.waterUsePct) }
           ]
-        })),
-
-      intro('A breakdown by field office was also wanted. It waits on a mapping of farms to offices, which the survey does not yet carry.')
+        }))
     ]
   };
 }

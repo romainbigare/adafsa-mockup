@@ -20,7 +20,7 @@ export const MODULES = [
     scope: 'field',
     blurb: 'What is growing, on how much land, and how that has moved since last season.',
     pages: [
-      { key: 'inventory', label: 'Crops & cultivated area', kind: 'inventory' },
+      { key: 'inventory', label: 'Crops and area', kind: 'inventory' },
       { key: 'change', label: 'Seasonal change', kind: 'change' },
       { key: 'fallow', label: 'Fallow land', kind: 'inventory' }
     ]
@@ -32,8 +32,8 @@ export const MODULES = [
     scope: 'tree',
     blurb: 'Date palms, fruit trees and forest stands — counts, species, canopy condition.',
     pages: [
-      { key: 'inventory', label: 'Trees, species & varieties', kind: 'inventory' },
-      { key: 'canopy', label: 'Canopy health', kind: 'inventory' },
+      { key: 'inventory', label: 'Trees and species', kind: 'inventory' },
+      { key: 'canopy', label: 'Tree health', kind: 'inventory' },
       { key: 'change', label: 'Annual change', kind: 'change' }
     ]
   },
@@ -56,8 +56,8 @@ export const MODULES = [
     scope: 'all',
     blurb: 'How efficiently each farm irrigates, against its own province.',
     pages: [
-      { key: 'scores', label: 'Efficiency scores', kind: 'inventory' },
-      { key: 'trend', label: 'Quarterly trend', kind: 'change' }
+      { key: 'scores', label: 'Scores', kind: 'inventory' },
+      { key: 'trend', label: 'Trend by quarter', kind: 'change' }
     ]
   },
   {
@@ -67,8 +67,8 @@ export const MODULES = [
     scope: 'all',
     blurb: 'What each farm should be using this month, what it is using, and what a crop costs in water.',
     pages: [
-      { key: 'demand', label: 'Monthly demand & over-allocation', kind: 'change' },
-      { key: 'budget', label: 'Seasonal water budget', kind: 'change' }
+      { key: 'demand', label: 'Monthly demand', kind: 'change' },
+      { key: 'budget', label: 'Season budget', kind: 'change' }
     ]
   },
   {

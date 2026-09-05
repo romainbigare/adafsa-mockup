@@ -1,63 +1,77 @@
-/* The taxonomy filter.
+/* The crop filter.
  *
- * A permanent rail rather than a drawer, because narrowing to a crop is the
- * most common thing anyone does here. Ticking a type narrows the map, the
- * headline figures and every table on the page at the same moment, so no two
- * parts of a screen can disagree about what is being counted.
+ * Everything is ticked when the page opens, so the rail shows what is being
+ * counted rather than an empty list. Unticking narrows the map, the figures and
+ * every table at the same moment.
  *
- * Nothing ticked means everything, so a page never opens on an empty screen. */
+ * The scroll position is kept across a re-render: the page redraws on every
+ * tick, and a list that jumped back to the top each time would be unusable. */
 
 import { h } from '../app/dom.js';
 import { scopeTree } from '../domain/taxonomy.js';
 import { setParams } from '../app/router.js';
 import { int } from '../domain/format.js';
 
+const scrollMemory = new Map();
+
+/* "Nothing selected" and "not filtered yet" have to be different states, or the
+ * None button would silently mean All. This sentinel matches no crop, so an
+ * empty selection genuinely empties the page. */
+const NONE = '-';
+
 export function filterRail(tree, { scope = 'all', selected = new Set(), counts = null, note = null } = {}) {
   const visible = scopeTree(tree, scope);
   const keys = visible.flatMap((category) => category.types.map((type) => type.key));
-  const anyOn = keys.some((key) => selected.has(key));
 
-  const update = (next) => setParams({ types: next.size === keys.length ? null : next, p: null });
+  /* An empty selection means everything, so that is what the boxes show. */
+  const active = selected.size ? new Set([...selected].filter((key) => keys.includes(key))) : new Set(keys);
 
+  const apply = (next) => setParams({
+    types: next.size === keys.length ? null : next.size === 0 ? new Set([NONE]) : next,
+    p: null
+  });
   const toggle = (list, on) => {
-    const next = new Set(selected.size ? selected : []);
+    const next = new Set(active);
     for (const key of list) on ? next.add(key) : next.delete(key);
-    update(next);
+    apply(next);
   };
 
-  const row = (label, key, on, { bold = false, count = null } = {}) =>
-    h('label', { class: ['tax-row', bold ? null : null] },
-      h('input', { type: 'checkbox', checked: on, onchange: (e) => toggle(Array.isArray(key) ? key : [key], e.target.checked) }),
-      h('span', { text: label }),
-      count != null ? h('span', { class: 'count', text: int(count) }) : null);
-
   const groups = visible.map((category) => {
-    const categoryKeys = category.types.map((t) => t.key);
-    const allOn = categoryKeys.every((key) => selected.has(key));
+    const categoryKeys = category.types.map((type) => type.key);
+    const on = categoryKeys.filter((key) => active.has(key)).length;
+    const box = h('input', { type: 'checkbox', checked: on === categoryKeys.length, onchange: (e) => toggle(categoryKeys, e.target.checked) });
+    if (on > 0 && on < categoryKeys.length) box.indeterminate = true;
+
     return h('div', { class: 'tax-group' },
-      h('div', { class: 'tax-cat' },
-        h('label', { class: 'tax-row', style: { fontWeight: 600 } },
-          h('input', { type: 'checkbox', checked: anyOn && allOn, onchange: (e) => toggle(categoryKeys, e.target.checked) }),
-          h('span', { class: 'swatch', style: { background: category.color } }),
-          h('span', { text: category.name }),
-          counts ? h('span', { class: 'count', text: int(categoryKeys.reduce((a, k) => a + (counts.get(k) || 0), 0)) }) : null)),
+      h('label', { class: 'tax-row tax-cat' }, box,
+        h('span', { class: 'swatch', style: { background: category.color } }),
+        h('span', { text: category.name }),
+        counts ? h('span', { class: 'count', text: int(categoryKeys.reduce((a, k) => a + (counts.get(k) || 0), 0)) }) : null),
       category.types.length > 1
         ? h('div', { class: 'tax-types' }, ...category.types.map((type) =>
-            row(type.name, type.key, anyOn ? selected.has(type.key) : false, { count: counts ? counts.get(type.key) || 0 : null })))
+            h('label', { class: 'tax-row' },
+              h('input', { type: 'checkbox', checked: active.has(type.key), onchange: (e) => toggle([type.key], e.target.checked) }),
+              h('span', { text: type.name }),
+              counts ? h('span', { class: 'count', text: int(counts.get(type.key) || 0) }) : null)))
         : null);
   });
 
+  const body = h('div', { class: 'rail-body' }, ...groups);
+  const memoryKey = `rail:${scope}`;
+  body.addEventListener('scroll', () => scrollMemory.set(memoryKey, body.scrollTop));
+  requestAnimationFrame(() => { body.scrollTop = scrollMemory.get(memoryKey) || 0; });
+
   return h('div', { class: 'rail-panel' },
     h('div', { class: 'rail-head' },
-      h('h2', { text: 'Filter by crop' }),
+      h('h2', { text: 'Crops' }),
       h('div', { class: 'rail-actions' },
-        h('button', { class: 'link', onclick: () => update(new Set(keys)), text: 'All' }),
-        h('button', { class: 'link', onclick: () => update(new Set()), text: 'Clear' }))),
-    h('div', { class: 'rail-body' }, ...groups),
-    h('p', { class: 'rail-note', text: note || (anyOn ? 'Filtering the whole page.' : 'Nothing ticked — showing everything.') }));
+        h('button', { class: 'link', onclick: () => apply(new Set(keys)), text: 'All' }),
+        h('button', { class: 'link', onclick: () => apply(new Set()), text: 'None' }))),
+    body,
+    note ? h('p', { class: 'rail-note', text: note }) : null);
 }
 
-/* How many farms grow each type, for the counts beside the checkboxes. */
+/* How many farms grow each type, for the counts beside the boxes. */
 export function typeCounts(farms) {
   const counts = new Map();
   for (const farm of farms) {

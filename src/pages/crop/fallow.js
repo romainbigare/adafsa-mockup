@@ -38,24 +38,31 @@ export function render({ selection }) {
   const bands = distribution(CULTIVATION, farms, (farm) => farm.cultivatedShare);
 
   return {
-    asOf: TODAY,
     tools: [comparisonSelect(selection.comparison)],
     content: [
       figures([
-        { value: int(fallowArea), unit: 'dun', label: 'Classified fallow' },
-        { value: pct(holding ? (fallowArea / holding) * 100 : 0, 1), label: 'Of all holding area' },
-        { value: int(withFallow.length), label: 'Farms carrying fallow land' },
-        { value: int(shrinking.length), label: `Farms with less in production ${period.label}`, tone: shrinking.length ? 'watch' : null }
+        { value: int(fallowArea), unit: 'dun', label: 'Fallow land', icon: 'land' },
+        { value: pct(holding ? (fallowArea / holding) * 100 : 0, 1), label: 'Share of all farm area', icon: 'ruler' },
+        { value: int(withFallow.length), label: 'Farms with fallow land', icon: 'farms' },
+        { value: int(shrinking.length), label: `Farms planting less ${period.label}`, icon: 'arrowDown', tone: shrinking.length ? 'watch' : null }
       ]),
 
       shrinking.length
-        ? callout('watch', `${int(shrinking.length)} farms have taken land out of production since the comparison quarter, ${dec(net.lost, 0)} dunums in total. Newly abandoned ground is what generates a message to the farmer, so this list is the one worth working through.`)
-        : callout('info', 'No farm has taken land out of production over this period.'),
+        ? callout('watch', `${int(shrinking.length)} farms are planting less than before — ${dec(net.lost, 0)} dunums in total.`)
+        : callout('info', 'No farm is planting less than before.'),
 
-      section('How much of each holding is in production', {},
+      section('Land in production', { icon: 'crop', half: true, note: 'Share of each farm.' },
         bandBar(bands)),
 
-      section('Where the fallow ground is', { note: 'Coloured by how much of the holding is in production.', flush: true },
+      section('By province', { icon: 'land', half: true, flush: true }, provinceBlock(farms, [
+        { key: 'fallow', label: 'Fallow (dun)', value: (set) => set.reduce((a, f) => a + f.fallowArea, 0), format: int },
+        { key: 'share', label: 'Share of area', value: (set) => {
+            const area = set.reduce((a, f) => a + f.area, 0);
+            return area ? (set.reduce((a, f) => a + f.fallowArea, 0) / area) * 100 : 0;
+          }, format: (v) => pct(v, 1) }
+      ])),
+
+      section('Where the fallow land is', { icon: 'pin', note: 'Colour shows land in production.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('crop-fallow', {
           mode: 'band',
           farms,
@@ -67,15 +74,7 @@ export function render({ selection }) {
           legendTitle: 'Land in production'
         }))),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
-        { key: 'fallow', label: 'Fallow (dun)', value: (set) => set.reduce((a, f) => a + f.fallowArea, 0), format: int },
-        { key: 'share', label: 'Share of holding', value: (set) => {
-            const area = set.reduce((a, f) => a + f.area, 0);
-            return area ? (set.reduce((a, f) => a + f.fallowArea, 0) / area) * 100 : 0;
-          }, format: (v) => pct(v, 1) }
-      ])),
-
-      section('Every farm', { note: 'Sort by the fallow column to work from the largest down.', flush: true },
+      section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(farms, {
           selection,
           searchable: true,
@@ -85,17 +84,15 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
-            { key: 'area', label: 'Holding (dun)', align: 'num', value: (f) => f.area, cell: (f) => dec(f.area, 1) },
+            { key: 'area', label: 'Farm area (dun)', align: 'num', value: (f) => f.area, cell: (f) => dec(f.area, 1) },
             { key: 'fallow', label: 'Fallow (dun)', align: 'num', defaultSort: true, value: (f) => f.fallowArea, cell: (f) => dec(f.fallowArea, 1) },
-            { key: 'inprod', label: 'In production', align: 'num', value: (f) => f.cultivatedShare, cell: (f) => pct(f.cultivatedShare) },
+            { key: 'inprod', label: 'Planted', align: 'num', value: (f) => f.cultivatedShare, cell: (f) => pct(f.cultivatedShare) },
             { key: 'band', label: 'Status', value: (f) => classify(CULTIVATION, f.cultivatedShare)?.label || '—' },
             { key: 'move', label: `Change ${period.label} (dun)`, align: 'num',
               value: (f) => { const m = moves.find((x) => x.record.fid === f.fid); return m ? m.delta : 0; },
               cell: (f) => { const m = moves.find((x) => x.record.fid === f.fid); return m ? signed(m.delta, 1) : '—'; } }
           ]
-        })),
-
-      intro('Fallow ground also appears in Land Use as a class of land. This page owns the detection and the movement; that one reports the standing inventory.')
+        }))
     ]
   };
 }

@@ -46,36 +46,35 @@ export function render({ selection }) {
   const worst = [...byCrop.values()].filter((c) => c.value > 1).sort((a, b) => b.value - a.value);
 
   return {
-    asOf: TODAY,
     tools: [infoPopover('How this is worked out', 'Water model inputs', FORMULA_NOTES)],
     rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
     content: [
       figures([
-        { value: compact(demand), unit: 'm³', label: `Allocated for ${month}` },
-        { value: compact(actual), unit: 'm³', label: 'Metered use' },
-        { value: int(flagged.length), label: 'Farms over-allocated', tone: flagged.length ? 'act' : null },
-        { value: compact(excess), unit: 'm³', label: 'Used above allocation', tone: excess > 0 ? 'watch' : null }
+        { value: compact(demand), unit: 'm³', label: `Water allowed in ${month}`, icon: 'water' },
+        { value: compact(actual), unit: 'm³', label: 'Water actually used', icon: 'water' },
+        { value: int(flagged.length), label: 'Farms using too much', icon: 'alert', tone: flagged.length ? 'act' : null },
+        { value: compact(excess), unit: 'm³', label: 'Extra water used', icon: 'arrowUp', tone: excess > 0 ? 'watch' : null }
       ]),
 
       flagged.length
-        ? callout('act', `${int(flagged.length)} farms are running above 125% of this month's allocation. Opening a farm shows which of its crops the excess sits in — the flag says that a farm is over, the per-crop split says where.`)
-        : callout('info', 'No farm is above its allocation this month.'),
+        ? callout('act', `${int(flagged.length)} farms used more than 125% of this month's allowance. Open a farm to see which crop.`)
+        : callout('info', 'No farm went over its allowance this month.'),
 
-      section('Use against allocation', { note: 'Measured against this month, not the season.' },
+      section('Water use', { icon: 'water', half: true, note: 'Compared with what is allowed.' },
         bandBar(distribution(WATER_USE, withDemand, (farm) => farm.waterUsePct))),
 
-      section('Where the excess sits, by crop', { note: `Cubic metres above allocation this month.` },
+      section('Which crops use too much', { icon: 'crop', half: true, note: 'Extra water used this month.' },
         worst.length
           ? barList(worst.map((crop) => ({ label: crop.label, value: crop.value, color: categoryColor(crop.category) })), { format: compact, limit: 12 })
-          : intro('Nothing is running above allocation in the current selection.')),
+          : intro('No crop is over its allowance.')),
 
-      section('By province', { flush: true }, provinceBlock(withDemand, [
-        { key: 'demand', label: 'Allocated (m³)', value: (set) => set.reduce((a, f) => a + f.waterDemand, 0), format: compact },
-        { key: 'actual', label: 'Metered (m³)', value: (set) => set.reduce((a, f) => a + f.waterActual, 0), format: compact },
+      section('By province', { icon: 'land', flush: true }, provinceBlock(withDemand, [
+        { key: 'demand', label: 'Allowed (m³)', value: (set) => set.reduce((a, f) => a + f.waterDemand, 0), format: compact },
+        { key: 'actual', label: 'Used (m³)', value: (set) => set.reduce((a, f) => a + f.waterActual, 0), format: compact },
         { key: 'flag', label: 'Over-allocated', value: (set) => set.filter((f) => f.overAllocated).length, format: int }
       ])),
 
-      section('Every farm', { note: 'Sort by variance to work from the largest overrun down.', flush: true },
+      section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(withDemand, {
           selection,
           searchable: true,
@@ -85,9 +84,9 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
-            { key: 'demand', label: 'Allocated (m³)', align: 'num', value: (f) => f.waterDemand, cell: (f) => int(f.waterDemand) },
-            { key: 'actual', label: 'Metered (m³)', align: 'num', value: (f) => f.waterActual, cell: (f) => int(f.waterActual) },
-            { key: 'variance', label: 'Variance (m³)', align: 'num', defaultSort: true, value: (f) => f.waterActual - f.waterDemand, cell: (f) => int(f.waterActual - f.waterDemand) },
+            { key: 'demand', label: 'Allowed (m³)', align: 'num', value: (f) => f.waterDemand, cell: (f) => int(f.waterDemand) },
+            { key: 'actual', label: 'Used (m³)', align: 'num', value: (f) => f.waterActual, cell: (f) => int(f.waterActual) },
+            { key: 'variance', label: 'Difference (m³)', align: 'num', defaultSort: true, value: (f) => f.waterActual - f.waterDemand, cell: (f) => int(f.waterActual - f.waterDemand) },
             { key: 'use', label: 'Use', align: 'num', value: (f) => f.waterUsePct, cell: (f) => pct(f.waterUsePct) },
             { key: 'band', label: 'Status', value: (f) => classify(WATER_USE, f.waterUsePct)?.label || '—',
               cell: (f) => { const band = classify(WATER_USE, f.waterUsePct); return h('span', { class: 'chip', style: { background: band.color + '22', color: band.color } }, band.label); } },

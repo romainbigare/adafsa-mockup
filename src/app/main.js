@@ -51,7 +51,6 @@ async function draw(route) {
     place,
     selection: chosen,
     tools: view.tools || [],
-    asOf: view.asOf,
     showRegion: view.showRegion !== false
   });
   renderBody(body, view);

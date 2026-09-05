@@ -61,45 +61,41 @@ export function render({ selection }) {
     rows.reduce((total, row) => total + monthlyDemand(row.category, row.area * monthlyCurve(row.category, row.type)[month], month), 0));
 
   return {
-    asOf: TODAY,
     tools: [infoPopover('How this is worked out', 'Water model inputs', FORMULA_NOTES)],
     rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
     content: [
       figures([
-        { value: compact(water), unit: 'm³', label: 'Water over a full cycle' },
-        { value: compact(kilos / 1000), unit: 't', label: 'Expected production' },
-        { value: kilos ? dec(water / kilos, 2) : '—', unit: 'm³/kg', label: 'Water per kilo produced' },
-        { value: int(area), unit: 'dun', label: 'Crop coverage surveyed' }
+        { value: compact(water), unit: 'm³', label: 'Water for a full season', icon: 'water' },
+        { value: compact(kilos / 1000), unit: 't', label: 'Expected harvest', icon: 'yieldup' },
+        { value: kilos ? dec(water / kilos, 2) : '—', unit: 'm³/kg', label: 'Water for one kilo', icon: 'scale' },
+        { value: int(area), unit: 'dun', label: 'Area planted', icon: 'crop' }
       ]),
 
-      intro('If ADAFSA authorises a crop across this many farms and this much land, this is the water it commits to over the growing cycle. That is the calculation the allocation plan rests on, and it is why a crop with a high figure in the last column is worth a conversation.'),
-
-      section('What each crop costs in water', { note: 'Over one full growing cycle, for the current selection.', flush: true },
+      section('What each crop costs in water', { icon: 'calculator', note: 'One full growing season.', flush: true },
         dataTable(crops, {
           selection,
           csvName: 'seasonal-water-budget',
           columns: [
             { key: 'type', label: 'Crop', strong: true, value: (c) => c.type,
               cell: (c) => h('span', { class: 'bar-cell' }, h('span', { class: 'swatch', style: { background: categoryColor(c.category) } }), c.type) },
-            { key: 'category', label: 'Group', value: (c) => c.category },
             { key: 'farms', label: 'Farms', align: 'num', value: (c) => c.farmCount, cell: (c) => int(c.farmCount) },
             { key: 'area', label: 'Dunums', align: 'num', value: (c) => c.area, cell: (c) => dec(c.area, 1) },
-            { key: 'cycle', label: 'Cycle (months)', align: 'num', value: (c) => c.cycle },
-            { key: 'water', label: 'Water (m³)', align: 'num', defaultSort: true, value: (c) => c.water, cell: (c) => int(c.water) },
-            { key: 'kilos', label: 'Production (t)', align: 'num', value: (c) => c.kilos / 1000, cell: (c) => dec(c.kilos / 1000, 1) },
-            { key: 'perkilo', label: 'm³ per kilo', align: 'num', value: (c) => c.perKilo, cell: (c) => (c.perKilo == null ? '—' : dec(c.perKilo, 2)) }
+            { key: 'cycle', label: 'Season (months)', align: 'num', value: (c) => c.cycle },
+            { key: 'water', label: 'Water needed (m³)', align: 'num', defaultSort: true, value: (c) => c.water, cell: (c) => int(c.water) },
+            { key: 'kilos', label: 'Harvest (t)', align: 'num', value: (c) => c.kilos / 1000, cell: (c) => dec(c.kilos / 1000, 1) },
+            { key: 'perkilo', label: 'Water per kilo (m³)', align: 'num', value: (c) => c.perKilo, cell: (c) => (c.perKilo == null ? '—' : dec(c.perKilo, 2)) }
           ]
         })),
 
-      section('Thirstiest crops per kilo produced', { note: 'The number worth quoting in a policy conversation.' },
+      section('Water needed for one kilo', { icon: 'scale', half: true, note: 'Higher means thirstier.' },
         barList(crops.filter((c) => c.perKilo != null).sort((a, b) => b.perKilo - a.perKilo)
           .map((crop) => ({ label: crop.type, value: crop.perKilo, color: categoryColor(crop.category) })),
           { format: (v) => `${dec(v, 2)} m³/kg`, limit: 12 })),
 
-      section('Crop coverage through the year', { note: 'Modelled demand by month, following what the farms actually plant.' },
+      section('Water needed each month', { icon: 'calendar', half: true, note: 'Follows what the farms plant.' },
         columnChart(MONTHS, [{ label: 'Water demand (m³)', color: COMPARE.current, values: monthly }], { format: compact })),
 
-      section('Water per kilo, by farm', { note: 'Searchable, as asked — the ratio matters at farm level too.', flush: true },
+      section('Water per kilo, by farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(farms.filter((farm) => farm.expectedKg > 0), {
           selection,
           searchable: true,
@@ -109,13 +105,11 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
-            { key: 'water', label: 'Seasonal water (m³)', align: 'num', value: (f) => f.seasonalWater, cell: (f) => int(f.seasonalWater) },
-            { key: 'kilos', label: 'Production (t)', align: 'num', value: (f) => f.expectedKg / 1000, cell: (f) => dec(f.expectedKg / 1000, 1) },
-            { key: 'perkilo', label: 'm³ per kilo', align: 'num', defaultSort: true, value: (f) => f.seasonalWater / f.expectedKg, cell: (f) => dec(f.seasonalWater / f.expectedKg, 2) }
+            { key: 'water', label: 'Water per season (m³)', align: 'num', value: (f) => f.seasonalWater, cell: (f) => int(f.seasonalWater) },
+            { key: 'kilos', label: 'Harvest (t)', align: 'num', value: (f) => f.expectedKg / 1000, cell: (f) => dec(f.expectedKg / 1000, 1) },
+            { key: 'perkilo', label: 'Water per kilo (m³)', align: 'num', defaultSort: true, value: (f) => f.seasonalWater / f.expectedKg, cell: (f) => dec(f.seasonalWater / f.expectedKg, 2) }
           ]
-        })),
-
-      intro('Fruit trees are included throughout this module, as the proposal requires. Forest stands are left out of it: the water calculation never covers them, and they produce nothing to weigh.')
+        }))
     ]
   };
 }

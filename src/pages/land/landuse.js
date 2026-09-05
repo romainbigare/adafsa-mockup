@@ -41,17 +41,16 @@ export function render({ selection }) {
   const fallow = parcels.filter((p) => p.type === 'Fallow Land').reduce((a, p) => a + p.area, 0);
 
   return {
-    asOf: TODAY,
     content: [
       figures([
-        { value: int(total), unit: 'dun', label: 'Land classified' },
-        { value: int(areaOf('Open Agriculture')), unit: 'dun', label: 'Open agriculture' },
-        { value: int(areaOf('Protected Agriculture') + areaOf('Structures')), unit: 'dun', label: 'Built and protected' },
-        { value: int(fallow), unit: 'dun', label: 'Fallow ground' },
-        { value: int(areaOf('Barren Land')), unit: 'dun', label: 'Barren' }
+        { value: int(total), unit: 'dun', label: 'Land mapped', icon: 'land' },
+        { value: int(areaOf('Open Agriculture')), unit: 'dun', label: 'Open farmland', icon: 'crop' },
+        { value: int(areaOf('Protected Agriculture') + areaOf('Structures')), unit: 'dun', label: 'Buildings and greenhouses', icon: 'land' },
+        { value: int(fallow), unit: 'dun', label: 'Fallow land', icon: 'ruler' },
+        { value: int(areaOf('Barren Land')), unit: 'dun', label: 'Bare ground', icon: 'ruler' }
       ]),
 
-      section('The classified survey', { note: 'Real parcel boundaries, coloured by class.', flush: true },
+      section('How the land is used', { icon: 'pin', note: 'Colour shows the type of land.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('land-landuse', {
           mode: 'parcels',
           farms,
@@ -62,23 +61,22 @@ export function render({ selection }) {
           farmColor: (farm) => landuseColor(dominantClass(farm)),
           labelOf: (farm) => `${dominantClass(farm)} · ${dec(farm.area, 1)} dun`,
           legend: CLASS_ORDER.map((name) => ({ label: name, color: landuseColor(name) })),
-          legendTitle: 'Land use class',
-          note: null
+          legendTitle: 'Land use class'
         }))),
 
-      section('By province', { flush: true }, provinceBlock(farms, [
-        { key: 'open', label: 'Open ag. (dun)', value: (set) => set.flatMap((f) => f.landParcels).filter((p) => p.category === 'Open Agriculture').reduce((a, p) => a + p.area, 0), format: int },
-        { key: 'built', label: 'Built (dun)', value: (set) => set.reduce((a, f) => a + f.structureArea, 0), format: (v) => dec(v, 1) },
+      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
+        { key: 'open', label: 'Farmland (dun)', value: (set) => set.flatMap((f) => f.landParcels).filter((p) => p.category === 'Open Agriculture').reduce((a, p) => a + p.area, 0), format: int },
+        { key: 'built', label: 'Buildings (dun)', value: (set) => set.reduce((a, f) => a + f.structureArea, 0), format: (v) => dec(v, 1) },
         { key: 'fallow', label: 'Fallow (dun)', value: (set) => set.reduce((a, f) => a + f.fallowArea, 0), format: int }
       ])),
 
-      section('Area by class', { note: 'Open a class to see the types inside it.', flush: true },
+      section('Area by land type', { icon: 'layers', note: 'Click a type to see more detail.', flush: true },
         summaryTable(rows, {
           measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1),
           totalLabel: 'All classified land', colorOf: (row) => landuseColor(row.name)
         })),
 
-      section('Every farm', { flush: true },
+      section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(farms, {
           selection,
           searchable: true,
@@ -88,15 +86,13 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
-            { key: 'area', label: 'Holding (dun)', align: 'num', defaultSort: true, value: (f) => f.area, cell: (f) => dec(f.area, 1) },
-            { key: 'prod', label: 'In production', align: 'num', value: (f) => f.cultivatedShare, cell: (f) => pct(f.cultivatedShare) },
+            { key: 'area', label: 'Farm area (dun)', align: 'num', defaultSort: true, value: (f) => f.area, cell: (f) => dec(f.area, 1) },
+            { key: 'prod', label: 'Planted', align: 'num', value: (f) => f.cultivatedShare, cell: (f) => pct(f.cultivatedShare) },
             { key: 'fallow', label: 'Fallow (dun)', align: 'num', value: (f) => f.fallowArea, cell: (f) => dec(f.fallowArea, 1) },
             { key: 'barren', label: 'Barren (dun)', align: 'num', value: (f) => f.barrenArea, cell: (f) => dec(f.barrenArea, 1) },
-            { key: 'built', label: 'Built (dun)', align: 'num', value: (f) => f.structureArea, cell: (f) => dec(f.structureArea, 2) }
+            { key: 'built', label: 'Buildings (dun)', align: 'num', value: (f) => f.structureArea, cell: (f) => dec(f.structureArea, 2) }
           ]
-        })),
-
-      intro('Fallow ground is reported here as a class of land. Crop Monitoring owns its detection and its movement from season to season.')
+        }))
     ]
   };
 }

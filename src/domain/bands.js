@@ -14,8 +14,8 @@ export const UNKNOWN_COLOR = '#9ca3af';
 const scale = (key, label, bands) => ({ key, label, bands, worstSev: Math.max(...bands.map((b) => b.sev)) });
 
 export const CULTIVATION = scale('cultivation', 'Cultivated share', [
-  { id: 'cultivated', label: 'Cultivated', range: '≥ 66%', color: '#1a9850', sev: 0, test: (v) => v >= 66 },
-  { id: 'partial', label: 'Partially fallow', range: '33–66%', color: '#fee08b', sev: 1, test: (v) => v >= 33 && v < 66 },
+  { id: 'cultivated', label: 'Planted', range: '≥ 66%', color: '#1a9850', sev: 0, test: (v) => v >= 66 },
+  { id: 'partial', label: 'Part planted', range: '33–66%', color: '#fee08b', sev: 1, test: (v) => v >= 33 && v < 66 },
   { id: 'fallow', label: 'Fallow', range: '< 33%', color: '#d9a441', sev: 2, test: (v) => v < 33 }
 ]);
 
@@ -23,7 +23,7 @@ export const CANOPY = scale('canopy', 'Canopy health index', [
   { id: 'healthy', label: 'Healthy', range: '≥ 80', color: '#1a9850', sev: 0, test: (v) => v >= 80 },
   { id: 'fair', label: 'Fair', range: '65–79', color: '#91cf60', sev: 1, test: (v) => v >= 65 && v < 80 },
   { id: 'stressed', label: 'Stressed', range: '50–64', color: '#fee08b', sev: 2, test: (v) => v >= 50 && v < 65 },
-  { id: 'severe', label: 'Severe stress', range: '< 50', color: '#d73027', sev: 3, test: (v) => v < 50 }
+  { id: 'severe', label: 'Very stressed', range: '< 50', color: '#d73027', sev: 3, test: (v) => v < 50 }
 ]);
 
 export const EFFICIENCY = scale('efficiency', 'Irrigation efficiency', [
@@ -38,9 +38,9 @@ export const EFFICIENCY = scale('efficiency', 'Irrigation efficiency', [
  * raised here, against the month rather than the season — by the time a season
  * closes it is too late for anyone to act on it. */
 export const WATER_USE = scale('waterUse', 'Use against demand', [
-  { id: 'under', label: 'Under-irrigated', range: '< 80%', color: '#e08214', sev: 2, test: (v) => v < 80 },
+  { id: 'under', label: 'Below plan', range: '< 80%', color: '#e08214', sev: 2, test: (v) => v < 80 },
   { id: 'onplan', label: 'On plan', range: '80–105%', color: '#1a9850', sev: 0, test: (v) => v >= 80 && v < 105 },
-  { id: 'excess', label: 'Mild excess', range: '105–125%', color: '#fee08b', sev: 1, test: (v) => v >= 105 && v <= 125 },
+  { id: 'excess', label: 'Slightly over', range: '105–125%', color: '#fee08b', sev: 1, test: (v) => v >= 105 && v <= 125 },
   { id: 'over', label: 'Over-allocated', range: '> 125%', color: '#b30000', sev: 3, test: (v) => v > 125 }
 ]);
 

@@ -13,6 +13,29 @@ export function s(tag, attrs = {}, ...children) {
   return node;
 }
 
+/* An axis that frames the data rather than the origin.
+ *
+ * An average that moves between 84 and 86 drawn from zero is a flat line, which
+ * tells the reader nothing. This pads either side of the range and rounds the
+ * ends to something quotable. */
+export function niceRange(min, max, ticks = 4) {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return { min: 0, max: 1, ticks: [0, 1] };
+  let span = max - min;
+  if (span <= 0) span = Math.abs(max) * 0.2 || 1;
+  const pad = span * 0.45;
+  const step = niceStep((span + pad * 2) / ticks);
+  const low = Math.floor((min - pad) / step) * step;
+  const high = Math.ceil((max + pad) / step) * step;
+  const out = [];
+  for (let v = low; v <= high + step / 2; v += step) out.push(Math.round(v * 1e6) / 1e6);
+  return { min: low, max: high, ticks: out };
+}
+
+function niceStep(raw) {
+  const magnitude = 10 ** Math.floor(Math.log10(Math.abs(raw) || 1));
+  return ([1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((v) => v >= raw) || magnitude * 10);
+}
+
 /* A "nice" upper bound and a small number of ticks, so an axis reads in round
  * numbers rather than in whatever the maximum happened to be. */
 export function niceScale(max, ticks = 4) {

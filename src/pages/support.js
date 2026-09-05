@@ -11,16 +11,16 @@ export function render() {
     showRegion: false,
     content: [
       h('div', { class: 'card' },
-        h('div', { class: 'card-head' }, h('h2', { text: 'Getting help' })),
+        h('div', { class: 'card-head' }, icon('support', { size: 15 }), h('h2', { text: 'Getting help' })),
         h('div', { class: 'card-body' },
           h('p', { class: 'section-intro' },
-            'Questions about a figure on any page, a farm that looks wrong, or a report you need and cannot find go to the platform team. Every page can be linked to directly — copying the address from the browser is the quickest way to point at what you are looking at.'))),
+            'Ask the platform team about any figure, farm or report. To point at what you are looking at, copy the address from your browser and send it — every page has its own link.'))),
       h('div', { class: 'card' },
-        h('div', { class: 'card-head' }, h('h2', { text: 'About the figures on this build' })),
+        h('div', { class: 'card-head' }, icon('info', { size: 15 }), h('h2', { text: 'About this version' })),
         h('div', { class: 'card-body' },
           h('div', { class: 'callout callout-info' }, icon('info'),
             h('div', {},
-              h('p', { text: 'This is a design mockup. Farm boundaries, crop parcels and land-use classes come from the survey; every score, count, forecast and history is generated. No number here describes a real farm.' })))))
+              h('p', { text: 'This is a design mockup. Farm outlines, crop parcels and land types come from the survey. Scores, counts and forecasts are made up for the demo.' })))))
     ]
   };
 }
