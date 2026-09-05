@@ -30,6 +30,11 @@ export const YIELD_TONNES_PER_DUNUM = {
  * in Abu Dhabi roughly doubles a crop's demand over winter. */
 export const ET_BY_MONTH = [0.62, 0.70, 0.85, 1.05, 1.25, 1.40, 1.45, 1.42, 1.25, 1.02, 0.80, 0.66];
 
+/* The module covers field crops, palms and fruit trees. Forest stands are
+ * outside it — the proposal never brings them into the water calculation, and
+ * they produce nothing to weigh, so a figure per kilo would be meaningless. */
+export const WATER_CATEGORIES = ['Cereals', 'Fodder', 'Open Field', 'Date Palm', 'Fruit Trees'];
+
 export const FORMULA_NOTES = [
   ['Monthly water demand', 'crop area × the crop’s base rate × the month’s ET multiplier'],
   ['Base rate', 'cubic metres per dunum per month, by crop category'],

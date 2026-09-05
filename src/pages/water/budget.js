@@ -17,7 +17,7 @@ import { columns as columnChart } from '../../charts/columns.js';
 import { dataTable } from '../../components/dataTable.js';
 import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { query, taxonomyTree, cropRows } from '../../data/store.js';
-import { FORMULA_NOTES, monthlyDemand } from '../../domain/waterModel.js';
+import { FORMULA_NOTES, WATER_CATEGORIES, monthlyDemand } from '../../domain/waterModel.js';
 import { CYCLE_MONTHS, monthlyCurve } from '../../domain/cropCalendar.js';
 import { categoryColor, COMPARE } from '../../domain/palette.js';
 import { int, dec, compact } from '../../domain/format.js';
@@ -27,7 +27,7 @@ import { TODAY, MONTHS } from '../../domain/periods.js';
 export function render({ selection }) {
   const all = query({ region: selection.region });
   const farms = query({ region: selection.region, types: selection.types });
-  const rows = cropRows(farms, { types: selection.types });
+  const rows = cropRows(farms, { types: selection.types, categories: WATER_CATEGORIES });
 
   /* The policy table: one row per crop, with what the whole crop costs the
    * emirate over its cycle and what it returns. */
@@ -115,7 +115,7 @@ export function render({ selection }) {
           ]
         })),
 
-      intro('Fruit trees are included throughout this module. Forest stands are not — they produce nothing to weigh, so a figure per kilo would be meaningless for them.')
+      intro('Fruit trees are included throughout this module, as the proposal requires. Forest stands are left out of it: the water calculation never covers them, and they produce nothing to weigh.')
     ]
   };
 }

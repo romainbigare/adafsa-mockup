@@ -18,7 +18,7 @@ import { dataTable } from '../../components/dataTable.js';
 import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { query, taxonomyTree, cropRows } from '../../data/store.js';
 import { WATER_USE, classify, distribution } from '../../domain/bands.js';
-import { FORMULA_NOTES } from '../../domain/waterModel.js';
+import { FORMULA_NOTES, WATER_CATEGORIES } from '../../domain/waterModel.js';
 import { COMPARE, categoryColor } from '../../domain/palette.js';
 import { int, dec, pct, m3, compact } from '../../domain/format.js';
 import { regionById } from '../../domain/regions.js';
@@ -36,7 +36,7 @@ export function render({ selection }) {
   const month = MONTHS[TODAY.getUTCMonth()];
 
   /* Where the excess sits, by crop — the answer to "it is the citrus trees". */
-  const rows = cropRows(withDemand, { types: selection.types });
+  const rows = cropRows(withDemand, { types: selection.types, categories: WATER_CATEGORIES });
   const byCrop = new Map();
   for (const row of rows) {
     const over = Math.max(0, row.actualThisMonth - row.demandThisMonth);
