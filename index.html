@@ -16,8 +16,12 @@
 <div class="app">
   <nav id="nav" class="nav" aria-label="Sections"></nav>
   <div class="app-main">
-    <header id="page-header" class="page-header"></header>
-    <div id="filter-strip" class="filter-strip"></div>
+    <!-- The header and the filters are one sticky block. Two of them stacked
+         left a hairline of scrolled content showing between the two. -->
+    <div class="app-bar">
+      <header id="page-header" class="page-header"></header>
+      <div id="filter-strip" class="filter-strip"></div>
+    </div>
     <main id="page-body" class="page-body" tabindex="-1"></main>
   </div>
 </div>

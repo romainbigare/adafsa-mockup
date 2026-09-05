@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const [url, out, scroll] = process.argv.slice(2);
+const proxy = process.env.HTTPS_PROXY;
+const b = await chromium.launch({ proxy: { server: proxy, bypass: '<-loopback>,localhost,127.0.0.1' } });
+const p = await b.newPage({ viewport: { width: 1440, height: 980 } });
+await p.goto(url, { waitUntil: 'load' });
+await p.waitForTimeout(2200);
+await p.evaluate((y) => window.scrollTo(0, Number(y)), scroll || 0);
+await p.waitForTimeout(400);
+await p.screenshot({ path: out });
+await b.close();

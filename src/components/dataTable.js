@@ -14,6 +14,7 @@ import { h, clear } from '../app/dom.js';
 import { icon } from '../app/icons.js';
 import { int } from '../domain/format.js';
 import { setParams } from '../app/router.js';
+import { deckMark } from '../app/deckMark.js';
 
 const PAGE_SIZE = 25;
 
@@ -56,6 +57,7 @@ export function dataTable(rows, {
       class: [col.align === 'num' ? 'num' : null, 'sortable'],
       'aria-sort': active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none',
       title: `Sort by ${col.label}`,
+      ...deckMark({ note: 'Any column heading sorts the table, either way' }),
       onclick: () => setParams({ sort: col.key, dir: active && sortDir === 'desc' ? 'asc' : 'desc', p: null })
     }, col.label, active ? h('span', { class: 'sort-mark', text: sortDir === 'asc' ? '▲' : '▼' }) : null);
   }));
@@ -77,7 +79,11 @@ export function dataTable(rows, {
     body.append(tr);
   }
 
-  const exportBtn = h('button', { class: 'btn btn-sm', onclick: () => exportCsv(sorted, columns, csvName) },
+  const exportBtn = h('button', {
+    class: 'btn btn-sm',
+    ...deckMark({ note: 'Downloads every row the search and sort produced, not the page on screen' }),
+    onclick: () => exportCsv(sorted, columns, csvName)
+  },
     icon('download', { size: 14 }), h('span', { text: 'Export CSV' }));
 
   const search = searchable

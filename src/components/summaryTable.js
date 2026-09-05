@@ -12,6 +12,7 @@ import { h, clear } from '../app/dom.js';
 import { icon } from '../app/icons.js';
 import { int, dec, pct } from '../domain/format.js';
 import { categoryColor } from '../domain/palette.js';
+import { deckMark } from '../app/deckMark.js';
 
 export function summaryTable(rows, {
   measure = 'area',
@@ -55,6 +56,7 @@ export function summaryTable(rows, {
             ? h('button', {
                 class: 'disclose', 'aria-expanded': String(expanded),
                 'aria-label': `${expanded ? 'Hide' : 'Show'} the crops inside ${row.name}`,
+                ...deckMark({ note: 'Opens a group into the crops it is made of' }),
                 onclick: () => { expanded ? open.delete(row.key) : open.add(row.key); draw(); }
               }, icon('chevron', { size: 13 }))
             : h('span', { style: { display: 'inline-block', width: '19px' } }),

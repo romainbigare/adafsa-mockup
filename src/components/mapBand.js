@@ -19,6 +19,7 @@ import { icon } from '../app/icons.js';
 import { int } from '../domain/format.js';
 import { NEUTRAL, SEQUENTIAL } from '../domain/palette.js';
 import { regionById, isEmirate } from '../domain/regions.js';
+import { deckMark } from '../app/deckMark.js';
 
 const BASEMAPS = {
   satellite: {
@@ -81,7 +82,8 @@ export function mapBand(id, options) {
     class: 'btn btn-sm map-square', title: label, 'aria-label': label, onclick
   }, glyph);
   const baseToggle = h('button', {
-    class: 'btn btn-sm map-square', title: 'Switch to the street map', 'aria-label': 'Switch to the street map'
+    class: 'btn btn-sm map-square', title: 'Switch to the street map', 'aria-label': 'Switch to the street map',
+    ...deckMark({ note: 'Swaps the satellite view for a street map' })
   }, icon('layers', { size: 15 }));
   baseToggle.addEventListener('click', () => {
     const next = base === 'satellite' ? 'streets' : 'satellite';
@@ -94,7 +96,11 @@ export function mapBand(id, options) {
     baseToggle,
     squareBtn('Zoom in', '+', () => map.zoomIn()),
     squareBtn('Zoom out', '\u2212', () => map.zoomOut()),
-    squareBtn('Fit to the region', icon('pin', { size: 15 }), () => fit(true))
+    h('button', {
+      class: 'btn btn-sm map-square', title: 'Fit to the region', 'aria-label': 'Fit to the region',
+      ...deckMark({ note: 'Frames the whole selection again after zooming' }),
+      onclick: () => fit(true)
+    }, icon('pin', { size: 15 }))
   );
 
   function fit(force = false) {

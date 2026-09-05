@@ -24,6 +24,7 @@ figure, table and chart works offline.
 ```bash
 node test/all.js        # or: npm test — plain Node, no runner to install
 node tools/smoke.mjs    # walks all 22 routes in a browser; needs Playwright
+node tools/screendeck.mjs   # rebuilds docs/ADAFSA_Platform_Screens.pptx from the live app
 ```
 
 ## What it contains
@@ -70,13 +71,14 @@ data/
 tools/
   build-attributes.mjs   regenerates data/attributes.js from data/geo
   smoke.mjs              walks every route in a browser and reports console errors
+  screendeck.mjs         photographs every screen and typesets the review deck
 src/
   app/       shell, two-level hash router, navigation model, page registry, DOM and icons
   domain/    pure logic — taxonomy, regions, bands, periods, aggregation, change,
              the crop calendar, the water model, the issue model, the palette
   data/      the survey join, the query API, lazy geometry
   charts/    hand-drawn SVG: bar lists, columns, trend lines, band bars
-  components/ figures, summary tables, the farm table, filter rail, map band, change table
+  components/ figures, summary tables, the farm table, the filter bar, map band, change table
   pages/     one small file per screen
   mock/      everything invented — the swap-for-an-API boundary
 ```

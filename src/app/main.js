@@ -28,6 +28,9 @@ function failure(message) {
 
 async function draw(route) {
   const token = ++drawToken;
+  /* A signal the screen deck waits on, so it photographs a finished page rather
+   * than one halfway through rendering. Nothing in the interface reads it. */
+  document.documentElement.dataset.deckReady = '0';
   const place = placeFor(route.segments);
   const chosen = selection(route.params);
   const path = route.segments.join('/');
@@ -61,7 +64,17 @@ async function draw(route) {
    * leave the reader where they were. */
   if (path !== lastPath) window.scrollTo(0, 0);
   lastPath = path;
+
+  document.documentElement.dataset.deckRoute = location.hash;
+  document.documentElement.dataset.deckReady = '1';
 }
+
+/* The handle the tools drive the app through: the screen deck and the route
+ * walk both use it, and neither has to know how the router is put together. */
+globalThis.adafsa = {
+  go: (hash) => { location.hash = hash; },
+  deck: () => import('./deck.js')
+};
 
 onRouteChange(draw);
 start();

@@ -7,11 +7,13 @@
 import { h } from '../app/dom.js';
 import { COMPARISONS } from '../domain/periods.js';
 import { setParams } from '../app/router.js';
+import { deckMark } from '../app/deckMark.js';
 
 export function comparisonSelect(current) {
   return h('div', { class: 'segmented', role: 'group', 'aria-label': 'Comparison period' },
     ...COMPARISONS.map((option) => h('button', {
       'aria-pressed': String(option.id === current),
+      ...deckMark({ note: 'Compares against last quarter or against last year' }),
       onclick: () => setParams({ cmp: option.id, p: null })
     }, option.label)));
 }
