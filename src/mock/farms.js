@@ -150,7 +150,7 @@ export function enrichFarm(farm, { fieldCropPool = [] } = {}) {
   /* Efficiency and water use pull against each other in both directions: a
    * farm well over its allocation is wasting water, and one well under it is
    * usually irrigating badly rather than frugally. */
-  const efficiency = clamp(around(rand, 93 - Math.abs(usePct - 100) * 0.38, 30), 22, 99);
+  const efficiency = Math.round(clamp(around(rand, 93 - Math.abs(usePct - 100) * 0.38, 30), 22, 99));
   const efficiencySeries = backwardSeries(rand, efficiency, { drift: 0.05, floor: 15 }).map((v) => Math.round(clamp(v, 15, 100)));
 
   // ---- Structures and cultivation history ----------------------------------
@@ -171,7 +171,7 @@ export function enrichFarm(farm, { fieldCropPool = [] } = {}) {
     canopyPalms,
     canopyFruit,
     canopy: canopyPalms ?? canopyFruit,
-    efficiency: Math.round(efficiency),
+    efficiency,
     efficiencySeries,
     waterDemand: demand,
     waterActual: actual,

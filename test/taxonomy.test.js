@@ -26,6 +26,6 @@ ok(key !== typeKey('Fruit Trees', 'Watermelon'), 'the same leaf in two categorie
 
 is(scopeTree(tree, 'field').map((c) => c.name), ['Cereals', 'Open Field'], 'a crop page offers no tree filters');
 is(scopeTree(tree, 'tree').map((c) => c.name), ['Date Palm', 'Fruit Trees', 'Forest Trees'], 'a tree page offers no crop filters');
-ok(colorOfType('Cereals', 'Something Unlisted') === '#d4a017', 'an unlisted type inherits its category colour');
+ok(colorOfType('Cereals') === '#eda100', 'a type takes its category colour rather than a hue of its own');
 
 done('taxonomy');

@@ -14,6 +14,8 @@
  *   - Dual-named crops keep their first name (handled at generation time).
  */
 
+import { categoryColor } from './palette.js';
+
 export const CATEGORY_RENAME = { 'Open-Field Produce': 'Open Field' };
 
 /* Which dataset carries each tree category's area.
@@ -29,13 +31,13 @@ export const TREE_AREA_SOURCE = {
 };
 
 export const CATEGORIES = [
-  { name: 'Cereals', kind: 'field', color: '#d4a017' },
-  { name: 'Fodder', kind: 'field', color: '#4c9a2a' },
-  { name: 'Open Field', kind: 'field', color: '#8e44ad' },
-  { name: 'Date Palm', kind: 'tree', color: '#7b4b2a' },
-  { name: 'Fruit Trees', kind: 'tree', color: '#e67e22' },
-  { name: 'Forest Trees', kind: 'tree', color: '#2f7d4f' }
-];
+  { name: 'Cereals', kind: 'field' },
+  { name: 'Fodder', kind: 'field' },
+  { name: 'Open Field', kind: 'field' },
+  { name: 'Date Palm', kind: 'tree' },
+  { name: 'Fruit Trees', kind: 'tree' },
+  { name: 'Forest Trees', kind: 'tree' }
+].map((c) => ({ ...c, color: categoryColor(c.name) }));
 
 export const CATEGORY_ORDER = CATEGORIES.map((c) => c.name);
 export const FIELD_CATEGORIES = CATEGORIES.filter((c) => c.kind === 'field').map((c) => c.name);
@@ -44,23 +46,11 @@ export const TREE_CATEGORIES = CATEGORIES.filter((c) => c.kind === 'tree').map((
 export const categoryMeta = (name) => CATEGORIES.find((c) => c.name === name);
 export const isTreeCategory = (name) => TREE_CATEGORIES.includes(name);
 
-/* Per-type colours. Anything not listed inherits its category's colour, so the
- * map and the charts never fall back to grey. */
-export const TYPE_COLORS = {
-  Barley: '#c9b870', Quinoa: '#b7472a', Wheat: '#e0a82e',
-  Alfalfa: '#5aa02c', Corn: '#f2c811', 'Rhodes Grass': '#9acd32', Sorghum: '#a0522d', 'Sudan Grass': '#2e8b57',
-  Beans: '#558b2f', Cabbage: '#26a69a', Cantaloupe: '#e8943a', Capsicum: '#e74c3c', Coriander: '#cddc39',
-  Cucumber: '#4caf50', Eggplant: '#6a1b9a', Garlic: '#d7cca3', Lettuce: '#aed581', Okra: '#827717',
-  Onion: '#c2569e', Potato: '#c8a165', Radish: '#e03b5b', Spinach: '#1b5e20', 'Sweet Potato': '#e07b39',
-  Tomato: '#ff6347', Watermelon: '#3e7c3a', Zucchini: '#33691e',
-  'Date Palm': '#7b4b2a',
-  Avocado: '#5c8a2e', Banana: '#f4d03f', 'Dragon Fruit': '#c72c6b', Fig: '#7b466a', Guava: '#de8aa0',
-  Lemon: '#f2e22e', Lime: '#a8d44a', Mandarin: '#ed8b16', Mango: '#f0932b', Olive: '#6b8e23',
-  Pomegranate: '#9b1b30', Strawberry: '#e63946', 'Tahiti Lime': '#7cb342',
-  'Forest Trees': '#2f7d4f'
-};
-
-export const colorOfType = (category, type) => TYPE_COLORS[type] || categoryMeta(category)?.color || '#9ca3af';
+/* Colour is assigned per category, from the validated identity palette in
+ * domain/palette.js. Types inherit their category's hue: a chart of forty crop
+ * types is a magnitude chart drawn in one colour, not forty identities nobody
+ * could tell apart. */
+export const colorOfType = (category) => categoryColor(category);
 
 /* A leaf name alone is ambiguous — watermelon is both an open-field crop and,
  * in other surveys, a fruit. Selections are keyed by category and type. */
