@@ -9,7 +9,7 @@ import { h, clear, append } from './dom.js';
 import { icon } from './icons.js';
 import { NAV, NAV_FOOTER, locate } from './nav.js';
 import { href, currentParams } from './router.js';
-import { regionPanel } from '../components/regionPanel.js';
+import { placeFilters, layoutVariant } from './filterLayouts.js';
 
 function navLink(entry, activeId, { child = false, section = false, expandable = false } = {}) {
   const params = currentParams();
@@ -61,14 +61,24 @@ export function renderHeader(root, { place, tools = [] }) {
   ]);
 }
 
-/* The rail carries the two filters that decide what the page counts: the region
- * always, and the crop filter when the page has one. A page that reports on a
- * single farm has neither, and gets the full width. */
-export function renderBody(root, { content, rail, selection, showRegion = true }) {
+/* The filters decide what the page counts: the region always, and the crops
+ * when the page has them. Where they sit is under review, so the four
+ * candidates live in filterLayouts.js and are chosen with ?layout=.
+ * A page about a single farm has neither and gets the full width. */
+export function renderBody(root, wrapper, { content, rail, selection, showRegion = true, tree = null, scope = 'all' }) {
   clear(root);
-  const panels = [showRegion ? regionPanel(selection.region) : null, rail].filter(Boolean);
-  root.classList.toggle('no-rail', panels.length === 0);
-  if (panels.length) root.append(h('aside', { class: 'rail' }, ...panels));
+  const variant = layoutVariant();
+  const { aside, strip } = placeFilters(root, { variant, rail, selection, showRegion, tree, scope });
+
+  wrapper.classList.remove(...[...wrapper.classList].filter((c) => c.startsWith('layout-')));
+  wrapper.classList.add('layout-' + variant);
+
+  const stripSlot = document.getElementById('filter-strip');
+  clear(stripSlot);
+  if (strip) stripSlot.append(strip);
+
+  root.classList.toggle('no-rail', aside.length === 0);
+  if (aside.length) root.append(variant === 'slim' ? aside[0] : h('aside', { class: 'rail' }, ...aside));
   root.append(h('div', { class: 'page-content' }, content));
 }
 

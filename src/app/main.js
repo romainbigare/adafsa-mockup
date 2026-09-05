@@ -8,6 +8,8 @@ import { start, onRouteChange, selection } from './router.js';
 import { renderNav, renderHeader, renderBody, placeFor } from './shell.js';
 import { loadPage } from './pages.js';
 import { h } from './dom.js';
+import { taxonomyTree } from '../data/store.js';
+import { moduleByKey } from '../domain/modules.js';
 
 const nav = document.getElementById('nav');
 const header = document.getElementById('page-header');
@@ -48,7 +50,13 @@ async function draw(route) {
   if (token !== drawToken) return;
 
   renderHeader(header, { place, tools: view.tools || [] });
-  renderBody(body, { ...view, selection: chosen, showRegion: view.showRegion !== false });
+  renderBody(body, document.querySelector('.app'), {
+    ...view,
+    selection: chosen,
+    showRegion: view.showRegion !== false,
+    tree: taxonomyTree(),
+    scope: moduleByKey(place.navId)?.scope || 'all'
+  });
   document.title = `${place.title ? place.title + ' — ' : ''}ADAFSA Platform`;
 
   /* Only jump to the top when the page itself changed; ticking a filter should
