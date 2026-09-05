@@ -22,7 +22,6 @@ import { categoryColor, COMPARE } from '../../domain/palette.js';
 import { int, dec, pct, signedPct, compact } from '../../domain/format.js';
 import { regionById } from '../../domain/regions.js';
 import { QUARTERS, TODAY, MONTHS } from '../../domain/periods.js';
-import { deckMark } from '../../app/deckMark.js';
 
 const chip = (band) => band
   ? h('span', { class: 'chip', style: { background: band.color + '22', color: band.color } }, band.label)
@@ -47,9 +46,9 @@ export function render({ place, selection }) {
   return {
     showRegion: false,
     tools: [
-      h('a', { class: 'btn', href: `#/farms`, ...deckMark({ to: 'F1' }) },
+      h('a', { class: 'btn', href: `#/farms` },
         icon('chevron', { size: 14 }), h('span', { text: 'Register' })),
-      h('a', { class: 'btn btn-primary', href: `#/farm/${farm.fid}/actions`, ...deckMark({ to: 'F3' }) },
+      h('a', { class: 'btn btn-primary', href: `#/farm/${farm.fid}/actions` },
         icon('alert', { size: 14 }), h('span', { text: `What to do (${issues.length})` }))
     ],
     content: [

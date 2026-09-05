@@ -9,16 +9,15 @@
  * The deck exists to be printed, written on and handed back, which decides the
  * layout:
  *   - One screen per page, so a comment has something to attach to.
- *   - Nothing is ever drawn on top of a screenshot. The numbered discs sit in
- *     the margin above and beside it; the key is underneath.
- *   - The right-hand column carries the context — the rest of a scrolling
- *     screen, and what the small buttons do.
+ *   - Nothing is ever drawn on top of a screenshot, and nothing is drawn beside
+ *     it either: the picture is the page.
+ *   - A screen too tall for one shot gets a second, smaller one in the
+ *     right-hand column showing the rest.
  *   - Everything is given room. A full page is a page nobody writes on.
  *
  * The technique is from the Wafra farm-app deck; the geometry is not. That app
  * is a phone in the left third of the page with two thirds of white beside it.
- * This one is a 1440-wide desktop platform, so the screenshot takes the width
- * and the annotations go around it.
+ * This one is a 1440-wide desktop platform, so the screenshot takes the width.
  *
  * All capture finishes before any typesetting begins — the browser is closed
  * before pptxgenjs is instantiated — so a capture problem never surfaces as a
@@ -42,8 +41,8 @@ const OUT = join(ROOT, outFlag > -1 ? process.argv[outFlag + 1] : 'docs/ADAFSA_P
 const VIEW = { width: 1440, height: 980 };
 const SCALE = 2;
 const HIDDEN_ENOUGH = 1 / 6;      // below this, a screen is "all there" and gets no tail shot
-const SHOT_PX = 2000;             // 6.75" wide on paper — about 296 dpi
-const TAIL_PX = 1040;             // 3.04" wide — about 342 dpi
+const SHOT_PX = 2000;             // 7.28" wide on paper — about 275 dpi
+const TAIL_PX = 1040;             // 2.55" wide — about 408 dpi
 const SHOT_Q = 0.93;              // JPEG quality for the screenshots — high enough for small type
 const CORNER = 0.007;             // corner radius as a share of image width — deliberately small
 const SHADOW_PAD = 0.014;         // band around the shot the baked shadow falls into
@@ -270,7 +269,7 @@ for (const screen of screens) {
    * rather than taking them again — same route, same app, same picture. */
   const twin = firstFiling.get(screen.id);
   if (twin !== screen && twin.file) {
-    Object.assign(screen, { file: twin.file, hidden: twin.hidden, tail: twin.tail, marks: twin.marks });
+    Object.assign(screen, { file: twin.file, hidden: twin.hidden, tail: twin.tail });
     continue;
   }
 
@@ -296,39 +295,6 @@ for (const screen of screens) {
    * invisible on paper and the deck is less than half the size to send. */
   screen.file = join(WORK, `${screen.id}.jpg`);
   screen.ink = (await shrink(raw, screen.file, SHOT_PX, { mime: 'image/jpeg', quality: SHOT_Q })).ink;
-
-  /* The marks are read at the same scroll position the screenshot was taken at,
-   * and only for what the screenshot actually shows. */
-  screen.marks = await page.evaluate(() => {
-    const seen = [];
-    /* ONE MARKER PER KIND OF CONTROL. Every column heading in a table carries
-     * the same note; eight discs saying one thing is worse than one. */
-    const already = new Set();
-    for (const el of document.querySelectorAll('[data-deck-to], [data-deck-note]')) {
-      const b = el.getBoundingClientRect();
-      if (!b.width || !b.height) continue;
-      const cx = b.x + b.width / 2;
-      const cy = b.y + b.height / 2;
-      if (cy < 4 || cy > window.innerHeight - 4) continue;    // below the fold points at nothing
-      /* Keyed on what the disc would SAY, not on which element says it: two
-       * column headings sort the same way and deserve one entry between them. */
-      const key = `${el.dataset.deckTo ?? ''}|${el.dataset.deckNote ?? ''}`;
-      if (already.has(key)) continue;
-      already.add(key);
-      const label = (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || '')
-        .trim().replace(/\s+/g, ' ');
-      /* A DISC WITH NOTHING TO SAY IS WORSE THAN NO DISC. */
-      if (!label) continue;
-      seen.push({
-        to: el.dataset.deckTo ?? null,
-        note: el.dataset.deckNote ?? null,
-        label: label.slice(0, 46),
-        x: cx / window.innerWidth,
-        y: cy / window.innerHeight
-      });
-    }
-    return seen.sort((a, b) => a.y - b.y || a.x - b.x);
-  });
 
   if (screen.hidden >= HIDDEN_ENOUGH) {
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
@@ -400,36 +366,30 @@ for (const section of sections) {
 plan.forEach((p, i) => { p.page = i + 1; });
 for (const p of plan) if (p.kind === 'screen') p.screen.page = p.page;
 
-const pageOf = new Map();
-for (const p of plan) if (p.kind === 'screen' && !pageOf.has(p.screen.id)) pageOf.set(p.screen.id, p.page);
-const byId = new Map(screens.map((s) => [s.id, s]));
-
-/* A marker aiming at a screen that is not in the deck sends the reviewer
- * looking for a page that does not exist. */
-for (const screen of screens) {
-  screen.marks = (screen.marks ?? []).filter((m) => !m.to || pageOf.has(m.to)).slice(0, 8);
-  screen.marks = screen.marks.map((m) => ({ ...m }));   // per filing, or one page moves the other's discs
-}
-
 // -------------------------------------------------------------- typesetting --
-/* Everything is given room. The page is A4 landscape and holds one screenshot,
- * so the temptation is to fill it; a printed page that is full is a printed
- * page nobody writes on. The gutters below are wider than they need to be on
- * purpose. */
+/* The page holds the screenshot and, when a screen scrolls, a smaller second
+ * one beside it. Nothing else, so the screenshot takes as much of the sheet as
+ * the second shot leaves it. A printed page that is full is a printed page
+ * nobody writes on, which is why the margins stay wide. */
 const W = 11.69, H = 8.27;
 const MARGIN = 0.62;
 const FONT = 'Calibri';
 
-const SHOT_X = MARGIN, SHOT_Y = 1.78, SHOT_W = 6.75;
-const SHOT_H = SHOT_W * RATIO;
-const DISC_D = 0.26;
-const DISC_TOP_Y = SHOT_Y - DISC_D - 0.12;
-const DISC_RIGHT_X = SHOT_X + SHOT_W + 0.16;
-const COL_X = SHOT_X + SHOT_W + 0.66;
-const COL_W = W - MARGIN - COL_X;
+const COL_W = 2.55;                            // the second shot, when a screen needs one
+const COL_X = W - MARGIN - COL_W;
+const SHOT_X = MARGIN, SHOT_Y = 1.62;
 const FOOT_Y = 7.72;
 
-const NOTE_Y = SHOT_Y + SHOT_H + 0.14;
+/* The screenshot starts at the same corner on every page and grows into
+ * whatever the page has left. A screen that needs a second shot gives up the
+ * width that shot takes; a screen that fits in one picture uses the height
+ * instead, and the white pools in the bottom-right corner either way. */
+const WIDE_W = COL_X - 0.62 - SHOT_X;          // beside a second shot
+const TALL_W = (7.30 - SHOT_Y) / RATIO;        // on its own, down to the footer's air
+const shotSize = (tail) => {
+  const w = tail ? WIDE_W : TALL_W;
+  return { w, h: w * RATIO };
+};
 
 const WAFRA = join(ROOT, 'assets/brand/wafra-logo.png');
 const WAFRA_RATIO = 133 / 416;                 // the file's own proportions
@@ -566,12 +526,13 @@ for (const item of plan) {
   ], { x: MARGIN, y: 0.78, w: 9.5, h: 0.5, fontFace: FONT, fontSize: 24, margin: 0 });
 
   /* The picture is wider than the screenshot by the band its shadow falls
-   * into, so it is hung off SHOT_X/SHOT_Y by that band. The screenshot itself
-   * lands exactly where the discs expect it. */
-  const bleed = SHOT_W * SHADOW_PAD;
+   * into, so it is hung off SHOT_X/SHOT_Y by that band and the screenshot
+   * itself lands where the geometry says. */
+  const shot = shotSize(!!screen.tail);
+  const bleed = shot.w * SHADOW_PAD;
   s.addImage({
     path: screen.file,
-    x: SHOT_X - bleed, y: SHOT_Y - bleed, w: SHOT_W + bleed * 2, h: SHOT_H + bleed * 2
+    x: SHOT_X - bleed, y: SHOT_Y - bleed, w: shot.w + bleed * 2, h: shot.h + bleed * 2
   });
 
   if (screen.hidden >= HIDDEN_ENOUGH) {
@@ -579,13 +540,12 @@ for (const item of plan) {
      * number does not have — and stated as the share that IS shown, which is
      * the harder half to misread. */
     s.addText(`Scrolls · about ${Math.round((1 - screen.hidden) * 20) * 5}% of this screen is shown above`, {
-      x: SHOT_X, y: NOTE_Y, w: SHOT_W, h: 0.22,
+      x: SHOT_X, y: SHOT_Y + shot.h + 0.14, w: shot.w, h: 0.22,
       fontFace: FONT, fontSize: 8, italic: true, color: FAINT, margin: 0
     });
   }
 
   // The rest of a scrolling screen, in the right column.
-  let keyY = SHOT_Y;
   if (screen.tail) {
     s.addText('THE REST OF THIS SCREEN', {
       x: COL_X, y: SHOT_Y, w: COL_W, h: 0.2,
@@ -598,74 +558,9 @@ for (const item of plan) {
       x: COL_X - tailBleed, y: SHOT_Y + 0.30 - tailBleed,
       w: COL_W + tailBleed * 2, h: tailH + tailBleed * 2
     });
-    keyY = SHOT_Y + 0.30 + tailH + 0.46;
-  }
-
-  // The discs, in the margin — never on the picture.
-  const marks = screen.marks ?? [];
-  if (marks.length) {
-    const top = marks.filter((m) => m.y < 0.16);
-    const side = marks.filter((m) => m.y >= 0.16);
-    const placed = new Map();
-    let lastX = -Infinity;
-    top.forEach((m) => {
-      const wanted = SHOT_X + m.x * SHOT_W - DISC_D / 2;
-      const x = Math.max(SHOT_X, Math.max(wanted, lastX + DISC_D + 0.04));
-      lastX = x;
-      placed.set(m, { x, y: DISC_TOP_Y });
-    });
-    let lastY = -Infinity;
-    side.forEach((m) => {
-      const wanted = SHOT_Y + m.y * SHOT_H - DISC_D / 2;
-      const y = Math.min(SHOT_Y + SHOT_H - DISC_D, Math.max(wanted, lastY + DISC_D + 0.04));
-      lastY = y;
-      placed.set(m, { x: DISC_RIGHT_X, y });
-    });
-    marks.forEach((m, i) => {
-      const at = placed.get(m);
-      s.addText(String(i + 1), {
-        shape: pres.ShapeType.ellipse, x: at.x, y: at.y, w: DISC_D, h: DISC_D,
-        fill: { color: BRAND }, line: { color: PAPER, width: 1 },
-        fontFace: FONT, fontSize: 8.5, bold: true, color: PAPER,
-        align: 'center', valign: 'middle', margin: 0
-      });
-    });
-
-    // The key that makes the discs mean anything.
-    s.addText('WHAT THE SMALL CONTROLS DO', {
-      x: COL_X, y: keyY, w: COL_W, h: 0.2,
-      fontFace: FONT, fontSize: 8, bold: true, color: FAINT, charSpacing: 1.2, margin: 0
-    });
-    /* Roomy while the room lasts. A screen with eight marked controls and a
-     * tall second shot above the key closes up rather than losing its last
-     * entries off the bottom of the page. */
-    const listTop = keyY + 0.32;
-    const LINE_H = Math.max(0.30, Math.min(0.46, (FOOT_Y - 0.16 - listTop) / marks.length));
-    marks.forEach((m, i) => {
-      const y = listTop + i * LINE_H;
-      if (y + LINE_H > FOOT_Y - 0.1) return;              // never run into the footer
-      s.addText(String(i + 1), {
-        shape: pres.ShapeType.ellipse, x: COL_X, y: y + 0.02, w: 0.2, h: 0.2,
-        fill: { color: BRAND }, line: { color: PAPER, width: 0.5 },
-        fontFace: FONT, fontSize: 7.5, bold: true, color: PAPER,
-        align: 'center', valign: 'middle', margin: 0
-      });
-      const target = m.to ? pageOf.get(m.to) : null;
-      s.addText([
-        { text: m.label, options: { bold: true, color: INK } },
-        ...(m.to
-          ? [{ text: `  →  ${m.to} ${byId.get(m.to)?.title ?? ''}`, options: { color: BRAND, bold: true } },
-             ...(target ? [{ text: `  (page ${target})`, options: { color: FAINT } }] : [])]
-          : [{ text: `  —  ${m.note}`, options: { color: MUTED } }])
-      ], {
-        x: COL_X + 0.28, y, w: COL_W - 0.28, h: LINE_H,
-        fontFace: FONT, fontSize: 7.5, color: MUTED, valign: 'top', lineSpacing: 9, margin: 0
-      });
-    });
   }
 
   s.addNotes(`${screen.id} — ${screen.title}\n\n${screen.note}`
-    + (marks.length ? `\n\n${marks.map((m, i) => `${i + 1}. ${m.label}${m.to ? ` → ${m.to}` : ` — ${m.note}`}`).join('\n')}` : '')
     + (screen.hidden >= HIDDEN_ENOUGH
         ? `\n\nThe screenshot shows ${Math.round((1 - screen.hidden) * 100)}% of this screen; the rest is in the smaller shot beside it.`
         : ''));
@@ -678,10 +573,7 @@ await pres.writeFile({ fileName: OUT });
 await rm(WORK, { recursive: true, force: true });
 
 const scrolling = screens.filter((s) => s.hidden >= HIDDEN_ENOUGH).length;
-const marked = screens.filter((s) => (s.marks ?? []).length).length;
-const discs = screens.reduce((n, s) => n + (s.marks ?? []).length, 0);
 console.log(`${plan.length} slides -> ${OUT.replace(ROOT + '/', '')}`);
 console.log(`  cover, contents, ${sections.length} section dividers, ${screens.length} screen pages (${DISTINCT} screens)`);
 console.log(`  ${scrolling} screens carry a "scrolls" note and a second shot of the rest`);
 console.log(`  ${tileStats.hit + tileStats.fetched} map tiles served (${tileStats.fetched} fetched, ${tileStats.hit} from .tile-cache)`);
-console.log(`  ${discs} small controls marked in the margin across ${marked} screens`);

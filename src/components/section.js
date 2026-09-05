@@ -6,7 +6,6 @@
 
 import { h } from '../app/dom.js';
 import { icon as glyph } from '../app/icons.js';
-import { deckMark } from '../app/deckMark.js';
 
 export function section(title, options = {}, ...content) {
   const { note = null, tools = [], flush = false, half = false, icon = null } = options;
@@ -39,7 +38,6 @@ export function infoPopover(label, title, entries) {
 
   const button = h('button', {
     class: 'btn btn-sm', 'aria-expanded': 'false',
-    ...deckMark({ note: 'Shows the model inputs behind these figures' }),
     onclick: () => {
       const open = panel.hidden;
       panel.hidden = !open;

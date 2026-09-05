@@ -10,7 +10,6 @@ import { dataTable } from './dataTable.js';
 import { dec, signed, signedPct } from '../domain/format.js';
 import { setParams } from '../app/router.js';
 import { regionById } from '../domain/regions.js';
-import { deckMark } from '../app/deckMark.js';
 
 export function directionTabs(moves, active) {
   const counts = moves.reduce((acc, move) => { acc[move.direction] = (acc[move.direction] || 0) + 1; return acc; }, {});
@@ -18,7 +17,6 @@ export function directionTabs(moves, active) {
     'aria-pressed': String(direction.id === active),
     'aria-label': `${direction.label} (${counts[direction.id] || 0})`,
     title: direction.hint,
-    ...deckMark({ note: 'Started, increased, decreased or stopped — pick one to list those farms' }),
     onclick: () => setParams({ dir1: direction.id, p: null })
   }, `${direction.label} (${counts[direction.id] || 0})`)));
 }

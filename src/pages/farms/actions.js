@@ -17,7 +17,6 @@ import { WATER_USE, classify } from '../../domain/bands.js';
 import { int, dec, pct } from '../../domain/format.js';
 import { regionById } from '../../domain/regions.js';
 import { TODAY, MONTHS } from '../../domain/periods.js';
-import { deckMark } from '../../app/deckMark.js';
 
 function issueCard(issue) {
   const tone = issue.severity === 'act' ? 'chip-act' : 'chip-watch';
@@ -42,11 +41,10 @@ export function render({ place }) {
   return {
     showRegion: false,
     tools: [
-      h('a', { class: 'btn', href: `#/farm/${farm.fid}`, ...deckMark({ to: 'F2' }) },
+      h('a', { class: 'btn', href: `#/farm/${farm.fid}` },
         icon('chevron', { size: 14 }), h('span', { text: 'Farm profile' })),
       h('button', {
-        class: 'btn', onclick: () => window.print(),
-        ...deckMark({ note: 'Prints this sheet to carry to the farm' })
+        class: 'btn', onclick: () => window.print()
       }, icon('print', { size: 14 }), h('span', { text: 'Print for a visit' }))
     ],
     content: [

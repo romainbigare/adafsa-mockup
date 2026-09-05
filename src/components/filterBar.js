@@ -16,7 +16,6 @@ import { REGIONS } from '../domain/regions.js';
 import { scopeTree } from '../domain/taxonomy.js';
 import { setParams } from '../app/router.js';
 import { cropFilter, activeKeys, scopeKeys, applySelection } from './cropFilter.js';
-import { deckMark } from '../app/deckMark.js';
 
 /* A button with a panel underneath it, closing on a click elsewhere. */
 function withPanel(button, panel) {
@@ -42,7 +41,6 @@ function regionField(current) {
     h('select', {
       class: 'select',
       'aria-label': 'Region',
-      ...deckMark({ note: 'Narrows every figure on the page to one province' }),
       onchange: (e) => setParams({ region: e.target.value, p: null })
     }, ...REGIONS.map((r) => h('option', { value: r.id, selected: r.id === current, text: r.label }))));
 }
@@ -72,8 +70,7 @@ function groupChip(tree, scope, selected, category) {
   if (category.types.length > 1) {
     const opener = h('button', {
       class: 'chip-more',
-      title: `Choose crops in ${category.name}`, 'aria-label': `Choose crops in ${category.name}`,
-      ...deckMark({ note: 'Opens the crops inside this group, one tick box each' })
+      title: `Choose crops in ${category.name}`, 'aria-label': `Choose crops in ${category.name}`
     }, icon('chevronDown', { size: 12 }));
     chip.append(withPanel(opener, cropFilter(tree, {
       scope, selected, only: category.name, memoryKey: 'group:' + category.name
@@ -98,8 +95,7 @@ export function filterBar({ tree, scope = null, selection, showRegion = true }) 
    * this is the second route rather than the first. */
   const allButton = h('button', {
     class: ['btn', filtering ? 'is-active' : null],
-    title: filtering ? `Choose individual crops — ${active.size} of ${keys.length} on` : 'Choose individual crops',
-    ...deckMark({ note: 'Opens the whole crop list, every group expanded' })
+    title: filtering ? `Choose individual crops — ${active.size} of ${keys.length} on` : 'Choose individual crops'
   }, icon('filter', { size: 14 }), h('span', { text: 'All crops' }));
   bar.append(withPanel(allButton, cropFilter(tree, { scope, selected: selection.types, memoryKey: 'all:' + scope })));
 
