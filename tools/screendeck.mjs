@@ -27,6 +27,7 @@
 
 import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { join, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
@@ -34,6 +35,7 @@ import pptxgen from 'pptxgenjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const WORK = join(ROOT, '.deck-work');
+const TILES = join(ROOT, '.tile-cache');       // survives the build; a second run is offline
 const outFlag = process.argv.indexOf('--out');
 const OUT = join(ROOT, outFlag > -1 ? process.argv[outFlag + 1] : 'docs/ADAFSA_Platform_Screens.pptx');
 
@@ -42,7 +44,10 @@ const SCALE = 2;
 const HIDDEN_ENOUGH = 1 / 6;      // below this, a screen is "all there" and gets no tail shot
 const SHOT_PX = 2000;             // 6.75" wide on paper — about 296 dpi
 const TAIL_PX = 1040;             // 3.04" wide — about 342 dpi
+const SHOT_Q = 0.93;              // JPEG quality for the screenshots — high enough for small type
 const CORNER = 0.007;             // corner radius as a share of image width — deliberately small
+const SHADOW_PAD = 0.014;         // band around the shot the baked shadow falls into
+const MIN_INK = 0.04;             // below this a "screenshot" is a blank sheet, and the build stops
 
 // ---------------------------------------------------------------- serving --
 const TYPES = {
@@ -50,15 +55,68 @@ const TYPES = {
   '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml', '.ttf': 'font/ttf'
 };
-const server = createServer(async (req, res) => {
+
+/* MAP TILES COME THROUGH HERE, NOT THROUGH THE BROWSER.
+ *
+ * A page photographed without its basemap is a page with a white hole where
+ * the map should be, and that is how it prints. The browser cannot reach the
+ * tile servers from inside the build, but this process can, so it fetches each
+ * tile and hands it back over plain HTTP on localhost. Tiles are kept in
+ * .tile-cache, so a second build draws its maps without a network at all.
+ *
+ * Only the deck build uses this. The published site keeps the real tile URLs. */
+const tileStats = { hit: 0, fetched: 0, failed: 0 };
+const tileFailures = [];
+const inFlight = new Map();
+
+/* Esri serves JPEG, OpenStreetMap serves PNG, and the cache keeps bytes rather
+ * than headers. The first two bytes say which. */
+const tileType = (b) => (b[0] === 0x89 && b[1] === 0x50 ? 'image/png' : 'image/jpeg');
+
+async function tile(url) {
+  const key = createHash('sha1').update(url).digest('hex');
+  const file = join(TILES, `${key}.bin`);
   try {
-    const url = decodeURIComponent(req.url.split('?')[0]);
-    const file = join(ROOT, url === '/' ? 'index.html' : url);
+    const cached = await readFile(file);
+    tileStats.hit++;
+    return cached;
+  } catch { /* not cached yet */ }
+  if (inFlight.has(url)) return inFlight.get(url);
+  const job = (async () => {
+    const res = await fetch(url, { headers: { 'user-agent': 'adafsa-mockup screendeck' } });
+    if (!res.ok) throw new Error(`${res.status} ${url}`);
+    const body = Buffer.from(await res.arrayBuffer());
+    await writeFile(file, body);
+    tileStats.fetched++;
+    return body;
+  })();
+  inFlight.set(url, job);
+  try { return await job; } finally { inFlight.delete(url); }
+}
+
+const server = createServer(async (req, res) => {
+  const [path, search = ''] = req.url.split('?');
+  if (path === '/__tiles') {
+    const url = new URLSearchParams(search).get('u');
+    try {
+      const body = await tile(url);
+      res.writeHead(200, { 'content-type': tileType(body), 'cache-control': 'no-store' });
+      res.end(body);
+    } catch (e) {
+      tileStats.failed++;
+      tileFailures.push(e.message);
+      res.writeHead(502); res.end();
+    }
+    return;
+  }
+  try {
+    const file = join(ROOT, decodeURIComponent(path) === '/' ? 'index.html' : decodeURIComponent(path));
     const body = await readFile(file);
     res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
     res.end(body);
   } catch { res.writeHead(404); res.end(); }
 });
+await mkdir(TILES, { recursive: true });
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const PORT = server.address().port;
 
@@ -69,6 +127,7 @@ const browser = await chromium.launch(
   proxy ? { proxy: { server: proxy, bypass: '<-loopback>,localhost,127.0.0.1' } } : {}
 );
 const page = await browser.newPage({ viewport: VIEW, deviceScaleFactor: SCALE });
+await page.addInitScript((relay) => { globalThis.ADAFSA_TILE_RELAY = relay; }, `http://127.0.0.1:${PORT}/__tiles`);
 
 /* Fifty unattended renders without this, and a screen that throws halfway
  * through is photographed mid-collapse with nobody the wiser until it prints. */
@@ -77,7 +136,7 @@ page.on('pageerror', (e) => problems.push(e.message));
 page.on('console', (m) => {
   if (m.type() !== 'error') return;
   const text = m.text();
-  if (/tile\.openstreetmap|arcgisonline|ERR_/i.test(text)) return;   // network, not the app
+  if (/ERR_/i.test(text)) return;                    // network, not the app
   problems.push(text);
 });
 
@@ -111,46 +170,100 @@ const DISTINCT = firstFiling.size;
 
 // ------------------------------------------------------------- image tools --
 /* The browser is already open and has a canvas, which beats a dependency.
- * The rounded corner is baked in here rather than asked of PowerPoint: its
- * own image rounding is a circular crop, not a radius. */
-async function shrink(src, out, width, { mime = 'image/png', round = true } = {}) {
+ *
+ * The rounded corner AND the shadow are both baked into the pixels here rather
+ * than asked of PowerPoint. Its image rounding is a circular crop, not a
+ * radius; and its picture shadow is an effect, which means every reader's
+ * viewer decides whether to draw it — several quietly do not. Pixels always
+ * print. That is why the image is a little larger than the screenshot: the
+ * band around it is the room the shadow falls into.
+ *
+ * Returns the share of the picture that is not white, which is how a screen
+ * photographed before it painted gets caught. */
+async function shrink(src, out, width, { mime = 'image/png', quality = 0.86, framed = true } = {}) {
   const b64 = (await readFile(src)).toString('base64');
-  const small = await page.evaluate(async ({ data, width, mime, round, corner }) => {
+  const shot = await page.evaluate(async ({ data, width, mime, quality, framed, corner, padShare }) => {
     const img = new Image();
     img.src = `data:image/png;base64,${data}`;
     await img.decode();
+    const height = Math.round((width * img.height) / img.width);
+    const pad = framed ? Math.round(width * padShare) : 0;
+
     const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = Math.round((width * img.height) / img.width);
+    canvas.width = width + pad * 2;
+    canvas.height = height + pad * 2;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';                       // JPEG has no alpha, and the paper is white
+    ctx.fillStyle = '#ffffff';                       // the paper, and JPEG has no alpha anyway
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    const r = round ? Math.max(2, Math.round(width * corner)) : 0;
-    if (r) {
-      ctx.beginPath();
-      ctx.roundRect(0.5, 0.5, canvas.width - 1, canvas.height - 1, r);
+
+    const r = framed ? Math.max(2, Math.round(width * corner)) : 0;
+    const frame = () => { ctx.beginPath(); ctx.roundRect(pad + 0.5, pad + 0.5, width - 1, height - 1, r); };
+
+    if (pad) {
+      /* Cast by filling the shape the screenshot will occupy — the shadow is
+       * of the picture's outline, so it stays true at the rounded corners. */
       ctx.save();
-      ctx.clip();
+      ctx.shadowColor = 'rgba(15, 23, 42, 0.20)';
+      ctx.shadowBlur = pad * 0.85;
+      ctx.shadowOffsetY = pad * 0.35;
+      ctx.fillStyle = '#ffffff';
+      frame();
+      ctx.fill();
+      ctx.restore();
     }
+
+    ctx.save();
+    if (r) { frame(); ctx.clip(); }
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, pad, pad, width, height);
+    ctx.restore();
+
     if (r) {
-      ctx.restore();
       ctx.strokeStyle = '#e5e7eb';                   // a hairline, so it reads as an object on paper
       ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(0.5, 0.5, canvas.width - 1, canvas.height - 1, r);
+      frame();
       ctx.stroke();
     }
-    return canvas.toDataURL(mime, 0.86).split(',')[1];
-  }, { data: b64, width, mime, round, corner: CORNER });
-  await writeFile(out, Buffer.from(small, 'base64'));
+
+    /* Ink, sampled coarsely — enough to tell a screen from a blank sheet. */
+    const px = ctx.getImageData(pad, pad, width, height).data;
+    let inked = 0, seen = 0;
+    for (let i = 0; i < px.length; i += 4 * 37) {
+      seen++;
+      if (px[i] < 246 || px[i + 1] < 246 || px[i + 2] < 246) inked++;
+    }
+
+    return { data: canvas.toDataURL(mime, quality).split(',')[1], ink: inked / seen, pad: pad / width };
+  }, { data: b64, width, mime, quality, framed, corner: CORNER, padShare: SHADOW_PAD });
+  await writeFile(out, Buffer.from(shot.data, 'base64'));
+  return shot;
 }
 
 // ------------------------------------------------------------------ capture --
 const clip = { x: 0, y: 0, width: VIEW.width, height: VIEW.height };
 const RATIO = VIEW.height / VIEW.width;
+
+/* A map is photographed when it has stopped arriving, not on a hopeful timer.
+ * Leaflet marks each tile element as loaded, so the page can say when the last
+ * one landed; a map that never finishes gives up after a few seconds rather
+ * than stalling the build. */
+async function settleTiles({ timeout = 9000 } = {}) {
+  if (!await page.evaluate(() => !!document.querySelector('.leaflet-container'))) return;
+  const until = Date.now() + timeout;
+  let steady = 0;
+  let last = -1;
+  while (Date.now() < until) {
+    const { loaded, pending } = await page.evaluate(() => ({
+      loaded: document.querySelectorAll('.leaflet-tile-loaded').length,
+      pending: document.querySelectorAll('.leaflet-tile:not(.leaflet-tile-loaded)').length
+    }));
+    if (loaded && !pending && loaded === last) steady++; else steady = 0;
+    if (steady >= 2) return;
+    last = loaded;
+    await page.waitForTimeout(220);
+  }
+}
 
 for (const screen of screens) {
   /* A second filing of the same screen borrows the first one's photographs
@@ -166,7 +279,8 @@ for (const screen of screens) {
     (route) => document.documentElement.dataset.deckReady === '1' && location.hash === route,
     screen.route
   );
-  await page.waitForTimeout(900);                    // map tiles and the first paint of the charts
+  await page.waitForTimeout(500);                    // the first paint of the charts
+  await settleTiles();
   await page.evaluate(() => window.scrollTo(0, 0));
 
   const measure = await page.evaluate(() => {
@@ -177,8 +291,11 @@ for (const screen of screens) {
 
   const raw = join(WORK, `${screen.id}-raw.png`);
   await page.screenshot({ path: raw, clip });
-  screen.file = join(WORK, `${screen.id}.png`);
-  await shrink(raw, screen.file, SHOT_PX);
+  /* JPEG, not PNG. Half of these screens are now mostly satellite photograph,
+   * which PNG stores badly; at this many pixels per inch the difference is
+   * invisible on paper and the deck is less than half the size to send. */
+  screen.file = join(WORK, `${screen.id}.jpg`);
+  screen.ink = (await shrink(raw, screen.file, SHOT_PX, { mime: 'image/jpeg', quality: SHOT_Q })).ink;
 
   /* The marks are read at the same scroll position the screenshot was taken at,
    * and only for what the screenshot actually shows. */
@@ -219,7 +336,7 @@ for (const screen of screens) {
     const tailRaw = join(WORK, `${screen.id}-tail-raw.png`);
     await page.screenshot({ path: tailRaw, clip });
     screen.tail = join(WORK, `${screen.id}-tail.jpg`);
-    await shrink(tailRaw, screen.tail, TAIL_PX, { mime: 'image/jpeg' });
+    await shrink(tailRaw, screen.tail, TAIL_PX, { mime: 'image/jpeg', quality: SHOT_Q });
     await page.evaluate(() => window.scrollTo(0, 0));
   }
 }
@@ -245,7 +362,7 @@ const brand = { path: join(WORK, 'brand.png'), ratio: 3 };
   });
   const brandRaw = join(WORK, 'brand-raw.png');
   await page.locator('#deck-brand').screenshot({ path: brandRaw });
-  await shrink(brandRaw, brand.path, 900, { round: false });
+  await shrink(brandRaw, brand.path, 900, { framed: false });
   await page.evaluate(() => document.getElementById('deck-brand-stage')?.remove());
   brand.ratio = rect.w / rect.h;
 }
@@ -256,6 +373,21 @@ server.close();
 if (problems.length) {
   console.error(`${problems.length} console error(s) while capturing:`);
   for (const p of problems.slice(0, 8)) console.error(`  ${p}`);
+  process.exit(1);
+}
+
+/* A page that went into the deck blank is the one fault a reviewer notices and
+ * nobody else does. Refuse to build rather than print an empty sheet. */
+const blank = screens.filter((sc) => sc.ink != null && sc.ink < MIN_INK);
+if (blank.length) {
+  console.error('screens photographed blank (nothing painted when the shutter went):');
+  for (const sc of blank) console.error(`  ${sc.id} ${sc.title} — ${(sc.ink * 100).toFixed(1)}% ink`);
+  process.exit(1);
+}
+
+if (tileFailures.length) {
+  console.error(`${tileFailures.length} map tile(s) could not be fetched; the maps would print with holes:`);
+  for (const f of tileFailures.slice(0, 5)) console.error(`  ${f}`);
   process.exit(1);
 }
 
@@ -298,12 +430,6 @@ const COL_W = W - MARGIN - COL_X;
 const FOOT_Y = 7.72;
 
 const NOTE_Y = SHOT_Y + SHOT_H + 0.14;
-
-/* Barely there, just enough for the screenshot to sit ON the page rather than
- * in it. A function rather than a constant on purpose: pptxgenjs converts the
- * shadow to EMU IN PLACE, so a single shared object is multiplied again on
- * every slide that uses it and the twentieth shadow comes out astronomical. */
-const softShadow = () => ({ type: 'outer', color: '94A3B8', opacity: 0.28, blur: 10, offset: 2.5, angle: 90 });
 
 const WAFRA = join(ROOT, 'assets/brand/wafra-logo.png');
 const WAFRA_RATIO = 133 / 416;                 // the file's own proportions
@@ -439,7 +565,14 @@ for (const item of plan) {
     { text: screen.title, options: { bold: true, color: INK } }
   ], { x: MARGIN, y: 0.78, w: 9.5, h: 0.5, fontFace: FONT, fontSize: 24, margin: 0 });
 
-  s.addImage({ path: screen.file, x: SHOT_X, y: SHOT_Y, w: SHOT_W, h: SHOT_H, shadow: softShadow() });
+  /* The picture is wider than the screenshot by the band its shadow falls
+   * into, so it is hung off SHOT_X/SHOT_Y by that band. The screenshot itself
+   * lands exactly where the discs expect it. */
+  const bleed = SHOT_W * SHADOW_PAD;
+  s.addImage({
+    path: screen.file,
+    x: SHOT_X - bleed, y: SHOT_Y - bleed, w: SHOT_W + bleed * 2, h: SHOT_H + bleed * 2
+  });
 
   if (screen.hidden >= HIDDEN_ENOUGH) {
     /* Rounded to the nearest 5%, because "about 63%" implies a precision the
@@ -459,7 +592,12 @@ for (const item of plan) {
       fontFace: FONT, fontSize: 8, bold: true, color: FAINT, charSpacing: 1.2, margin: 0
     });
     const tailH = COL_W * RATIO;
-    s.addImage({ path: screen.tail, x: COL_X, y: SHOT_Y + 0.30, w: COL_W, h: tailH, shadow: softShadow() });
+    const tailBleed = COL_W * SHADOW_PAD;
+    s.addImage({
+      path: screen.tail,
+      x: COL_X - tailBleed, y: SHOT_Y + 0.30 - tailBleed,
+      w: COL_W + tailBleed * 2, h: tailH + tailBleed * 2
+    });
     keyY = SHOT_Y + 0.30 + tailH + 0.46;
   }
 
@@ -545,4 +683,5 @@ const discs = screens.reduce((n, s) => n + (s.marks ?? []).length, 0);
 console.log(`${plan.length} slides -> ${OUT.replace(ROOT + '/', '')}`);
 console.log(`  cover, contents, ${sections.length} section dividers, ${screens.length} screen pages (${DISTINCT} screens)`);
 console.log(`  ${scrolling} screens carry a "scrolls" note and a second shot of the rest`);
+console.log(`  ${tileStats.hit + tileStats.fetched} map tiles served (${tileStats.fetched} fetched, ${tileStats.hit} from .tile-cache)`);
 console.log(`  ${discs} small controls marked in the margin across ${marked} screens`);

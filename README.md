@@ -71,7 +71,8 @@ data/
 tools/
   build-attributes.mjs   regenerates data/attributes.js from data/geo
   smoke.mjs              walks every route in a browser and reports console errors
-  screendeck.mjs         photographs every screen and typesets the review deck
+  screendeck.mjs         photographs every screen and typesets the review deck;
+                         serves the map tiles itself and keeps them in .tile-cache
 src/
   app/       shell, two-level hash router, navigation model, page registry, DOM and icons
   domain/    pure logic — taxonomy, regions, bands, periods, aggregation, change,

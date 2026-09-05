@@ -21,6 +21,11 @@ import { NEUTRAL, SEQUENTIAL } from '../domain/palette.js';
 import { regionById, isEmirate } from '../domain/regions.js';
 import { deckMark } from '../app/deckMark.js';
 
+/* A build that photographs the app has no direct route to the tile servers, so
+ * it serves them from its own cache and points this at it. Empty in a browser,
+ * where the tile URLs below are used as they are. */
+export const relayed = (url) => (globalThis.ADAFSA_TILE_RELAY ? `${globalThis.ADAFSA_TILE_RELAY}?u=${url}` : url);
+
 const BASEMAPS = {
   satellite: {
     label: 'Satellite',
@@ -73,7 +78,7 @@ export function mapBand(id, options) {
 
   function setBasemap(name) {
     baseLayers.forEach((layer) => map.removeLayer(layer));
-    baseLayers = BASEMAPS[name].layers.map(([url, opts]) => window.L.tileLayer(url, opts).addTo(map));
+    baseLayers = BASEMAPS[name].layers.map(([url, opts]) => window.L.tileLayer(relayed(url), opts).addTo(map));
     base = name;
   }
   setBasemap(base);
