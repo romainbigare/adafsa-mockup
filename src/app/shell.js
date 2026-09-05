@@ -64,12 +64,12 @@ export function renderHeader(root, { place, tools = [] }) {
 /* The filters live in one strip under the page header: the region always, and
  * the crop groups when the page has them. A page about a single farm has
  * neither, and the strip disappears. */
-export function renderBody(root, { content, selection, showRegion = true, tree = null, filterScope = null, counts = null }) {
+export function renderBody(root, { content, selection, showRegion = true, tree = null, filterScope = null }) {
   clear(root);
   const strip = document.getElementById('filter-strip');
   clear(strip);
   if (showRegion || filterScope) {
-    strip.append(filterBar({ tree, scope: filterScope, selection, counts, showRegion }));
+    strip.append(filterBar({ tree, scope: filterScope, selection, showRegion }));
   }
   root.append(h('div', { class: 'page-content' }, content));
 }

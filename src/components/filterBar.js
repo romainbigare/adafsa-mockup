@@ -15,7 +15,6 @@ import { icon } from '../app/icons.js';
 import { REGIONS } from '../domain/regions.js';
 import { scopeTree } from '../domain/taxonomy.js';
 import { setParams } from '../app/router.js';
-import { int } from '../domain/format.js';
 import { cropFilter, activeKeys, scopeKeys, applySelection } from './cropFilter.js';
 
 /* A button with a panel underneath it, closing on a click elsewhere. */
@@ -46,12 +45,11 @@ function regionField(current) {
 }
 
 /* One chip per group: the name toggles the whole group, the chevron opens it. */
-function groupChip(tree, scope, selected, counts, category) {
+function groupChip(tree, scope, selected, category) {
   const categoryKeys = category.types.map((t) => t.key);
   const active = activeKeys(tree, scope, selected);
   const on = categoryKeys.filter((k) => active.has(k)).length;
   const all = on === categoryKeys.length;
-  const farms = counts ? categoryKeys.reduce((a, k) => a + (counts.get(k) || 0), 0) : null;
 
   const main = h('button', {
     class: 'chip-main',
@@ -64,8 +62,7 @@ function groupChip(tree, scope, selected, counts, category) {
     }
   },
     h('span', { class: 'swatch', style: { background: category.color } }),
-    h('span', { text: category.name }),
-    farms != null ? h('span', { class: 'chip-count', text: int(farms) }) : null);
+    h('span', { text: category.name }));
 
   const chip = h('span', { class: ['chip-toggle', all ? 'is-on' : on ? 'is-part' : 'is-off'] }, main);
 
@@ -73,13 +70,13 @@ function groupChip(tree, scope, selected, counts, category) {
     const opener = h('button', { class: 'chip-more', title: `Choose crops in ${category.name}`, 'aria-label': `Choose crops in ${category.name}` },
       icon('chevronDown', { size: 12 }));
     chip.append(withPanel(opener, cropFilter(tree, {
-      scope, selected, counts, only: category.name, memoryKey: 'group:' + category.name
+      scope, selected, only: category.name, memoryKey: 'group:' + category.name
     })));
   }
   return chip;
 }
 
-export function filterBar({ tree, scope = null, selection, counts = null, showRegion = true }) {
+export function filterBar({ tree, scope = null, selection, showRegion = true }) {
   const bar = h('div', { class: 'filter-bar' });
   if (showRegion) bar.append(regionField(selection.region));
   if (!scope || !tree) return bar;
@@ -89,20 +86,19 @@ export function filterBar({ tree, scope = null, selection, counts = null, showRe
   const active = activeKeys(tree, scope, selection.types);
   const filtering = active.size !== keys.length;
 
-  for (const category of groups) bar.append(groupChip(tree, scope, selection.types, counts, category));
+  for (const category of groups) bar.append(groupChip(tree, scope, selection.types, category));
 
   /* The whole taxonomy in one panel. Each chip already opens its own group, so
-   * this is the second route rather than the first, and it stays an icon to
-   * keep six groups and the region on one line. */
+   * this is the second route rather than the first. */
   const allButton = h('button', {
-    class: ['btn', 'map-square', filtering ? 'is-active' : null],
-    title: filtering ? `Choose crops — ${int(active.size)} of ${int(keys.length)} on` : 'Choose individual crops',
-    'aria-label': 'Choose individual crops'
-  }, icon('filter', { size: 15 }));
-  bar.append(withPanel(allButton, cropFilter(tree, { scope, selected: selection.types, counts, memoryKey: 'all:' + scope })));
+    class: ['btn', filtering ? 'is-active' : null],
+    title: filtering ? `Choose individual crops — ${active.size} of ${keys.length} on` : 'Choose individual crops'
+  }, icon('filter', { size: 14 }), h('span', { text: 'All crops' }));
+  bar.append(withPanel(allButton, cropFilter(tree, { scope, selected: selection.types, memoryKey: 'all:' + scope })));
 
+  /* The chips already say what is on, so the only thing worth adding is a way
+   * back to everything. */
   if (filtering) {
-    bar.append(h('span', { class: 'bar-state', text: `${int(active.size)} of ${int(keys.length)} crops` }));
     bar.append(h('button', {
       class: 'link bar-clear',
       onclick: () => setParams({ types: null, p: null }),

@@ -13,7 +13,6 @@ import { h } from '../app/dom.js';
 import { icon } from '../app/icons.js';
 import { scopeTree } from '../domain/taxonomy.js';
 import { setParams } from '../app/router.js';
-import { int } from '../domain/format.js';
 
 const openGroups = new Set();
 const scrollMemory = new Map();
@@ -40,17 +39,16 @@ export function applySelection(tree, scope, next) {
 }
 
 /* A checkbox list of one category's varieties. */
-function typeRows(category, active, counts, onToggle) {
+function typeRows(category, active, onToggle) {
   return category.types.map((type) =>
     h('div', { class: 'tax-row' },
       h('label', { class: 'tax-label' },
         h('input', { type: 'checkbox', checked: active.has(type.key), onchange: (e) => onToggle([type.key], e.target.checked) }),
-        h('span', { text: type.name })),
-      counts ? h('span', { class: 'count', text: int(counts.get(type.key) || 0) }) : null));
+        h('span', { text: type.name }))));
 }
 
 /* The full tree. `only` narrows it to a single group, for a chip's own panel. */
-export function cropFilter(tree, { scope = 'all', selected = new Set(), counts = null, only = null, memoryKey = 'all' } = {}) {
+export function cropFilter(tree, { scope = 'all', selected = new Set(), only = null, memoryKey = 'all' } = {}) {
   const visible = scopeTree(tree, scope).filter((c) => !only || c.name === only);
   const active = activeKeys(tree, scope, selected);
   const toggle = (list, on) => {
@@ -90,10 +88,9 @@ export function cropFilter(tree, { scope = 'all', selected = new Set(), counts =
             : h('span', { class: 'tax-toggle-spacer' }),
           h('label', { class: 'tax-label' }, box,
             h('span', { class: 'swatch', style: { background: category.color } }),
-            h('span', { text: category.name })),
-          counts ? h('span', { class: 'count', text: int(categoryKeys.reduce((a, k) => a + (counts.get(k) || 0), 0)) }) : null),
+            h('span', { text: category.name }))),
         category.types.length > 1 && isOpen
-          ? h('div', { class: only ? null : 'tax-types' }, ...typeRows(category, active, counts, toggle))
+          ? h('div', { class: only ? null : 'tax-types' }, ...typeRows(category, active, toggle))
           : null);
     }));
   }
@@ -109,20 +106,6 @@ export function cropFilter(tree, { scope = 'all', selected = new Set(), counts =
       h('div', { class: 'rail-actions' },
         h('button', { class: 'link', onclick: () => toggle(keys, true), text: 'All' }),
         h('button', { class: 'link', onclick: () => toggle(keys, false), text: 'None' }))),
-    h('div', { class: 'rail-columns' },
-      h('span', { text: only ? 'Crop' : 'Crop group' }),
-      counts ? h('span', { text: 'Farms' }) : null),
+    h('div', { class: 'rail-columns' }, h('span', { text: only ? 'Crop' : 'Crop group' })),
     body);
-}
-
-/* How many farms grow each type, for the counts beside the boxes. */
-export function typeCounts(farms) {
-  const counts = new Map();
-  for (const farm of farms) {
-    for (const crop of farm.crops) {
-      if (crop.former || !crop.area) continue;
-      counts.set(crop.key, (counts.get(crop.key) || 0) + 1);
-    }
-  }
-  return counts;
 }

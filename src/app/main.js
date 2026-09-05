@@ -8,8 +8,7 @@ import { start, onRouteChange, selection } from './router.js';
 import { renderNav, renderHeader, renderBody, placeFor } from './shell.js';
 import { loadPage } from './pages.js';
 import { h } from './dom.js';
-import { taxonomyTree, query } from '../data/store.js';
-import { typeCounts } from '../components/cropFilter.js';
+import { taxonomyTree } from '../data/store.js';
 
 const nav = document.getElementById('nav');
 const header = document.getElementById('page-header');
@@ -54,8 +53,7 @@ async function draw(route) {
     ...view,
     selection: chosen,
     showRegion: view.showRegion !== false,
-    tree: taxonomyTree(),
-    counts: view.filterScope ? typeCounts(query({ region: chosen.region })) : null
+    tree: taxonomyTree()
   });
   document.title = `${place.title ? place.title + ' — ' : ''}ADAFSA Platform`;
 

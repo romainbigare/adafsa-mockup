@@ -215,7 +215,7 @@ table.grid td.name { font-weight: 550; }
 .rail-head button.link { border: 0; background: none; color: var(--focus); font-size: 11.5px; cursor: pointer; padding: 0; }
 .rail-body { padding: 5px 6px 8px; flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .rail-columns {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  display: flex; align-items: center; gap: 8px;
   padding: 6px 13px; border-bottom: 1px solid var(--line); flex: none;
   font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-4); font-weight: 650;
 }
@@ -225,7 +225,6 @@ table.grid td.name { font-weight: 550; }
 .tax-label { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; cursor: pointer; }
 .tax-label span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tax-row input { accent-color: var(--brand-600); margin: 0; flex: none; }
-.tax-row .count { color: var(--ink-4); font-size: 11.5px; font-variant-numeric: tabular-nums; flex: none; }
 .tax-cat .tax-label { font-weight: 600; }
 .tax-toggle { border: 0; background: none; padding: 0; cursor: pointer; color: var(--ink-4); display: inline-flex; flex: none; }
 .tax-toggle .icon { transition: transform .15s; }
@@ -343,8 +342,10 @@ table.grid td.name { font-weight: 550; }
 }
 .filter-bar .btn.is-active { border-color: var(--brand-500); color: var(--brand-800); background: var(--brand-50); }
 .bar-clear { border: 0; background: none; color: var(--focus); font-size: 12.5px; cursor: pointer; padding: 0 4px; }
-.bar-state { font-size: 12px; color: var(--ink-3); margin-inline-start: 2px; }
 .inline-field { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-3); }
+/* The region and the crops are two different questions — a little air between
+   them, and a hairline to say so. */
+.filter-bar > .inline-field { margin-inline-end: 12px; padding-inline-end: 12px; border-inline-end: 1px solid var(--line); }
 
 /* A group chip is two controls in one shape: the name toggles the whole group,
    the chevron opens its varieties. It cannot clip its overflow — the varieties
@@ -362,7 +363,6 @@ table.grid td.name { font-weight: 550; }
   border-start-start-radius: 999px; border-end-start-radius: 999px;
 }
 .chip-toggle > .chip-main:only-child { border-radius: 999px; }
-.chip-toggle .chip-count { font-size: 11px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
 .chip-toggle .chip-more {
   border: 0; border-inline-start: 1px solid var(--line); background: none;
   padding: 0 5px; color: var(--ink-4); cursor: pointer; display: inline-flex; align-items: center;
