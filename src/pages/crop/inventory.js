@@ -92,7 +92,7 @@ export function render({ selection }) {
             { key: 'area', label: 'Farm area (dun)', align: 'num', value: (f) => f.area, cell: (f) => dec(f.area, 1) },
             { key: 'field', label: 'Crops (dun)', align: 'num', defaultSort: true, value: (f) => f.fieldArea, cell: (f) => dec(f.fieldArea, 1) },
             { key: 'share', label: 'Share', align: 'num', value: (f) => (f.area ? (f.fieldArea / f.area) * 100 : 0), cell: (f) => pct(f.area ? (f.fieldArea / f.area) * 100 : 0) },
-            { key: 'crops', label: 'Crops', value: (f) => f.crops.filter((c) => !c.former && FIELD_CATEGORIES.includes(c.category)).map((c) => c.type).sort().join(', ') || '—' }
+            { key: 'crops', label: 'Crops', wrap: true, value: (f) => f.crops.filter((c) => !c.former && FIELD_CATEGORIES.includes(c.category)).map((c) => c.type).sort().join(', ') || '—' }
           ]
         }))
     ]

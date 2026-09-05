@@ -82,7 +82,7 @@ export function render({ selection }) {
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
             { key: 'count', label: 'Structures', align: 'num', defaultSort: true, value: (f) => f.structures.length, cell: (f) => int(f.structures.length) },
             { key: 'built', label: 'Area covered (dun)', align: 'num', value: (f) => f.structureArea, cell: (f) => dec(f.structureArea, 2) },
-            { key: 'types', label: 'Types', value: (f) => [...new Set(f.structures.map((s) => s.tier2))].sort().join(', ') },
+            { key: 'types', label: 'Types', wrap: true, value: (f) => [...new Set(f.structures.map((s) => s.tier2))].sort().join(', ') },
             { key: 'pending', label: 'Waiting for tier 3', align: 'num', value: (f) => f.structures.filter((s) => s.tier3 === null).length, cell: (f) => int(f.structures.filter((s) => s.tier3 === null).length) }
           ]
         }))

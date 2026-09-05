@@ -113,7 +113,9 @@ a { color: inherit; }
 .page-body { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); gap: 20px; padding: 20px 24px 64px; align-items: start; }
 .page-body.no-rail { grid-template-columns: minmax(0, 1fr); }
 .rail { position: sticky; top: calc(var(--header-h) + 20px); max-height: calc(100vh - var(--header-h) - 36px); display: flex; flex-direction: column; }
-.page-content { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-content: start; align-items: start; }
+/* Cards sharing a row take the height of the taller one, so their bottom
+   edges line up. */
+.page-content { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-content: start; align-items: stretch; }
 .page-content > * { grid-column: 1 / -1; }
 .page-content > .card.half { grid-column: span 1; }
 @media (max-width: 1240px) { .page-content > .card.half { grid-column: 1 / -1; } }
@@ -139,7 +141,8 @@ a { color: inherit; }
 .segmented button[aria-pressed="true"] { background: var(--brand-50); color: var(--brand-800); font-weight: 600; }
 
 /* ---- Cards and sections ------------------------------------------------ */
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.card > .card-body { flex: 1; }
 .card-head { display: flex; align-items: center; gap: 9px; padding: 13px 16px 0; flex-wrap: wrap; }
 .card-head > .icon { color: var(--ink-4); flex: none; }
 .card-head h2 { font-size: 14.5px; font-weight: 650; }
@@ -147,6 +150,10 @@ a { color: inherit; }
 .card-head .card-tools { margin-inline-start: auto; display: flex; gap: 8px; align-items: center; }
 .card-body { padding: 14px 16px 16px; }
 .card-body.flush { padding: 0; }
+/* A card holding nothing but a chart, stretched to match a taller neighbour,
+   centres its drawing rather than leaving it stranded at the top. */
+.card-body:has(> .chart:only-child),
+.card-body:has(> .band-bar:only-child) { display: flex; flex-direction: column; justify-content: center; }
 
 .section-intro { font-size: 13px; color: var(--ink-2); max-width: 68ch; }
 
@@ -175,7 +182,8 @@ a { color: inherit; }
 /* ---- Tables ------------------------------------------------------------ */
 .table-wrap { overflow-x: auto; }
 table.grid { width: 100%; border-collapse: collapse; font-size: 13px; }
-table.grid th, table.grid td { padding: 8px 12px; text-align: start; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.grid th, table.grid td { padding: 8px 12px; text-align: start; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+table.grid td.wrap { white-space: normal; min-width: 200px; }
 table.grid thead th {
   position: sticky; top: 0; z-index: 1; background: var(--surface-sunken);
   font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); font-weight: 600;
@@ -203,6 +211,8 @@ table.grid td.name { font-weight: 550; }
 
 /* ---- Filter rail ------------------------------------------------------- */
 .rail-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; min-height: 0; flex: 0 1 auto; }
+.rail-panel--fixed { flex: none; }
+.rail-pad { padding: 10px 12px; }
 .rail-panel + .rail-panel { margin-top: 14px; }
 .rail-head { display: flex; align-items: center; gap: 8px; padding: 11px 13px; border-bottom: 1px solid var(--line); background: var(--surface-sunken); flex: none; }
 .rail-head h2 { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); font-weight: 650; }

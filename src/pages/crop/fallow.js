@@ -80,7 +80,7 @@ export function render({ selection }) {
             { key: 'fallow', label: 'Fallow (dun)', align: 'num', defaultSort: true, value: (f) => f.fallowArea, cell: (f) => dec(f.fallowArea, 1) },
             { key: 'inprod', label: 'Planted', align: 'num', value: (f) => f.cultivatedShare, cell: (f) => pct(f.cultivatedShare) },
             { key: 'band', label: 'Status', value: (f) => classify(CULTIVATION, f.cultivatedShare)?.label || '—' },
-            { key: 'move', label: `Change ${period.label} (dun)`, align: 'num',
+            { key: 'move', label: 'Change (dun)', align: 'num',
               value: (f) => { const m = moves.find((x) => x.record.fid === f.fid); return m ? m.delta : 0; },
               cell: (f) => { const m = moves.find((x) => x.record.fid === f.fid); return m ? signed(m.delta, 1) : '—'; } }
           ]

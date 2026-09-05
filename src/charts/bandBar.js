@@ -18,7 +18,7 @@ export function bandBar(rows, { total = null, showLegend = true } = {}) {
 
   if (!showLegend) return bar;
 
-  return h('div', { style: { display: 'grid', gap: '8px' } }, bar,
+  return h('div', { class: 'band-bar', style: { display: 'grid', gap: '8px' } }, bar,
     h('ul', { style: { listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '3px', fontSize: '12.5px' } },
       ...rows.map((row) => h('li', { style: { display: 'flex', alignItems: 'center', gap: '7px' } },
         h('span', { class: 'swatch', style: { background: row.color } }),

@@ -71,7 +71,7 @@ export function dataTable(rows, {
       onclick: target ? () => { location.hash = target.replace(/^#/, '#'); } : null
     }, ...columns.map((col) => {
       const content = col.cell ? col.cell(row) : col.value(row);
-      return h('td', { class: [col.align === 'num' ? 'num' : null, col.strong ? 'name' : null] },
+      return h('td', { class: [col.align === 'num' ? 'num' : null, col.strong ? 'name' : null, col.wrap ? 'wrap' : null] },
         content instanceof Node ? content : String(content ?? '—'));
     }));
     body.append(tr);

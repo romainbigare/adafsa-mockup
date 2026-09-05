@@ -9,7 +9,7 @@ import { h, clear, append } from './dom.js';
 import { icon } from './icons.js';
 import { NAV, NAV_FOOTER, locate } from './nav.js';
 import { href, currentParams } from './router.js';
-import { regionSelect } from '../components/regionSelect.js';
+import { regionPanel } from '../components/regionPanel.js';
 
 function navLink(entry, activeId, { child = false, section = false, expandable = false } = {}) {
   const params = currentParams();
@@ -46,7 +46,7 @@ export function renderNav(root, place) {
   ]);
 }
 
-export function renderHeader(root, { place, selection, tools = [], showRegion = true }) {
+export function renderHeader(root, { place, tools = [] }) {
   clear(root);
   append(root, [
     h('button', {
@@ -57,16 +57,18 @@ export function renderHeader(root, { place, selection, tools = [], showRegion = 
     h('div', { class: 'page-title' },
       place?.eyebrow ? h('div', { class: 'eyebrow', text: place.eyebrow }) : null,
       h('h1', { text: place?.title || '' })),
-    h('div', { class: 'header-tools' },
-      ...tools,
-      showRegion ? regionSelect(selection.region) : null)
+    tools.length ? h('div', { class: 'header-tools' }, ...tools) : null
   ]);
 }
 
-export function renderBody(root, { content, rail }) {
+/* The rail carries the two filters that decide what the page counts: the region
+ * always, and the crop filter when the page has one. A page that reports on a
+ * single farm has neither, and gets the full width. */
+export function renderBody(root, { content, rail, selection, showRegion = true }) {
   clear(root);
-  root.classList.toggle('no-rail', !rail);
-  if (rail) root.append(h('aside', { class: 'rail' }, rail));
+  const panels = [showRegion ? regionPanel(selection.region) : null, rail].filter(Boolean);
+  root.classList.toggle('no-rail', panels.length === 0);
+  if (panels.length) root.append(h('aside', { class: 'rail' }, ...panels));
   root.append(h('div', { class: 'page-content' }, content));
 }
 

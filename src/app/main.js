@@ -47,13 +47,8 @@ async function draw(route) {
   }
   if (token !== drawToken) return;
 
-  renderHeader(header, {
-    place,
-    selection: chosen,
-    tools: view.tools || [],
-    showRegion: view.showRegion !== false
-  });
-  renderBody(body, view);
+  renderHeader(header, { place, tools: view.tools || [] });
+  renderBody(body, { ...view, selection: chosen, showRegion: view.showRegion !== false });
   document.title = `${place.title ? place.title + ' — ' : ''}ADAFSA Platform`;
 
   /* Only jump to the top when the page itself changed; ticking a filter should

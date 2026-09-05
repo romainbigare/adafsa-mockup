@@ -55,7 +55,7 @@ export function render({ selection }) {
           { key: 'owner', label: 'Owner', value: (f) => f.owner },
           { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
           { key: 'area', label: 'Farm area (dun)', align: 'num', defaultSort: true, value: (f) => f.area, cell: (f) => dec(f.area, 1) },
-          { key: 'crops', label: 'Main crops', value: (f) => f.crops.filter((c) => !c.former).sort((a, b) => b.area - a.area).slice(0, 3).map((c) => c.type).join(', ') || '—' },
+          { key: 'crops', label: 'Main crops', wrap: true, value: (f) => f.crops.filter((c) => !c.former).sort((a, b) => b.area - a.area).slice(0, 3).map((c) => c.type).join(', ') || '—' },
           { key: 'trees', label: 'Trees', align: 'num', value: (f) => f.trees, cell: (f) => int(f.trees) },
           { key: 'ier', label: 'Water score', align: 'num', value: (f) => f.efficiency,
             cell: (f) => { const band = classify(EFFICIENCY, f.efficiency); return h('span', { class: 'bar-cell' }, h('span', { class: 'swatch', style: { background: band.color } }), String(f.efficiency)); } },

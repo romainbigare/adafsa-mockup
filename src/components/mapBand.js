@@ -80,12 +80,15 @@ export function mapBand(id, options) {
   const squareBtn = (label, glyph, onclick) => h('button', {
     class: 'btn btn-sm map-square', title: label, 'aria-label': label, onclick
   }, glyph);
-  const baseToggle = h('button', { class: 'btn btn-sm', title: 'Change the base map' },
-    icon('layers', { size: 15 }), h('span', { text: 'Streets' }));
+  const baseToggle = h('button', {
+    class: 'btn btn-sm map-square', title: 'Switch to the street map', 'aria-label': 'Switch to the street map'
+  }, icon('layers', { size: 15 }));
   baseToggle.addEventListener('click', () => {
     const next = base === 'satellite' ? 'streets' : 'satellite';
     setBasemap(next);
-    baseToggle.replaceChildren(icon('layers', { size: 15 }), h('span', { text: next === 'satellite' ? 'Streets' : 'Satellite' }));
+    const label = next === 'satellite' ? 'Switch to the street map' : 'Switch to the satellite map';
+    baseToggle.title = label;
+    baseToggle.setAttribute('aria-label', label);
   });
   controls.append(
     baseToggle,
