@@ -1,21 +1,11 @@
-/* ==========================================================================
-   Wafra Leaflet overrides
-   Copied verbatim from the original mockups. The z-index popup-pane rules
-   ensure popups layer above the floating UI panels; harmless elsewhere.
-   ========================================================================== */
-
-.leaflet-container { font-family: "Inter", sans-serif; background: #1f2937; }
-
-.leaflet-popup-content-wrapper {
-  background-color: rgba(255,255,255,0.95) !important;
-  backdrop-filter: blur(8px);
-  border-radius: 0.5rem !important;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important;
-  color: #111827 !important;
+/* Leaflet overrides — enough to make the map look like part of the page. */
+.leaflet-container { font: inherit; background: #dde3e6; }
+.leaflet-control-attribution {
+  font-size: 10px; background: rgb(255 255 255 / 78%); color: var(--ink-3);
 }
-.leaflet-popup-tip { background-color: rgba(255,255,255,0.95) !important; }
-.leaflet-control-attribution { font-size: 10px; background: rgba(255,255,255,0.7) !important; }
-
-.leaflet-pane.leaflet-popup-pane { z-index: 1000 !important; }
-.leaflet-popup { z-index: 1000 !important; }
+.leaflet-control-attribution a { color: var(--ink-2); }
+.leaflet-popup-content-wrapper { border-radius: var(--r-sm); box-shadow: var(--shadow-lg); }
+.leaflet-popup-content { margin: 10px 12px; font-size: 12.5px; line-height: 1.45; }
+.leaflet-popup-content strong { display: block; margin-bottom: 3px; }
+.leaflet-tooltip { font-size: 12px; border-radius: var(--r-sm); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.leaflet-bar a { color: var(--ink-2); }

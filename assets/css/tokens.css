@@ -1,47 +1,56 @@
-/* ==========================================================================
-   Wafra design tokens
-   CSS custom properties mirroring the Tailwind brand palette + shared
-   surface colors used across the dashboard and farm-analysis pages.
-   Keep values in sync with assets/tailwind-config.js — do not diverge.
-   ========================================================================== */
+/* Design tokens.
+ *
+ * The platform is a reading surface first — mostly tables and figures, with
+ * maps where a question is genuinely about a place. The palette is quiet so the
+ * status colours mean something when they appear.
+ *
+ * Identity colours for the crop taxonomy live in src/domain/palette.js, where
+ * they can be validated by script. Only the interface chrome is here. */
 
 :root {
-  /* Brand palette (green), 50 (lightest) -> 900 (darkest) */
-  --brand-50:  #f0fdf4;
+  color-scheme: light;
+
+  --brand-50: #f0fdf4;
   --brand-100: #dcfce7;
   --brand-200: #bbf7d0;
-  --brand-300: #86efac;
-  --brand-400: #4ade80;
   --brand-500: #22c55e;
   --brand-600: #16a34a;
   --brand-700: #15803d;
   --brand-800: #166534;
-  --brand-900: #14532d;
 
-  /* Typography — one humanist sans everywhere. Numeric/label slots that used to
-     be monospace now reuse the sans stack (with tabular-nums where digits must
-     line up), so nothing reads as a "technical" console font. */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: var(--font-sans);
+  --page: #f7f7f6;
+  --surface: #ffffff;
+  --surface-sunken: #fafaf9;
+  --line: #e5e7eb;
+  --line-strong: #d1d5db;
 
-  /* Surfaces */
-  --panel-bg: rgba(255, 255, 255, 0.85);
-  --page-bg: #f9fafb;
-  --text-primary: #111827;
+  --ink: #111827;
+  --ink-2: #4b5563;
+  --ink-3: #6b7280;
+  --ink-4: #9ca3af;
 
-  /* ------------------------------------------------------------------ */
-  /* Semantic status colours — the COLOUR CONTRACT.                     */
-  /* red = needs action · amber = watch · green = fine · grey = no data.*/
-  /* These are the ONLY meanings these hues carry anywhere in the app   */
-  /* (status chips, tiles, cluster badges, the verdict). Band palettes  */
-  /* follow the same direction; never reuse these hues decoratively.    */
-  /* ------------------------------------------------------------------ */
-  --status-ok:        #16a34a;   /* green  600 */
-  --status-ok-bg:     #dcfce7;   /* green  100 */
-  --status-warn:      #c2410c;   /* amber  700 (text on warn-bg)        */
-  --status-warn-bg:   #ffedd5;   /* amber  100 */
-  --status-critical:  #b91c1c;   /* red    700 */
-  --status-critical-bg: #fee2e2; /* red    100 */
-  --status-neutral:   #6b7280;   /* gray   500 */
-  --status-neutral-bg:#f3f4f6;   /* gray   100 */
+  /* The colour contract: these four meanings and no others. */
+  --ok: #16a34a;
+  --ok-bg: #dcfce7;
+  --watch: #c2410c;
+  --watch-bg: #ffedd5;
+  --act: #b91c1c;
+  --act-bg: #fee2e2;
+  --none: #6b7280;
+  --none-bg: #f3f4f6;
+
+  --focus: #2a78d6;
+
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --nav-w: 232px;
+  --rail-w: 236px;
+  --header-h: 60px;
+
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 14px;
+
+  --shadow: 0 1px 2px rgb(17 24 39 / 6%), 0 1px 3px rgb(17 24 39 / 4%);
+  --shadow-lg: 0 4px 16px rgb(17 24 39 / 10%);
 }

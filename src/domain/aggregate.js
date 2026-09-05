@@ -111,7 +111,7 @@ export function classBreakdown(entries, { order = null } = {}) {
     name: cat.name,
     area: cat.area,
     count: cat.count,
-    children: [...cat.types.values()].sort((a, b) => b.area - a.area).map((t) => ({ key: cat.name + '→' + t.name, ...t }))
+    children: [...cat.types.values()].sort((a, b) => b.area - a.area).map((t) => ({ key: cat.name + ':' + t.name, ...t }))
   }));
   rows = order ? rows.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name)) : rows.sort((a, b) => b.area - a.area);
   const totalArea = rows.reduce((a, r) => a + r.area, 0);

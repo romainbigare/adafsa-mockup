@@ -54,7 +54,7 @@ export const colorOfType = (category) => categoryColor(category);
 
 /* A leaf name alone is ambiguous — watermelon is both an open-field crop and,
  * in other surveys, a fruit. Selections are keyed by category and type. */
-export const SEP = '→';
+export const SEP = ':';
 export const typeKey = (category, type) => category + SEP + type;
 export const splitKey = (key) => {
   const i = key.indexOf(SEP);
