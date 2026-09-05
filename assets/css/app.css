@@ -53,7 +53,14 @@ a { color: inherit; }
 
 .nav-list { list-style: none; margin: 0; padding: 0 8px; flex: 1; }
 .nav-item + .nav-item { margin-top: 2px; }
+.nav-item.has-children { padding-bottom: 0; transition: padding-bottom .22s ease; }
 .nav-item.has-children.is-open { padding-bottom: 8px; }
+
+/* The fold. A grid row travelling between no height and its own height needs
+   to be told neither number, which is the whole reason it is a grid. */
+.nav-fold { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .22s ease; }
+.nav-item.is-open > .nav-fold { grid-template-rows: 1fr; }
+.nav-fold > .nav-sub { overflow: hidden; min-height: 0; }
 .nav-item + .nav-item.has-children { margin-top: 3px; }
 .nav-item.has-children:last-of-type { padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--line) 65%, transparent); }
 .nav-item:first-child { padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--line) 65%, transparent); }
@@ -69,17 +76,17 @@ a { color: inherit; }
 }
 .nav-item > a:hover { background: var(--surface-sunken); color: var(--ink); }
 .nav-item > a .icon { color: var(--ink-4); }
-/* The section you are in reads as a heading; only the open page carries the
-   accent bar and the tint. */
-.nav-item > a.is-section { color: var(--ink); font-weight: 600; }
-.nav-item > a.is-section .icon { color: var(--brand-700); }
+/* The group you are inside reads as a heading, not as a selection: no accent
+   bar, no tint, no colour on its icon. The open chevron and the highlighted
+   page underneath already say where you are. */
+.nav-item.is-open > a { color: var(--ink); font-weight: 600; }
 .nav-item > a[aria-current] {
   background: var(--brand-50); color: var(--brand-800); font-weight: 600;
   border-inline-start-color: var(--brand-500);
 }
 .nav-item > a[aria-current] .icon { color: var(--brand-700); }
 
-.nav-sub { list-style: none; margin: 3px 0 0; padding: 0 0 0 27px; display: grid; gap: 1px; }
+.nav-sub { list-style: none; margin: 0; padding: 3px 0 0 27px; display: grid; gap: 1px; }
 .nav-sub a {
   display: block; padding: 5px 10px; border-radius: var(--r-sm);
   font-size: 12.5px; color: var(--ink-3); text-decoration: none;
@@ -388,4 +395,10 @@ table.grid td.name { font-weight: 550; }
 
 @media (max-width: 760px) {
   .filter-bar { padding: 8px 14px; }
+}
+
+/* Someone who has asked their machine for less movement gets the fold without
+   the travel. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-fold, .nav-item.has-children, .nav-chevron { transition: none; }
 }

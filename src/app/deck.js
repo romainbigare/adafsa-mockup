@@ -29,7 +29,7 @@ const NOTES = {
   'land/landuse': 'Shows how the land is used on every farm: fields, palms, other trees, greenhouses, buildings and empty land. Zoom in and the map draws the real shape of each piece of land.',
   'land/structures': 'Shows what is built on the farms: houses, labour housing, sheds, water tanks, animal pens, roads and pump rooms. It gives the type of each one. (Module 3: structure detection.)',
   'land/change': 'Shows buildings that are new and buildings that are gone. It needs two quarters of data before it can show anything.',
-  'ier/scores': 'Gives every farm a score from 0 to 100 for how well it waters its crops. Each score gets a band: Excellent, Good, Acceptable, Poor or Critical. (Module 4: IER score and band.)',
+  'ier/scores': 'Gives every farm a score from 0 to 100 for how well it waters its crops, and a band for that score. The tabs list the farms at 65 or more, which keep their subsidy. (Module 4: IER score, band and subsidy list.)',
   'ier/trend': 'Shows whether the scores are getting better or worse over time. A line and hard numbers, and no map on purpose. (Module 4: quarter-on-quarter trend.)',
   'water/demand': 'Shows how much water each farm should use this month and how much it really used. Farms using far more than they need are flagged. (Module 6: monthly water demand and over-allocation flag.)',
   'water/budget': 'Shows how much water a crop needs for a whole season, and how much food it gives back for that water. Useful when deciding what to grow. (Module 6: seasonal water budget.)',

@@ -45,6 +45,7 @@ export function selection(params = currentParams()) {
     sort: params.get('sort') || '',
     direction: params.get('dir1') || 'increased',
     dir: params.get('dir') || '',
+    subsidy: params.get('sub') || '',
     page: Math.max(1, Number(params.get('p') || 1))
   };
 }

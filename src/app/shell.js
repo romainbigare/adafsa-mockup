@@ -11,39 +11,79 @@ import { NAV, NAV_FOOTER, locate } from './nav.js';
 import { href, currentParams } from './router.js';
 import { filterBar } from '../components/filterBar.js';
 
-function navLink(entry, activeId, { child = false, section = false, expandable = false } = {}) {
-  const params = currentParams();
+function navLink(entry, { child = false, expandable = false } = {}) {
   return h('a', {
-    class: [child ? 'nav-child' : 'nav-top', section ? 'is-section' : null],
-    href: href(entry.segments, params),
-    'aria-current': entry.id === activeId ? 'page' : null,
-    'aria-expanded': expandable ? String(section) : null
+    class: child ? 'nav-child' : 'nav-top',
+    href: href(entry.segments, currentParams()),
+    'aria-expanded': expandable ? 'false' : null
   },
     child ? null : icon(entry.icon, { size: 17 }),
     h('span', { class: 'nav-label', text: entry.label }),
     expandable ? h('span', { class: 'nav-chevron' }, icon('chevronDown', { size: 14 })) : null);
 }
 
-/* A module opens when you are inside it and closes when you leave, so the menu
- * stays short. The chevron says the entry has more underneath. */
-export function renderNav(root, place) {
+/* THE MENU IS BUILT ONCE AND THEN ONLY CHANGES STATE.
+ *
+ * A module's pages are always in the DOM, folded away by a grid row that goes
+ * from nothing to its own height. Rebuilding the list on every page change
+ * would put the new menu straight into its final shape with nothing to
+ * animate, and the group would appear to jump. Built once, the fold has
+ * somewhere to travel from.
+ *
+ * The group heading is never marked as the current page — only the page you
+ * are on carries that. The heading is a heading; the open chevron already says
+ * which module you are inside. */
+let menu = null;
+
+function buildNav(root) {
   clear(root);
+  const items = NAV.map((entry) => {
+    const link = navLink(entry, { expandable: !!entry.children });
+    const li = h('li', { class: ['nav-item', entry.children ? 'has-children' : null] }, link);
+    const children = (entry.children || []).map((child) => ({ entry: child, link: navLink(child, { child: true }) }));
+    if (children.length) {
+      li.append(h('div', { class: 'nav-fold' },
+        h('ul', { class: 'nav-sub' }, ...children.map((c) => h('li', {}, c.link)))));
+    }
+    return { entry, li, link, children };
+  });
+  const footer = NAV_FOOTER.map((entry) => ({ entry, link: navLink(entry) }));
+
   append(root, [
     h('div', { class: 'nav-brand' },
       h('strong', { text: 'ADAFSA' }),
       h('span', { text: 'Agricultural Monitoring Platform' })),
-    h('ul', { class: 'nav-list' }, ...NAV.map((entry) => {
-      const inSection = !!entry.children && entry.id === place?.navId;
-      const item = h('li', { class: ['nav-item', entry.children ? 'has-children' : null, inSection ? 'is-open' : null] },
-        navLink(entry, place?.navId, { section: inSection, expandable: !!entry.children }));
-      if (inSection) {
-        item.append(h('ul', { class: 'nav-sub' },
-          ...entry.children.map((child) => h('li', {}, navLink(child, place?.childId, { child: true })))));
-      }
-      return item;
-    })),
-    h('div', { class: 'nav-foot' }, ...NAV_FOOTER.map((entry) => navLink(entry, place?.navId)))
+    h('ul', { class: 'nav-list' }, ...items.map((i) => i.li)),
+    h('div', { class: 'nav-foot' }, ...footer.map((f) => f.link))
   ]);
+  return { root, items, footer };
+}
+
+const mark = (link, current) => {
+  if (current) link.setAttribute('aria-current', 'page');
+  else link.removeAttribute('aria-current');
+};
+
+export function renderNav(root, place) {
+  if (!menu || menu.root !== root || !root.firstChild) menu = buildNav(root);
+  const params = currentParams();
+
+  for (const item of menu.items) {
+    const here = item.entry.id === place?.navId;
+    const open = here && !!item.children.length;
+    item.li.classList.toggle('is-open', open);
+    item.link.href = href(item.entry.segments, params);
+    if (item.children.length) item.link.setAttribute('aria-expanded', String(open));
+    mark(item.link, here && !item.children.length);
+    for (const child of item.children) {
+      child.link.href = href(child.entry.segments, params);
+      mark(child.link, here && child.entry.id === place?.childId);
+    }
+  }
+  for (const entry of menu.footer) {
+    entry.link.href = href(entry.entry.segments, params);
+    mark(entry.link, entry.entry.id === place?.navId);
+  }
 }
 
 export function renderHeader(root, { place, tools = [] }) {

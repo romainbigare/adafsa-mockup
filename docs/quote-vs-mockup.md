@@ -87,11 +87,13 @@ and open sheds now appear nowhere in the quote, while the mockup's L1 Land use
 page still shows Greenhouse, Shade House and Open Shed as land classes.
 Either they come back into the taxonomy, or they come off the screen.
 
-### c. Subsidy-eligible filter (IER 65)
+### ~~c. Subsidy-eligible filter (IER 65)~~ — built
 A named Module 4 deliverable: *"List of farms above IER 65 threshold — eligible
-for continued subsidy consideration."* Nothing in the mockup filters on it. This
-is the deliverable with the clearest operational use for ADAFSA, and it is one
-button on I1.
+for continued subsidy consideration."* **Now on I1**: a headline figure for the
+count, and three tabs over the farm table — all farms, keeps subsidy (65+),
+below the line — with Export CSV giving whichever list is showing. The threshold
+is the bottom edge of the Acceptable band, so the page and the contract cannot
+drift apart.
 
 ### d. Flood irrigation detection
 Also Module 4, with its own accuracy target (82 % at M3, 90 % from M6):
@@ -189,8 +191,8 @@ on screen will be read as the platform's numbers. One line on the Overview —
 1. Settle the Tier 2 / Tier 3 question (§3a) — it is the only outright
    contradiction.
 2. Decide whether protected agriculture is in or out (§3b).
-3. Add the subsidy-eligible filter and the flood irrigation flag (§3c, §3d) —
-   both are named deliverables with accuracy targets attached.
+3. Add the flood irrigation flag (§3d) — a named deliverable with its own
+   accuracy target. The subsidy filter (§3c) is done.
 4. Rename **Yield Optimisation** to **Yield Forecast** (§2).
 5. Bring back a district rollup and the yield trend map (§3e, §3f).
 6. Add one "Reports and exports" screen (§3g).

@@ -14,7 +14,8 @@ import { mapBand } from '../../components/mapBand.js';
 import { dataTable } from '../../components/dataTable.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { query } from '../../data/store.js';
-import { EFFICIENCY, classify, distribution, colorFor } from '../../domain/bands.js';
+import { EFFICIENCY, classify, distribution, colorFor, SUBSIDY_SCORE, keepsSubsidy } from '../../domain/bands.js';
+import { setParams } from '../../app/router.js';
 import { mean } from '../../domain/aggregate.js';
 import { PROVINCES, regionById } from '../../domain/regions.js';
 import { int, signed, pct } from '../../domain/format.js';
@@ -31,6 +32,22 @@ function zoneAverages(all) {
   return zones;
 }
 
+/* Three views of one table. The count sits in the tab, because the number of
+ * farms that keep their subsidy is the answer as often as the list is. */
+const VIEWS = [
+  { id: '', label: 'All farms', keep: () => true },
+  { id: 'in', label: `Keeps subsidy (${SUBSIDY_SCORE}+)`, keep: (f) => keepsSubsidy(f.efficiency) },
+  { id: 'out', label: 'Below the line', keep: (f) => !keepsSubsidy(f.efficiency) }
+];
+
+function subsidyTabs(current, counts) {
+  return h('div', { class: 'segmented', role: 'group', 'aria-label': 'Which farms to list' },
+    ...VIEWS.map((view) => h('button', {
+      'aria-pressed': String(view.id === current),
+      onclick: () => setParams({ sub: view.id || null, p: null })
+    }, `${view.label} (${int(counts[view.id])})`)));
+}
+
 export function render({ selection }) {
   const everything = query({});
   const zones = zoneAverages(everything);
@@ -40,6 +57,11 @@ export function render({ selection }) {
   const average = mean(farms, (farm) => farm.efficiency);
   const priority = farms.filter((farm) => (classify(EFFICIENCY, farm.efficiency)?.sev || 0) >= 3);
   const critical = farms.filter((farm) => classify(EFFICIENCY, farm.efficiency)?.id === 'critical');
+  const eligible = farms.filter((farm) => keepsSubsidy(farm.efficiency));
+
+  const view = VIEWS.find((v) => v.id === selection.subsidy) || VIEWS[0];
+  const counts = Object.fromEntries(VIEWS.map((v) => [v.id, farms.filter(v.keep).length]));
+  const listed = farms.filter(view.keep);
 
   return {
     filterScope: 'all',
@@ -47,6 +69,7 @@ export function render({ selection }) {
       figures([
         { value: int(farms.length), label: 'Farms scored', icon: 'farms' },
         { value: average == null ? '—' : Math.round(average), label: 'Average score', icon: 'ruler' },
+        { value: int(eligible.length), label: `Keeps subsidy (${SUBSIDY_SCORE}+)`, icon: 'check' },
         { value: int(priority.length), label: 'Need attention', icon: 'alert', tone: priority.length ? 'watch' : null },
         { value: int(critical.length), label: 'In the lowest band', icon: 'alert', tone: critical.length ? 'act' : null }
       ]),
@@ -71,11 +94,16 @@ export function render({ selection }) {
           legendTitle: 'Efficiency score'
         }))),
 
-      section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
-        dataTable(farms, {
+      section('Every farm', {
+        icon: 'table',
+        note: view.id ? 'Export CSV gives this list.' : 'Click a column title to sort.',
+        flush: true,
+        tools: [subsidyTabs(view.id, counts)]
+      },
+        dataTable(listed, {
           selection,
           searchable: true,
-          csvName: 'irrigation-efficiency',
+          csvName: view.id === 'in' ? 'subsidy-eligible-farms' : view.id === 'out' ? 'below-subsidy-line' : 'irrigation-efficiency',
           hrefFor: (farm) => `#/farm/${farm.fid}`,
           columns: [
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },

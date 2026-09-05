@@ -17,20 +17,48 @@ import { scopeTree } from '../domain/taxonomy.js';
 import { setParams } from '../app/router.js';
 import { cropFilter, activeKeys, scopeKeys, applySelection } from './cropFilter.js';
 
+/* WHICH PANEL IS OPEN IS REMEMBERED, NOT THE ELEMENT.
+ *
+ * Ticking a crop changes the selection, which redraws the page, which builds a
+ * new filter bar. If "open" lived in the panel, every tick would shut it and
+ * unticking three crops would be three trips through the chevron. So the bar
+ * remembers the key of the open panel and the new one opens itself. */
+let openPanel = null;
+let closerBound = false;
+
+function bindCloser() {
+  if (closerBound) return;
+  closerBound = true;
+  document.addEventListener('click', (event) => {
+    /* A click inside any popover — including the tick box whose redraw just
+     * replaced this very element — is not a click elsewhere. */
+    if (event.target.closest?.('.popover-host')) return;
+    if (openPanel === null) return;
+    openPanel = null;
+    for (const box of document.querySelectorAll('.filter-pop')) box.hidden = true;
+    for (const btn of document.querySelectorAll('.popover-host [aria-expanded="true"]')) {
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') document.body.click();
+  });
+}
+
 /* A button with a panel underneath it, closing on a click elsewhere. */
-function withPanel(button, panel) {
-  const box = h('div', { class: 'filter-pop', hidden: true }, panel);
+function withPanel(button, panel, key) {
+  bindCloser();
+  const shown = openPanel === key;
+  const box = h('div', { class: 'filter-pop', hidden: !shown }, panel);
   const host = h('span', { class: 'popover-host' }, button, box);
-  button.setAttribute('aria-expanded', 'false');
+  button.setAttribute('aria-expanded', String(shown));
   button.addEventListener('click', (event) => {
     event.stopPropagation();
     const open = box.hidden;
     for (const other of document.querySelectorAll('.filter-pop')) if (other !== box) other.hidden = true;
     box.hidden = !open;
+    openPanel = open ? key : null;
     button.setAttribute('aria-expanded', String(open));
-  });
-  document.addEventListener('click', (event) => {
-    if (!host.contains(event.target)) { box.hidden = true; button.setAttribute('aria-expanded', 'false'); }
   });
   return host;
 }
@@ -72,9 +100,10 @@ function groupChip(tree, scope, selected, category) {
       class: 'chip-more',
       title: `Choose crops in ${category.name}`, 'aria-label': `Choose crops in ${category.name}`
     }, icon('chevronDown', { size: 12 }));
+    const key = 'group:' + category.name;
     chip.append(withPanel(opener, cropFilter(tree, {
-      scope, selected, only: category.name, memoryKey: 'group:' + category.name
-    })));
+      scope, selected, only: category.name, memoryKey: key
+    }), key));
   }
   return chip;
 }
@@ -97,7 +126,7 @@ export function filterBar({ tree, scope = null, selection, showRegion = true }) 
     class: ['btn', filtering ? 'is-active' : null],
     title: filtering ? `Choose individual crops — ${active.size} of ${keys.length} on` : 'Choose individual crops'
   }, icon('filter', { size: 14 }), h('span', { text: 'All crops' }));
-  bar.append(withPanel(allButton, cropFilter(tree, { scope, selected: selection.types, memoryKey: 'all:' + scope })));
+  bar.append(withPanel(allButton, cropFilter(tree, { scope, selected: selection.types, memoryKey: 'all:' + scope }), 'all:' + scope));
 
   /* The chips already say what is on, so the only thing worth adding is a way
    * back to everything. */

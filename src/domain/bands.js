@@ -36,6 +36,12 @@ export const EFFICIENCY = scale('efficiency', 'Irrigation efficiency', [
   { id: 'critical', label: 'Critical', range: '< 50', color: STATUS.bad, sev: 4, test: (v) => v < 50 }
 ]);
 
+/* The subsidy line, from the contract: a farm scoring 65 or better — acceptable
+ * or above — stays on the list ADAFSA keeps for continued subsidy. It is the
+ * band edge, not a second number, so the two can never disagree. */
+export const SUBSIDY_SCORE = 65;
+export const keepsSubsidy = (score) => score != null && score >= SUBSIDY_SCORE;
+
 /* Water use against the modelled monthly demand. The over-allocation flag is
  * raised here, against the month rather than the season — by the time a season
  * closes it is too late for anyone to act on it. */

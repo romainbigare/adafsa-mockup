@@ -35,6 +35,11 @@ import { chromium } from 'playwright';
 import pptxgen from 'pptxgenjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+/* The version and the address of the live mockup are read from package.json
+ * rather than typed here, so the cover cannot claim one thing while the repo
+ * says another. */
+const pkg = JSON.parse(await readFile(join(ROOT, 'package.json'), 'utf8'));
 const WORK = join(ROOT, '.deck-work');
 const TILES = join(ROOT, '.tile-cache');       // survives the build; a second run is offline
 const outFlag = process.argv.indexOf('--out');
@@ -430,6 +435,10 @@ for (const item of plan) {
     s.addText('The platform, screen by screen', {
       x: MARGIN, y: 2.72, w: 10.45, h: 0.95, fontFace: FONT, fontSize: 40, bold: true, color: INK, valign: 'top', margin: 0
     });
+    s.addText(`VERSION ${pkg.version}`, {
+      x: MARGIN, y: 3.74, w: 4.0, h: 0.28, fontFace: FONT, fontSize: 11,
+      bold: true, color: FAINT, charSpacing: 1.6, margin: 0
+    });
     const stat = (x, value, label) => {
       s.addText(value, { x, y: 4.42, w: 2.6, h: 0.9, fontFace: FONT, fontSize: 50, bold: true, color: INK, margin: 0 });
       s.addText(label, { x, y: 5.29, w: 2.6, h: 0.32, fontFace: FONT, fontSize: 11, bold: true, color: BRAND, charSpacing: 1.6, margin: 0 });
@@ -437,6 +446,11 @@ for (const item of plan) {
     stat(MARGIN, String(DISTINCT), 'SCREENS');
     stat(MARGIN + 2.75, String(sections.length), 'SECTIONS');
     stat(MARGIN + 5.5, String(plan.length), 'PAGES');
+    /* A real hyperlink: the reader opens the live mockup from the slide. */
+    s.addText(pkg.homepage.replace(/^https?:\/\//, ''), {
+      x: MARGIN, y: 6.42, w: 6.4, h: 0.32, fontFace: FONT, fontSize: 12.5,
+      color: BRAND, margin: 0, hyperlink: { url: pkg.homepage, tooltip: 'Open the live mockup' }
+    });
     const wafraW = 1.75;
     s.addImage({
       path: WAFRA, x: W - MARGIN - wafraW, y: 6.72, w: wafraW, h: wafraW * WAFRA_RATIO

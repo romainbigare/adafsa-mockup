@@ -1,6 +1,9 @@
 /* Band scales must be disjoint and complete, or a farm falls through the floor
  * and shows as unclassified on a page that claims to score every farm. */
-import { CULTIVATION, CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION, classify, distribution, worstCount } from '../src/domain/bands.js';
+import {
+  CULTIVATION, CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION,
+  classify, distribution, worstCount, SUBSIDY_SCORE, keepsSubsidy
+} from '../src/domain/bands.js';
 import { is, ok, close, done } from './helpers.js';
 
 const scales = [CULTIVATION, CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION];
@@ -16,6 +19,18 @@ for (const scale of scales) {
 // The over-allocation threshold is strictly above 125%, as specified.
 is(classify(WATER_USE, 125).id, 'excess', '125% is not yet over-allocated');
 is(classify(WATER_USE, 125.1).id, 'over', 'above 125% is over-allocated');
+
+/* The subsidy line is the bottom of the acceptable band, not a second number
+ * living beside it. If someone moves one, this fails rather than letting the
+ * page and the contract quietly disagree. */
+is(SUBSIDY_SCORE, 65, 'the subsidy line is 65, as the quote states');
+ok(!keepsSubsidy(SUBSIDY_SCORE - 0.1), 'just below the line loses the subsidy');
+ok(keepsSubsidy(SUBSIDY_SCORE), 'exactly on the line keeps it');
+ok(!keepsSubsidy(null), 'an unscored farm is not on the list');
+for (let v = 0; v <= 100; v += 0.5) {
+  const band = classify(EFFICIENCY, v);
+  is(keepsSubsidy(v), band.sev <= 2, `score ${v}: the subsidy list is acceptable and above`);
+}
 
 const records = [
   { area: 10, score: 95 }, { area: 20, score: 85 }, { area: 30, score: 40 }, { area: 5, score: null }
