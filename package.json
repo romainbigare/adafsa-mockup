@@ -1,0 +1,12 @@
+{
+  "name": "adafsa-platform-mockup",
+  "private": true,
+  "version": "2.0.0",
+  "description": "ADAFSA agricultural monitoring platform — static mockup. No dependencies, no build step: native ES modules served as static files.",
+  "type": "module",
+  "scripts": {
+    "serve": "python3 -m http.server 8137",
+    "build:data": "node tools/build-attributes.mjs",
+    "test": "node test/all.js"
+  }
+}
