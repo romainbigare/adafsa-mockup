@@ -7,12 +7,11 @@
 import { h } from '../../app/dom.js';
 import { section, intro, emptyState } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { comparisonSelect } from '../../components/comparison.js';
 import { directionTabs, contributorTable } from '../../components/changeTable.js';
 import { trendLine } from '../../charts/trendLine.js';
 import { barList } from '../../charts/barList.js';
-import { query, taxonomyTree, cropRows } from '../../data/store.js';
+import { query, cropRows } from '../../data/store.js';
 import { movements, netMovement, trend, hasHistoryFor } from '../../domain/change.js';
 import { FIELD_CATEGORIES, categoryMeta } from '../../domain/taxonomy.js';
 import { COMPARE, categoryColor } from '../../domain/palette.js';
@@ -33,7 +32,7 @@ export function render({ selection }) {
   if (!hasHistoryFor(selection.comparison)) {
     return {
       tools: [comparisonSelect(selection.comparison)],
-      rail: filterRail(taxonomyTree(), { scope: 'field', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'field',
       content: emptyState('Not enough history yet.',
         'This comparison needs more quarters than the survey has collected. It will fill in as the record grows.')
     };
@@ -58,7 +57,7 @@ export function render({ selection }) {
 
   return {
     tools: [comparisonSelect(selection.comparison)],
-    rail: filterRail(taxonomyTree(), { scope: 'field', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'field',
     content: [
       figures([
         { value: signed(net.net, 1), unit: 'dun', label: `Net change ${period.label}`, icon: 'trend', tone: net.net < 0 ? 'watch' : null },

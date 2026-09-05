@@ -14,9 +14,8 @@ import { h } from '../app/dom.js';
 import { section } from '../components/section.js';
 import { figures } from '../components/figures.js';
 import { summaryTable, countFormat } from '../components/summaryTable.js';
-import { filterRail, typeCounts } from '../components/filterRail.js';
 import { mapBand } from '../components/mapBand.js';
-import { query, taxonomyTree, taxonomyEntries, allFarms } from '../data/store.js';
+import { query, taxonomyEntries } from '../data/store.js';
 import { taxonomyBreakdown } from '../domain/aggregate.js';
 import { int, dec } from '../domain/format.js';
 import { TODAY } from '../domain/periods.js';
@@ -40,12 +39,6 @@ export function render({ selection }) {
   const filtering = selection.types.size > 0;
   const regionName = regionById(selection.region).label;
 
-  const rail = filterRail(taxonomyTree(), {
-    scope: 'all',
-    selected: selection.types,
-    counts: typeCounts(query({ region: selection.region }))
-  });
-
   const map = mapBand('overview', {
     mode: 'counts',
     farms,
@@ -55,7 +48,7 @@ export function render({ selection }) {
   });
 
   return {
-    rail,
+    filterScope: 'all',
     content: [
       figures([
         { value: int(farms.length), label: filtering ? `Farms with these crops` : `Farms in ${regionName}`, icon: 'farms' },

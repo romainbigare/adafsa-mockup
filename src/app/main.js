@@ -8,8 +8,8 @@ import { start, onRouteChange, selection } from './router.js';
 import { renderNav, renderHeader, renderBody, placeFor } from './shell.js';
 import { loadPage } from './pages.js';
 import { h } from './dom.js';
-import { taxonomyTree } from '../data/store.js';
-import { moduleByKey } from '../domain/modules.js';
+import { taxonomyTree, query } from '../data/store.js';
+import { typeCounts } from '../components/cropFilter.js';
 
 const nav = document.getElementById('nav');
 const header = document.getElementById('page-header');
@@ -50,12 +50,12 @@ async function draw(route) {
   if (token !== drawToken) return;
 
   renderHeader(header, { place, tools: view.tools || [] });
-  renderBody(body, document.querySelector('.app'), {
+  renderBody(body, {
     ...view,
     selection: chosen,
     showRegion: view.showRegion !== false,
     tree: taxonomyTree(),
-    scope: moduleByKey(place.navId)?.scope || 'all'
+    counts: view.filterScope ? typeCounts(query({ region: chosen.region })) : null
   });
   document.title = `${place.title ? place.title + ' — ' : ''}ADAFSA Platform`;
 

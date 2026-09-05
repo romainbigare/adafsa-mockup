@@ -15,8 +15,7 @@ import { figures } from '../../components/figures.js';
 import { barList } from '../../charts/barList.js';
 import { columns as columnChart } from '../../charts/columns.js';
 import { dataTable } from '../../components/dataTable.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
-import { query, taxonomyTree, cropRows } from '../../data/store.js';
+import { query, cropRows } from '../../data/store.js';
 import { FORMULA_NOTES, WATER_CATEGORIES, monthlyDemand } from '../../domain/waterModel.js';
 import { CYCLE_MONTHS, monthlyCurve } from '../../domain/cropCalendar.js';
 import { categoryColor, COMPARE } from '../../domain/palette.js';
@@ -62,7 +61,7 @@ export function render({ selection }) {
 
   return {
     tools: [infoPopover('How this is worked out', 'Water model inputs', FORMULA_NOTES)],
-    rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'all',
     content: [
       figures([
         { value: compact(water), unit: 'm³', label: 'Water for a full season', icon: 'water' },

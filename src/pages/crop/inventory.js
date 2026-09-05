@@ -9,10 +9,9 @@ import { h } from '../../app/dom.js';
 import { section } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { summaryTable, countFormat } from '../../components/summaryTable.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { mapBand } from '../../components/mapBand.js';
 import { dataTable } from '../../components/dataTable.js';
-import { query, taxonomyTree, taxonomyEntries } from '../../data/store.js';
+import { query, taxonomyEntries } from '../../data/store.js';
 import { taxonomyBreakdown } from '../../domain/aggregate.js';
 import { FIELD_CATEGORIES } from '../../domain/taxonomy.js';
 import { categoryColor } from '../../domain/palette.js';
@@ -51,7 +50,7 @@ export function render({ selection }) {
   })).filter((entry) => entry.count > 0);
 
   return {
-    rail: filterRail(taxonomyTree(), { scope: 'field', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'field',
     content: [
       figures([
         { value: int(withField.length), label: 'Farms with field crops', icon: 'farms' },

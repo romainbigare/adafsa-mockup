@@ -11,8 +11,7 @@ import { comparisonSelect } from '../../components/comparison.js';
 import { directionTabs, contributorTable } from '../../components/changeTable.js';
 import { trendLine } from '../../charts/trendLine.js';
 import { barList } from '../../charts/barList.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
-import { query, taxonomyTree, cropRows } from '../../data/store.js';
+import { query, cropRows } from '../../data/store.js';
 import { movements, netMovement, trend, hasHistoryFor } from '../../domain/change.js';
 import { TREE_CATEGORIES } from '../../domain/taxonomy.js';
 import { COMPARE, categoryColor } from '../../domain/palette.js';
@@ -52,7 +51,7 @@ export function render({ selection }) {
 
   return {
     tools: [comparisonSelect(selection.comparison)],
-    rail: filterRail(taxonomyTree(), { scope: 'tree', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'tree',
     content: [
       figures([
         { value: signed(treeNet.net, 0), label: `Net change ${period.label}`, icon: 'trend', tone: treeNet.net < 0 ? 'watch' : null },

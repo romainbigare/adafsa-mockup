@@ -14,8 +14,7 @@ import { figures } from '../../components/figures.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { barList } from '../../charts/barList.js';
 import { dataTable } from '../../components/dataTable.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
-import { query, taxonomyTree, cropRows } from '../../data/store.js';
+import { query, cropRows } from '../../data/store.js';
 import { WATER_USE, classify, distribution } from '../../domain/bands.js';
 import { FORMULA_NOTES, WATER_CATEGORIES } from '../../domain/waterModel.js';
 import { COMPARE, categoryColor } from '../../domain/palette.js';
@@ -46,7 +45,7 @@ export function render({ selection }) {
 
   return {
     tools: [infoPopover('How this is worked out', 'Water model inputs', FORMULA_NOTES)],
-    rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'all',
     content: [
       figures([
         { value: compact(demand), unit: 'm³', label: `Water allowed in ${month}`, icon: 'water' },

@@ -9,7 +9,7 @@ import { h, clear, append } from './dom.js';
 import { icon } from './icons.js';
 import { NAV, NAV_FOOTER, locate } from './nav.js';
 import { href, currentParams } from './router.js';
-import { placeFilters, layoutVariant } from './filterLayouts.js';
+import { filterBar } from '../components/filterBar.js';
 
 function navLink(entry, activeId, { child = false, section = false, expandable = false } = {}) {
   const params = currentParams();
@@ -61,24 +61,16 @@ export function renderHeader(root, { place, tools = [] }) {
   ]);
 }
 
-/* The filters decide what the page counts: the region always, and the crops
- * when the page has them. Where they sit is under review, so the four
- * candidates live in filterLayouts.js and are chosen with ?layout=.
- * A page about a single farm has neither and gets the full width. */
-export function renderBody(root, wrapper, { content, rail, selection, showRegion = true, tree = null, scope = 'all' }) {
+/* The filters live in one strip under the page header: the region always, and
+ * the crop groups when the page has them. A page about a single farm has
+ * neither, and the strip disappears. */
+export function renderBody(root, { content, selection, showRegion = true, tree = null, filterScope = null, counts = null }) {
   clear(root);
-  const variant = layoutVariant();
-  const { aside, strip } = placeFilters(root, { variant, rail, selection, showRegion, tree, scope });
-
-  wrapper.classList.remove(...[...wrapper.classList].filter((c) => c.startsWith('layout-')));
-  wrapper.classList.add('layout-' + variant);
-
-  const stripSlot = document.getElementById('filter-strip');
-  clear(stripSlot);
-  if (strip) stripSlot.append(strip);
-
-  root.classList.toggle('no-rail', aside.length === 0);
-  if (aside.length) root.append(variant === 'slim' ? aside[0] : h('aside', { class: 'rail' }, ...aside));
+  const strip = document.getElementById('filter-strip');
+  clear(strip);
+  if (showRegion || filterScope) {
+    strip.append(filterBar({ tree, scope: filterScope, selection, counts, showRegion }));
+  }
   root.append(h('div', { class: 'page-content' }, content));
 }
 

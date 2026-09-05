@@ -12,8 +12,7 @@ import { h } from '../../app/dom.js';
 import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { columns as columnChart } from '../../charts/columns.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
-import { query, taxonomyTree, cropRows } from '../../data/store.js';
+import { query, cropRows } from '../../data/store.js';
 import { monthlyCurve, windowFor, CYCLE_MONTHS } from '../../domain/cropCalendar.js';
 import { categoryColor, COMPARE, INK } from '../../domain/palette.js';
 import { int, dec } from '../../domain/format.js';
@@ -60,10 +59,7 @@ export function render({ selection }) {
   const quiet = MONTHS[dunumsByMonth.indexOf(Math.min(...dunumsByMonth))];
 
   return {
-    rail: filterRail(taxonomyTree(), {
-      scope: 'all', selected: selection.types, counts: typeCounts(all),
-      note: 'Pick one crop to see its own year.'
-    }),
+    filterScope: 'all',
     content: [
       figures([
         { value: int(crops.length), label: 'Crops selected', icon: 'crop' },

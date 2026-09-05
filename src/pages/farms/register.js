@@ -12,8 +12,7 @@ import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { dataTable } from '../../components/dataTable.js';
 import { mapBand } from '../../components/mapBand.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
-import { query, taxonomyTree } from '../../data/store.js';
+import { query } from '../../data/store.js';
 import { EFFICIENCY, CANOPY, classify } from '../../domain/bands.js';
 import { openIssues } from '../../domain/issues.js';
 import { categoryColor } from '../../domain/palette.js';
@@ -27,7 +26,7 @@ export function render({ selection }) {
   const flagged = farms.filter((farm) => openIssues(farm).length > 0);
 
   return {
-    rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'all',
     content: [
       figures([
         { value: int(farms.length), label: `Farms in ${regionById(selection.region).label}`, icon: 'farms' },

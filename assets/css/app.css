@@ -98,7 +98,7 @@ a { color: inherit; }
 .app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
 .page-header {
-  position: sticky; top: 0; z-index: 30;
+  position: sticky; top: 0; z-index: 610;
   background: color-mix(in srgb, var(--page) 88%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
@@ -110,9 +110,7 @@ a { color: inherit; }
 .page-title h1 { font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
 .header-tools { margin-inline-start: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
-.page-body { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); gap: 20px; padding: 20px 24px 64px; align-items: start; }
-.page-body.no-rail { grid-template-columns: minmax(0, 1fr); }
-.rail { position: sticky; top: calc(var(--header-h) + 20px); max-height: calc(100vh - var(--header-h) - 36px); display: flex; flex-direction: column; }
+.page-body { padding: 20px 24px 64px; }
 /* Cards sharing a row take the height of the taller one, so their bottom
    edges line up. */
 .page-content { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-content: start; align-items: stretch; }
@@ -210,10 +208,7 @@ table.grid td.name { font-weight: 550; }
 .table-foot .spacer { margin-inline-start: auto; }
 
 /* ---- Filter rail ------------------------------------------------------- */
-.rail-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; min-height: 0; flex: 0 1 auto; }
-.rail-panel--fixed { flex: none; }
-.rail-pad { padding: 10px 12px; }
-.rail-panel + .rail-panel { margin-top: 14px; }
+.rail-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-lg); overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
 .rail-head { display: flex; align-items: center; gap: 8px; padding: 11px 13px; border-bottom: 1px solid var(--line); background: var(--surface-sunken); flex: none; }
 .rail-head h2 { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); font-weight: 650; }
 .rail-head .rail-actions { margin-inline-start: auto; display: flex; gap: 6px; }
@@ -238,10 +233,11 @@ table.grid td.name { font-weight: 550; }
 .tax-toggle-spacer { width: 13px; flex: none; }
 .tax-types { padding-inline-start: 19px; }
 
-.rail-note { padding: 8px 13px 12px; font-size: 11.5px; color: var(--ink-4); flex: none; border-top: 1px solid var(--line); }
 
 /* ---- Map --------------------------------------------------------------- */
-.map-band { position: relative; height: 420px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: #dde3e6; }
+/* Its own stacking context, so Leaflet's controls and attribution cannot
+   climb over a filter panel opened above them. */
+.map-band { isolation: isolate; z-index: 0; position: relative; height: 420px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: #dde3e6; }
 .map-band.tall { height: 520px; }
 .map-band.short { height: 300px; }
 /* Leaflet stamps `position: relative` inline when it initialises against a
@@ -329,56 +325,69 @@ table.grid td.name { font-weight: 550; }
 .map-controls .btn { white-space: nowrap; }
 
 /* ==========================================================================
-   Filter placement candidates — see src/app/filterLayouts.js. Three of these
-   four blocks come out once one is chosen.
+   The filter bar — one strip under the page header.
    ========================================================================== */
 
 .filter-strip:empty { display: none; }
 .filter-strip {
-  position: sticky; top: var(--header-h); z-index: 25;
+  /* Above Leaflet's own controls, which sit at 500. */
+  position: sticky; top: var(--header-h); z-index: 600;
   background: color-mix(in srgb, var(--page) 92%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
-.filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 9px 24px; }
-.filter-bar--right { justify-content: flex-end; }
+.filter-bar { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; padding: 8px 24px; }
 .filter-bar .bar-label {
   font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
   color: var(--ink-4); font-weight: 650; margin-inline-start: 6px;
 }
+.filter-bar .btn.is-active { border-color: var(--brand-500); color: var(--brand-800); background: var(--brand-50); }
+.bar-clear { border: 0; background: none; color: var(--focus); font-size: 12.5px; cursor: pointer; padding: 0 4px; }
+.bar-state { font-size: 12px; color: var(--ink-3); margin-inline-start: 2px; }
 .inline-field { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-3); }
 
+/* A group chip is two controls in one shape: the name toggles the whole group,
+   the chevron opens its varieties. It cannot clip its overflow — the varieties
+   panel hangs out of it. */
 .chip-toggle {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: stretch;
   border: 1px solid var(--line-strong); background: var(--surface);
-  border-radius: 999px; padding: 4px 11px; font-size: 12.5px; color: var(--ink-3); cursor: pointer;
+  border-radius: 999px;
 }
-.chip-toggle:hover { background: var(--surface-sunken); }
-.chip-toggle .swatch { opacity: .35; }
-.chip-toggle.is-on { background: var(--brand-50); border-color: var(--brand-200); color: var(--brand-800); font-weight: 600; }
+.chip-toggle > .popover-host { display: inline-flex; align-items: stretch; }
+.chip-toggle .chip-main {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 0; background: none; padding: 4px 8px 4px 10px;
+  font-size: 12.5px; color: var(--ink-2); cursor: pointer;
+  border-start-start-radius: 999px; border-end-start-radius: 999px;
+}
+.chip-toggle > .chip-main:only-child { border-radius: 999px; }
+.chip-toggle .chip-count { font-size: 11px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
+.chip-toggle .chip-more {
+  border: 0; border-inline-start: 1px solid var(--line); background: none;
+  padding: 0 5px; color: var(--ink-4); cursor: pointer; display: inline-flex; align-items: center;
+  border-start-end-radius: 999px; border-end-end-radius: 999px;
+}
+.chip-toggle .chip-more:hover { background: var(--surface-sunken); color: var(--ink); }
+.chip-toggle .chip-more[aria-expanded="true"] .icon { transform: rotate(180deg); }
+.chip-toggle .chip-more .icon { transition: transform .15s; }
+.chip-toggle:hover { border-color: var(--ink-4); }
+.chip-toggle .swatch { opacity: .3; }
+.chip-toggle.is-on { background: var(--brand-50); border-color: var(--brand-200); }
+.chip-toggle.is-on .chip-main { color: var(--brand-800); font-weight: 600; }
 .chip-toggle.is-on .swatch { opacity: 1; }
-.chip-toggle.is-part { border-style: dashed; color: var(--ink-2); }
+.chip-toggle.is-on .chip-more { border-inline-start-color: var(--brand-200); color: var(--brand-700); }
+.chip-toggle.is-part { border-style: dashed; }
+.chip-toggle.is-part .chip-main { color: var(--ink); }
 .chip-toggle.is-part .swatch { opacity: .7; }
+.chip-toggle.is-off .chip-main { color: var(--ink-4); text-decoration: line-through; }
 
-.filter-pop {
-  position: absolute; inset-inline-end: 0; top: calc(100% + 6px); z-index: 40; width: 268px;
-}
-.filter-pop .rail-panel { max-height: 62vh; box-shadow: var(--shadow-lg); }
+.filter-pop { position: absolute; inset-inline-start: -1px; top: calc(100% + 7px); z-index: 700; width: 246px; }
+.chip-toggle .filter-pop { inset-inline-start: auto; inset-inline-end: -1px; }
+.filter-pop[hidden] { display: none; }
+.filter-pop .rail-panel { max-height: 64vh; }
+.filter-bar > .popover-host:last-of-type .filter-pop { inset-inline-start: auto; inset-inline-end: 0; }
 
-.rail-slim { position: sticky; top: calc(var(--header-h) + 20px); align-self: start; }
-.slim-toggle {
-  width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--line); background: var(--surface); border-radius: var(--r);
-  box-shadow: var(--shadow); cursor: pointer; color: var(--ink-2);
+@media (max-width: 760px) {
+  .filter-bar { padding: 8px 14px; }
 }
-.slim-toggle[aria-expanded="true"] { background: var(--brand-50); color: var(--brand-800); border-color: var(--brand-200); }
-.slim-drawer {
-  position: absolute; inset-inline-start: 0; top: 46px; z-index: 40; width: 258px;
-  display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - var(--header-h) - 90px);
-}
-.slim-drawer .rail-panel { box-shadow: var(--shadow-lg); }
-
-.layout-bar .page-body,
-.layout-button .page-body { grid-template-columns: minmax(0, 1fr); }
-.layout-slim .page-body { grid-template-columns: 38px minmax(0, 1fr); gap: 14px; }
-.slim-drawer[hidden], .filter-pop[hidden] { display: none; }

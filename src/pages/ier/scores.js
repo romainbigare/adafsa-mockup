@@ -13,8 +13,7 @@ import { figures } from '../../components/figures.js';
 import { mapBand } from '../../components/mapBand.js';
 import { dataTable } from '../../components/dataTable.js';
 import { bandBar } from '../../charts/bandBar.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
-import { query, taxonomyTree } from '../../data/store.js';
+import { query } from '../../data/store.js';
 import { EFFICIENCY, classify, distribution, colorFor } from '../../domain/bands.js';
 import { mean } from '../../domain/aggregate.js';
 import { PROVINCES, regionById } from '../../domain/regions.js';
@@ -43,7 +42,7 @@ export function render({ selection }) {
   const critical = farms.filter((farm) => classify(EFFICIENCY, farm.efficiency)?.id === 'critical');
 
   return {
-    rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'all',
     content: [
       figures([
         { value: int(farms.length), label: 'Farms scored', icon: 'farms' },

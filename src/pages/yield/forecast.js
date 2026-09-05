@@ -14,8 +14,7 @@ import { figures } from '../../components/figures.js';
 import { barList } from '../../charts/barList.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { dataTable } from '../../components/dataTable.js';
-import { filterRail, typeCounts } from '../../components/filterRail.js';
-import { query, taxonomyTree, cropRows } from '../../data/store.js';
+import { query, cropRows } from '../../data/store.js';
 import { YIELD_DEVIATION, classify, distribution } from '../../domain/bands.js';
 import { categoryColor } from '../../domain/palette.js';
 import { int, dec, pct, signedPct, compact } from '../../domain/format.js';
@@ -46,7 +45,7 @@ export function render({ selection }) {
   const wellBelow = rows.filter((row) => classify(YIELD_DEVIATION, row.yieldDeviation)?.id === 'well_below').length;
 
   return {
-    rail: filterRail(taxonomyTree(), { scope: 'all', selected: selection.types, counts: typeCounts(all) }),
+    filterScope: 'all',
     content: [
       figures([
         { value: compact(production / 1000), unit: 't', label: 'Expected harvest', icon: 'yieldup' },

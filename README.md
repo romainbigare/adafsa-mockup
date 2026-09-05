@@ -44,8 +44,11 @@ Twenty-two pages, in the order and under the names agreed in the review
 
 Three ideas run through all of them.
 
-**The region selector is in the header of every page.** Each province answers to a
-different person, so narrowing to one is never something to go looking for.
+**One filter bar under the page header.** It carries the region and a chip for each
+crop group. A chip's name turns the whole group on or off; its chevron opens that
+group's varieties. The funnel button opens the whole taxonomy at once. Everything is
+ticked when a page opens, so the bar shows what is being counted rather than an empty
+list, and a filter moves the map, the figures and every table together.
 
 **Maps illustrate; they do not carry the argument.** A map appears where the question
 is genuinely about a place. Change and trend pages have none — that was settled
