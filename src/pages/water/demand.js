@@ -13,7 +13,6 @@ import { section, intro, callout, infoPopover } from '../../components/section.j
 import { figures } from '../../components/figures.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { barList } from '../../charts/barList.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { dataTable } from '../../components/dataTable.js';
 import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { query, taxonomyTree, cropRows } from '../../data/store.js';
@@ -68,11 +67,6 @@ export function render({ selection }) {
           ? barList(worst.map((crop) => ({ label: crop.label, value: crop.value, color: categoryColor(crop.category) })), { format: compact, limit: 12 })
           : intro('No crop is over its allowance.')),
 
-      section('By province', { icon: 'land', flush: true }, provinceBlock(withDemand, [
-        { key: 'demand', label: 'Allowed (m³)', value: (set) => set.reduce((a, f) => a + f.waterDemand, 0), format: compact },
-        { key: 'actual', label: 'Used (m³)', value: (set) => set.reduce((a, f) => a + f.waterActual, 0), format: compact },
-        { key: 'flag', label: 'Over-allocated', value: (set) => set.filter((f) => f.overAllocated).length, format: int }
-      ])),
 
       section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(withDemand, {

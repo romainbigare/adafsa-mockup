@@ -12,7 +12,6 @@ import { comparisonSelect } from '../../components/comparison.js';
 import { directionTabs, contributorTable } from '../../components/changeTable.js';
 import { trendLine } from '../../charts/trendLine.js';
 import { barList } from '../../charts/barList.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { query, taxonomyTree, cropRows } from '../../data/store.js';
 import { movements, netMovement, trend, hasHistoryFor } from '../../domain/change.js';
 import { FIELD_CATEGORIES, categoryMeta } from '../../domain/taxonomy.js';
@@ -69,10 +68,10 @@ export function render({ selection }) {
       ]),
 
       section('Area planted, quarter by quarter', {
-        icon: 'trend', note: 'Dunums in the ground.'
+        icon: 'trend', half: true, note: 'Dunums in the ground.'
       }, trendLine(QUARTERS.map((q) => q.label), [
         { label: 'Field crops (dunums)', color: COMPARE.current, values: drawn.map((point) => point.value) }
-      ], { format: (v) => int(v) })),
+      ], { format: (v) => int(v), half: true })),
 
       section('Which crops moved', { icon: 'crop', half: true, note: 'Gain or loss in dunums.' },
         movers.length
@@ -80,17 +79,11 @@ export function render({ selection }) {
               label: crop.label,
               value: Math.abs(crop.value),
               amount: signed(crop.value, 1) + ' dun',
-              color: crop.value >= 0 ? COMPARE.gain : COMPARE.loss
+              amountColor: crop.value >= 0 ? COMPARE.up : COMPARE.down,
+              color: COMPARE.neutral
             })), { limit: 12 })
           : intro('No crop changed over this period.')),
 
-      section('By province', { icon: 'land', half: true, flush: true }, provinceBlock(farms, [
-        { key: 'net', label: `Net change (dun)`, value: provinceNet, format: (v) => signed(v, 1) },
-        { key: 'now', label: 'Now (dun)', value: (set) => {
-            const ids = new Set(set.map((f) => f.fid));
-            return moves.filter((m) => ids.has(m.record.farm.fid)).reduce((a, m) => a + m.after, 0);
-          }, format: (v) => int(v) }
-      ])),
 
       section('Which farms', {
         icon: 'table',

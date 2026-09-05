@@ -9,11 +9,11 @@ import { s, niceScale } from './svg.js';
 import { attachTooltip } from './tooltip.js';
 import { INK } from '../domain/palette.js';
 
-const W = 720;
 const H = 190;
 const PAD = { top: 10, right: 8, bottom: 26, left: 46 };
 
-export function columns(labels, series, { format = (v) => String(Math.round(v)), height = H } = {}) {
+export function columns(labels, series, { format = (v) => String(Math.round(v)), height = H, half = false } = {}) {
+  const W = half ? 440 : 720;
   const container = h('figure', { class: 'chart' });
   const plotW = W - PAD.left - PAD.right;
   const plotH = height - PAD.top - PAD.bottom;

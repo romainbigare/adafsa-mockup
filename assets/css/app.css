@@ -112,7 +112,7 @@ a { color: inherit; }
 
 .page-body { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); gap: 20px; padding: 20px 24px 64px; align-items: start; }
 .page-body.no-rail { grid-template-columns: minmax(0, 1fr); }
-.rail { position: sticky; top: calc(var(--header-h) + 20px); height: calc(100vh - var(--header-h) - 36px); display: flex; flex-direction: column; }
+.rail { position: sticky; top: calc(var(--header-h) + 20px); max-height: calc(100vh - var(--header-h) - 36px); display: flex; flex-direction: column; }
 .page-content { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-content: start; align-items: start; }
 .page-content > * { grid-column: 1 / -1; }
 .page-content > .card.half { grid-column: span 1; }
@@ -186,6 +186,7 @@ table.grid tbody tr:hover { background: var(--surface-sunken); }
 table.grid tbody tr.is-clickable { cursor: pointer; }
 table.grid tfoot td { padding: 9px 12px; font-weight: 650; border-top: 2px solid var(--line-strong); background: var(--surface-sunken); }
 table.grid td.name { font-weight: 550; }
+.card.half table.grid th, .card.half table.grid td { padding-inline: 9px; }
 .sortable { cursor: pointer; user-select: none; }
 .sortable .sort-mark { color: var(--ink-4); margin-inline-start: 4px; font-size: 10px; }
 .row-child td:first-child { padding-inline-start: 34px; font-weight: 400; color: var(--ink-2); }
@@ -201,20 +202,32 @@ table.grid td.name { font-weight: 550; }
 .table-foot .spacer { margin-inline-start: auto; }
 
 /* ---- Filter rail ------------------------------------------------------- */
-.rail-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.rail-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; min-height: 0; flex: 0 1 auto; }
 .rail-panel + .rail-panel { margin-top: 14px; }
 .rail-head { display: flex; align-items: center; gap: 8px; padding: 11px 13px; border-bottom: 1px solid var(--line); background: var(--surface-sunken); flex: none; }
 .rail-head h2 { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); font-weight: 650; }
 .rail-head .rail-actions { margin-inline-start: auto; display: flex; gap: 6px; }
 .rail-head button.link { border: 0; background: none; color: var(--focus); font-size: 11.5px; cursor: pointer; padding: 0; }
-.rail-body { padding: 6px 6px 10px; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
-.tax-group + .tax-group { margin-top: 2px; }
-.tax-row { display: flex; align-items: center; gap: 7px; padding: 4px 7px; border-radius: var(--r-sm); font-size: 12.5px; }
+.rail-body { padding: 5px 6px 8px; flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.rail-columns {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 6px 13px; border-bottom: 1px solid var(--line); flex: none;
+  font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-4); font-weight: 650;
+}
+.tax-group + .tax-group { margin-top: 1px; }
+.tax-row { display: flex; align-items: center; gap: 6px; padding: 4px 7px; border-radius: var(--r-sm); font-size: 12.5px; }
 .tax-row:hover { background: var(--surface-sunken); }
-.tax-row input { accent-color: var(--brand-600); margin: 0; }
-.tax-row .count { margin-inline-start: auto; color: var(--ink-4); font-size: 11.5px; font-variant-numeric: tabular-nums; }
-.tax-cat > .tax-row { font-weight: 600; }
-.tax-types { padding-inline-start: 22px; }
+.tax-label { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; cursor: pointer; }
+.tax-label span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tax-row input { accent-color: var(--brand-600); margin: 0; flex: none; }
+.tax-row .count { color: var(--ink-4); font-size: 11.5px; font-variant-numeric: tabular-nums; flex: none; }
+.tax-cat .tax-label { font-weight: 600; }
+.tax-toggle { border: 0; background: none; padding: 0; cursor: pointer; color: var(--ink-4); display: inline-flex; flex: none; }
+.tax-toggle .icon { transition: transform .15s; }
+.tax-toggle[aria-expanded="true"] .icon { transform: rotate(180deg); }
+.tax-toggle-spacer { width: 13px; flex: none; }
+.tax-types { padding-inline-start: 19px; }
+
 .rail-note { padding: 8px 13px 12px; font-size: 11.5px; color: var(--ink-4); flex: none; border-top: 1px solid var(--line); }
 
 /* ---- Map --------------------------------------------------------------- */
@@ -229,7 +242,7 @@ table.grid td.name { font-weight: 550; }
   position: absolute; inset-block-start: 12px; inset-inline-start: 12px; z-index: 500;
   background: color-mix(in srgb, var(--surface) 94%, transparent);
   border: 1px solid var(--line); border-radius: var(--r-sm); padding: 9px 11px; box-shadow: var(--shadow);
-  max-width: 220px; font-size: 12px;
+  max-width: 200px; font-size: 11.5px;
 }
 .map-legend h3 { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
 .map-legend li { display: flex; align-items: center; gap: 7px; padding: 2px 0; }

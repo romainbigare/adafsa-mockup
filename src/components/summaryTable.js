@@ -32,7 +32,7 @@ export function summaryTable(rows, {
       h('th', { text: 'Category' }),
       h('th', { class: 'num', text: measureLabel }),
       h('th', { class: 'num', text: 'Share' }),
-      h('th', { style: { width: '28%' }, text: '' }))),
+      h('th', { style: { width: '20%' }, text: '' }))),
     body,
     h('tfoot', {}, h('tr', {},
       h('td', { text: totalLabel }),

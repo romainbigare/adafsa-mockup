@@ -9,7 +9,6 @@ import { h } from '../../app/dom.js';
 import { section, intro, callout } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { mapBand } from '../../components/mapBand.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { dataTable } from '../../components/dataTable.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { query } from '../../data/store.js';
@@ -61,11 +60,6 @@ export function render({ selection }) {
           legendTitle: 'Tree health score'
         }))),
 
-      section('By province', { icon: 'land', flush: true }, provinceBlock(scored, [
-        { key: 'palm', label: 'Palm score', value: (set) => mean(set.filter((f) => f.canopyPalms != null), (f) => f.canopyPalms), format: (v) => (v == null ? '—' : Math.round(v)) },
-        { key: 'fruit', label: 'Fruit tree score', value: (set) => mean(set.filter((f) => f.canopyFruit != null), (f) => f.canopyFruit), format: (v) => (v == null ? '—' : Math.round(v)) },
-        { key: 'stress', label: 'Farms stressed', value: (set) => set.filter((f) => (classify(CANOPY, f.canopy)?.sev || 0) >= 2).length, format: int }
-      ])),
 
       section('Every farm with trees', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(scored, {

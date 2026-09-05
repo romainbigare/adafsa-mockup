@@ -16,7 +16,6 @@ import { figures } from '../../components/figures.js';
 import { comparisonSelect } from '../../components/comparison.js';
 import { directionTabs, contributorTable } from '../../components/changeTable.js';
 import { trendLine } from '../../charts/trendLine.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { query } from '../../data/store.js';
 import { movements, netMovement, trend, hasHistoryFor, contributors } from '../../domain/change.js';
 import { COMPARE } from '../../domain/palette.js';
@@ -64,13 +63,6 @@ export function render({ selection }) {
           { label: 'Structures counted', color: COMPARE.current, values: drawn.map((point) => point.value) }
         ], { format: int, zeroBased: false })),
 
-      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
-        { key: 'now', label: 'Structures now', value: (set) => set.reduce((a, f) => a + f.structures.length, 0), format: int },
-        { key: 'net', label: `Net ${period.label}`, value: (set) => {
-            const ids = new Set(set.map((f) => f.fid));
-            return moves.filter((m) => ids.has(m.record.fid)).reduce((a, m) => a + m.delta, 0);
-          }, format: (v) => signed(v, 0) }
-      ])),
 
       section('Which farms', {
         icon: 'table',

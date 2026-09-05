@@ -11,7 +11,6 @@ import { comparisonSelect } from '../../components/comparison.js';
 import { directionTabs, contributorTable } from '../../components/changeTable.js';
 import { trendLine } from '../../charts/trendLine.js';
 import { barList } from '../../charts/barList.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { query, taxonomyTree, cropRows } from '../../data/store.js';
 import { movements, netMovement, trend, hasHistoryFor } from '../../domain/change.js';
@@ -62,27 +61,21 @@ export function render({ selection }) {
         { value: int(treeNet.counts.increased + treeNet.counts.decreased), label: 'Farms that changed', icon: 'farms' }
       ]),
 
-      section('Trees counted, quarter by quarter', { icon: 'trend', note: 'Total trees in the selection.' },
+      section('Trees counted, quarter by quarter', { icon: 'trend', half: true, note: 'Total trees in the selection.' },
         trendLine(QUARTERS.map((q) => q.label), [
           { label: 'Trees counted', color: COMPARE.current, values: drawn.map((point) => point.value) }
-        ], { format: compact, zeroBased: false })),
+        ], { format: compact, zeroBased: false, half: true })),
 
       section('Which trees changed', { icon: 'trees', half: true, note: 'Gain or loss in dunums.' },
         movers.length
           ? barList(movers.map((entry) => ({
               label: entry.label, value: Math.abs(entry.value),
               amount: signed(entry.value, 1) + ' dun',
-              color: entry.value >= 0 ? COMPARE.gain : COMPARE.loss
+              amountColor: entry.value >= 0 ? COMPARE.up : COMPARE.down,
+              color: COMPARE.neutral
             })), { limit: 12 })
           : intro('No tree group changed over this period.')),
 
-      section('By province', { icon: 'land', half: true, flush: true }, provinceBlock(farms, [
-        { key: 'now', label: 'Trees now', value: (set) => set.reduce((a, f) => a + f.trees, 0), format: int },
-        { key: 'net', label: `Net ${period.label}`, value: (set) => {
-            const ids = new Set(set.map((f) => f.fid));
-            return treeMoves.filter((m) => ids.has(m.record.fid)).reduce((a, m) => a + m.delta, 0);
-          }, format: (v) => signed(v, 0) }
-      ])),
 
       section('Which farms', {
         icon: 'table',

@@ -11,7 +11,6 @@ import { h } from '../../app/dom.js';
 import { section, intro, callout } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { mapBand } from '../../components/mapBand.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { dataTable } from '../../components/dataTable.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { filterRail, typeCounts } from '../../components/filterRail.js';
@@ -60,13 +59,8 @@ export function render({ selection }) {
       section('Scores', { icon: 'ruler', half: true, note: 'Farms in each band.' },
         bandBar(distribution(EFFICIENCY, farms, (farm) => farm.efficiency))),
 
-      section('Province averages', { icon: 'land', half: true, note: 'A farm is compared to its own province.', flush: true },
-        provinceBlock(farms, [
-          { key: 'score', label: 'Average score', value: (set) => mean(set, (f) => f.efficiency), format: (v) => (v == null ? '—' : Math.round(v)) },
-          { key: 'priority', label: 'Need attention', value: (set) => set.filter((f) => (classify(EFFICIENCY, f.efficiency)?.sev || 0) >= 3).length, format: int }
-        ])),
 
-      section('Where the weak scores are', { icon: 'pin', note: 'Colour shows the score band.', flush: true },
+      section('Where the weak scores are', { icon: 'pin', half: true, note: 'Colour shows the score band.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('ier-scores', {
           mode: 'band',
           farms,

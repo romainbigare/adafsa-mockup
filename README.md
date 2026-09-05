@@ -44,9 +44,8 @@ Twenty-two pages, in the order and under the names agreed in the review
 
 Three ideas run through all of them.
 
-**Reporting goes emirate, then province, then farm.** Each province answers to a
-different person, so the region selector is in the header of every page and never
-buried on one of them.
+**The region selector is in the header of every page.** Each province answers to a
+different person, so narrowing to one is never something to go looking for.
 
 **Maps illustrate; they do not carry the argument.** A map appears where the question
 is genuinely about a place. Change and trend pages have none — that was settled
@@ -89,11 +88,13 @@ platform this replaces could not do that.
 once into a 103 KB attribute table and the polygons sit behind a dynamic import.
 Re-run `npm run build:data` after changing anything under `data/geo/`.
 
-**Colour is checked rather than chosen.** `src/domain/palette.js` holds two palettes
-with two jobs: a fixed, colour-vision-validated order for the six taxonomy categories,
-and the status ramps in `src/domain/bands.js` for the places where something is being
-judged. Nothing decorative borrows the status hues. Three identity hues sit below 3:1
-against the page, so every legend and bar carries a visible label.
+**Colour is checked rather than chosen.** `src/domain/palette.js` holds the whole
+vocabulary: a fixed, colour-vision-validated order for the six taxonomy categories; one
+five-step status ramp that every band scale in `src/domain/bands.js` draws from, used
+only where something is judged; one blue ramp for plain magnitude; and a deliberately
+quiet treatment for change, where the bars are one neutral colour and the signed number
+carries the direction. Three identity hues sit below 3:1 against the page, so every
+legend and bar carries a visible label.
 
 ## Real data and invented data
 

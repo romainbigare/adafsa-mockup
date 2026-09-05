@@ -1,54 +1,56 @@
 /* Band scales — how a number becomes a status word and a colour.
  *
- * The colour contract, restated for this design: the red/amber/green ramp is
- * only ever used where something is being judged (irrigation, water, canopy,
- * cultivation). Inventory pages colour by classification instead, from the
- * taxonomy palette, and never borrow this ramp. Keeping those apart is what
- * lets a red dot mean one thing across the whole platform.
+ * Every scale here draws from the one status ramp in domain/palette.js rather
+ * than picking its own greens and reds, so the same shade means the same thing
+ * on every page. The ramp appears only where something is being judged;
+ * inventory pages colour by classification from the taxonomy palette and never
+ * borrow it.
  *
  * `sev` is attention severity, 0 (fine) upwards. It is stated rather than
  * inferred from array order, because some scales run good-bad-good. */
 
-export const UNKNOWN_COLOR = '#9ca3af';
+import { STATUS, NEUTRAL } from './palette.js';
+
+export const UNKNOWN_COLOR = NEUTRAL;
 
 const scale = (key, label, bands) => ({ key, label, bands, worstSev: Math.max(...bands.map((b) => b.sev)) });
 
 export const CULTIVATION = scale('cultivation', 'Cultivated share', [
-  { id: 'cultivated', label: 'Planted', range: '≥ 66%', color: '#1a9850', sev: 0, test: (v) => v >= 66 },
-  { id: 'partial', label: 'Part planted', range: '33–66%', color: '#fee08b', sev: 1, test: (v) => v >= 33 && v < 66 },
-  { id: 'fallow', label: 'Fallow', range: '< 33%', color: '#d9a441', sev: 2, test: (v) => v < 33 }
+  { id: 'cultivated', label: 'Planted', range: '≥ 66%', color: STATUS.good, sev: 0, test: (v) => v >= 66 },
+  { id: 'partial', label: 'Part planted', range: '33–66%', color: STATUS.watch, sev: 1, test: (v) => v >= 33 && v < 66 },
+  { id: 'fallow', label: 'Fallow', range: '< 33%', color: STATUS.poor, sev: 2, test: (v) => v < 33 }
 ]);
 
 export const CANOPY = scale('canopy', 'Canopy health index', [
-  { id: 'healthy', label: 'Healthy', range: '≥ 80', color: '#1a9850', sev: 0, test: (v) => v >= 80 },
-  { id: 'fair', label: 'Fair', range: '65–79', color: '#91cf60', sev: 1, test: (v) => v >= 65 && v < 80 },
-  { id: 'stressed', label: 'Stressed', range: '50–64', color: '#fee08b', sev: 2, test: (v) => v >= 50 && v < 65 },
-  { id: 'severe', label: 'Very stressed', range: '< 50', color: '#d73027', sev: 3, test: (v) => v < 50 }
+  { id: 'healthy', label: 'Healthy', range: '≥ 80', color: STATUS.good, sev: 0, test: (v) => v >= 80 },
+  { id: 'fair', label: 'Fair', range: '65–79', color: STATUS.fair, sev: 1, test: (v) => v >= 65 && v < 80 },
+  { id: 'stressed', label: 'Stressed', range: '50–64', color: STATUS.watch, sev: 2, test: (v) => v >= 50 && v < 65 },
+  { id: 'severe', label: 'Very stressed', range: '< 50', color: STATUS.bad, sev: 3, test: (v) => v < 50 }
 ]);
 
 export const EFFICIENCY = scale('efficiency', 'Irrigation efficiency', [
-  { id: 'excellent', label: 'Excellent', range: '90–100', color: '#1a9850', sev: 0, test: (v) => v >= 90 },
-  { id: 'good', label: 'Good', range: '80–89', color: '#91cf60', sev: 1, test: (v) => v >= 80 && v < 90 },
-  { id: 'acceptable', label: 'Acceptable', range: '65–79', color: '#fee08b', sev: 2, test: (v) => v >= 65 && v < 80 },
-  { id: 'poor', label: 'Poor', range: '50–64', color: '#fc8d59', sev: 3, test: (v) => v >= 50 && v < 65 },
-  { id: 'critical', label: 'Critical', range: '< 50', color: '#d73027', sev: 4, test: (v) => v < 50 }
+  { id: 'excellent', label: 'Excellent', range: '90–100', color: STATUS.good, sev: 0, test: (v) => v >= 90 },
+  { id: 'good', label: 'Good', range: '80–89', color: STATUS.fair, sev: 1, test: (v) => v >= 80 && v < 90 },
+  { id: 'acceptable', label: 'Acceptable', range: '65–79', color: STATUS.watch, sev: 2, test: (v) => v >= 65 && v < 80 },
+  { id: 'poor', label: 'Poor', range: '50–64', color: STATUS.poor, sev: 3, test: (v) => v >= 50 && v < 65 },
+  { id: 'critical', label: 'Critical', range: '< 50', color: STATUS.bad, sev: 4, test: (v) => v < 50 }
 ]);
 
 /* Water use against the modelled monthly demand. The over-allocation flag is
  * raised here, against the month rather than the season — by the time a season
  * closes it is too late for anyone to act on it. */
 export const WATER_USE = scale('waterUse', 'Use against demand', [
-  { id: 'under', label: 'Below plan', range: '< 80%', color: '#e08214', sev: 2, test: (v) => v < 80 },
-  { id: 'onplan', label: 'On plan', range: '80–105%', color: '#1a9850', sev: 0, test: (v) => v >= 80 && v < 105 },
-  { id: 'excess', label: 'Slightly over', range: '105–125%', color: '#fee08b', sev: 1, test: (v) => v >= 105 && v <= 125 },
-  { id: 'over', label: 'Over-allocated', range: '> 125%', color: '#b30000', sev: 3, test: (v) => v > 125 }
+  { id: 'under', label: 'Below plan', range: '< 80%', color: STATUS.poor, sev: 2, test: (v) => v < 80 },
+  { id: 'onplan', label: 'On plan', range: '80–105%', color: STATUS.good, sev: 0, test: (v) => v >= 80 && v < 105 },
+  { id: 'excess', label: 'Slightly over', range: '105–125%', color: STATUS.watch, sev: 1, test: (v) => v >= 105 && v <= 125 },
+  { id: 'over', label: 'Over-allocated', range: '> 125%', color: STATUS.bad, sev: 3, test: (v) => v > 125 }
 ]);
 
 export const YIELD_DEVIATION = scale('yieldDeviation', 'Against the crop average', [
-  { id: 'above', label: 'Above average', range: '≥ +10%', color: '#1a9850', sev: 0, test: (v) => v >= 10 },
-  { id: 'ontrack', label: 'Around average', range: '−10% to +10%', color: '#a6d96a', sev: 0, test: (v) => v >= -10 && v < 10 },
-  { id: 'below', label: 'Below average', range: '−25% to −10%', color: '#fdae61', sev: 2, test: (v) => v >= -25 && v < -10 },
-  { id: 'well_below', label: 'Well below average', range: '< −25%', color: '#d73027', sev: 3, test: (v) => v < -25 }
+  { id: 'above', label: 'Above average', range: '≥ +10%', color: STATUS.good, sev: 0, test: (v) => v >= 10 },
+  { id: 'ontrack', label: 'Around average', range: '−10% to +10%', color: STATUS.fair, sev: 0, test: (v) => v >= -10 && v < 10 },
+  { id: 'below', label: 'Below average', range: '−25% to −10%', color: STATUS.poor, sev: 2, test: (v) => v >= -25 && v < -10 },
+  { id: 'well_below', label: 'Well below average', range: '< −25%', color: STATUS.bad, sev: 3, test: (v) => v < -25 }
 ]);
 
 export function classify(scaleDef, value) {

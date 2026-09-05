@@ -98,7 +98,11 @@ export function mapBand(id, options) {
     const points = (current?.farms || []).filter((f) => f.lat && f.lng).map((f) => [f.lat, f.lng]);
     if (!points.length) { map.setView([23.9, 54.4], 8); return; }
     if (force || fittedRegion !== current.region) {
-      map.fitBounds(window.L.latLngBounds(points).pad(0.08));
+      /* The legend sits over the top-left corner, so the data is framed clear
+       * of it rather than underneath it. */
+      const legendRoom = current.legend?.length ? [element.clientWidth < 620 ? 190 : 230, 20] : [24, 20];
+      /* And clear of the control column on the right. */
+      map.fitBounds(window.L.latLngBounds(points), { paddingTopLeft: legendRoom, paddingBottomRight: [104, 34] });
       fittedRegion = current.region;
     }
   }

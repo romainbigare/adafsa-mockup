@@ -8,7 +8,6 @@ import { h } from '../../app/dom.js';
 import { section, intro, callout } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { mapBand } from '../../components/mapBand.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { dataTable } from '../../components/dataTable.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { comparisonSelect } from '../../components/comparison.js';
@@ -54,15 +53,8 @@ export function render({ selection }) {
       section('Land in production', { icon: 'crop', half: true, note: 'Share of each farm.' },
         bandBar(bands)),
 
-      section('By province', { icon: 'land', half: true, flush: true }, provinceBlock(farms, [
-        { key: 'fallow', label: 'Fallow (dun)', value: (set) => set.reduce((a, f) => a + f.fallowArea, 0), format: int },
-        { key: 'share', label: 'Share of area', value: (set) => {
-            const area = set.reduce((a, f) => a + f.area, 0);
-            return area ? (set.reduce((a, f) => a + f.fallowArea, 0) / area) * 100 : 0;
-          }, format: (v) => pct(v, 1) }
-      ])),
 
-      section('Where the fallow land is', { icon: 'pin', note: 'Colour shows land in production.', flush: true },
+      section('Where the fallow land is', { icon: 'pin', half: true, note: 'Colour shows land in production.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('crop-fallow', {
           mode: 'band',
           farms,

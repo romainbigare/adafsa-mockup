@@ -16,7 +16,6 @@ import { figures } from '../components/figures.js';
 import { summaryTable, countFormat } from '../components/summaryTable.js';
 import { filterRail, typeCounts } from '../components/filterRail.js';
 import { mapBand } from '../components/mapBand.js';
-import { provinceBlock } from '../components/provinceBlock.js';
 import { query, taxonomyTree, taxonomyEntries, allFarms } from '../data/store.js';
 import { taxonomyBreakdown } from '../domain/aggregate.js';
 import { int, dec } from '../domain/format.js';
@@ -71,14 +70,6 @@ export function render({ selection }) {
         flush: true
       }, h('div', { style: { padding: '0 16px 16px' } }, map)),
 
-      section('By province', {
-        icon: 'land',
-        note: 'Click a province name to open it.',
-        flush: true
-      }, provinceBlock(farms, [
-        { key: 'area', label: 'Farm area (dun)', value: (set) => set.reduce((a, f) => a + f.area, 0), format: (v) => int(v) },
-        { key: 'cultivated', label: 'In production (dun)', value: (set) => set.reduce((a, f) => a + f.cultivatedArea, 0), format: (v) => int(v) }
-      ], { total: { farms: farms.length } })),
 
       section('Crops by area', {
         icon: 'crop', half: true,

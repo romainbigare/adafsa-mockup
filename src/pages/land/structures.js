@@ -15,7 +15,6 @@ import { section, intro, callout } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { summaryTable } from '../../components/summaryTable.js';
 import { mapBand } from '../../components/mapBand.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { dataTable } from '../../components/dataTable.js';
 import { query } from '../../data/store.js';
 import { classBreakdown } from '../../domain/aggregate.js';
@@ -58,10 +57,6 @@ export function render({ selection }) {
           legendTitle: 'Structures per holding'
         }))),
 
-      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
-        { key: 'count', label: 'Structures', value: (set) => set.reduce((a, f) => a + f.structures.length, 0), format: int },
-        { key: 'area', label: 'Area covered (dun)', value: (set) => set.reduce((a, f) => a + f.structureArea, 0), format: (v) => dec(v, 1) }
-      ])),
 
       section('Area by structure type', { icon: 'land', half: true, note: 'Click a class to see its types.', flush: true },
         summaryTable(rows, {

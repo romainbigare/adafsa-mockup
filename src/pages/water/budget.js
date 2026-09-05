@@ -93,7 +93,7 @@ export function render({ selection }) {
           { format: (v) => `${dec(v, 2)} m³/kg`, limit: 12 })),
 
       section('Water needed each month', { icon: 'calendar', half: true, note: 'Follows what the farms plant.' },
-        columnChart(MONTHS, [{ label: 'Water demand (m³)', color: COMPARE.current, values: monthly }], { format: compact })),
+        columnChart(MONTHS, [{ label: 'Water demand (m³)', color: COMPARE.current, values: monthly }], { format: compact, half: true })),
 
       section('Water per kilo, by farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(farms.filter((farm) => farm.expectedKg > 0), {

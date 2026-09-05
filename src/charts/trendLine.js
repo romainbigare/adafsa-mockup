@@ -9,11 +9,14 @@ import { s, niceScale, niceRange } from './svg.js';
 import { attachTooltip } from './tooltip.js';
 import { INK } from '../domain/palette.js';
 
-const W = 720;
 const H = 210;
 const PAD = { top: 12, right: 14, bottom: 26, left: 48 };
 
-export function trendLine(labels, series, { format = (v) => String(Math.round(v)), height = H, zeroBased = true } = {}) {
+/* The drawing is scaled to the width of its card, so a chart in a half-width
+ * card needs a narrower canvas or it renders as a thin strip with the labels
+ * shrunk to nothing. */
+export function trendLine(labels, series, { format = (v) => String(Math.round(v)), height = H, zeroBased = true, half = false } = {}) {
+  const W = half ? 440 : 720;
   const container = h('figure', { class: 'chart' });
   const plotW = W - PAD.left - PAD.right;
   const plotH = height - PAD.top - PAD.bottom;

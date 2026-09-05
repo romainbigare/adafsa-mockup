@@ -10,7 +10,6 @@ import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { summaryTable } from '../../components/summaryTable.js';
 import { mapBand } from '../../components/mapBand.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { dataTable } from '../../components/dataTable.js';
 import { query, landClasses } from '../../data/store.js';
 import { classBreakdown } from '../../domain/aggregate.js';
@@ -64,11 +63,6 @@ export function render({ selection }) {
           legendTitle: 'Land use class'
         }))),
 
-      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
-        { key: 'open', label: 'Farmland (dun)', value: (set) => set.flatMap((f) => f.landParcels).filter((p) => p.category === 'Open Agriculture').reduce((a, p) => a + p.area, 0), format: int },
-        { key: 'built', label: 'Buildings (dun)', value: (set) => set.reduce((a, f) => a + f.structureArea, 0), format: (v) => dec(v, 1) },
-        { key: 'fallow', label: 'Fallow (dun)', value: (set) => set.reduce((a, f) => a + f.fallowArea, 0), format: int }
-      ])),
 
       section('Area by land type', { icon: 'layers', note: 'Click a type to see more detail.', flush: true },
         summaryTable(rows, {

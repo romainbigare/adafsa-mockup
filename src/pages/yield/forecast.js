@@ -14,7 +14,6 @@ import { figures } from '../../components/figures.js';
 import { barList } from '../../charts/barList.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { dataTable } from '../../components/dataTable.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { query, taxonomyTree, cropRows } from '../../data/store.js';
 import { YIELD_DEVIATION, classify, distribution } from '../../domain/bands.js';
@@ -77,21 +76,8 @@ export function render({ selection }) {
       section('Against the crop average', { icon: 'ruler', half: true, note: 'How the plantings compare.' },
         bandBar(distribution(YIELD_DEVIATION, rows, (row) => row.yieldDeviation, (row) => row.area))),
 
-      section('Expected harvest by province', {
-        icon: 'land', half: true,
-        flush: true
-      }, provinceBlock(farms, [
-        { key: 'production', label: 'Expected harvest (t)', value: (set) => {
-            const ids = new Set(set.map((f) => f.fid));
-            return rows.filter((r) => ids.has(r.farm.fid)).reduce((a, r) => a + r.expectedKg, 0) / 1000;
-          }, format: (v) => dec(v, 1) },
-        { key: 'below', label: 'Farms below', value: (set) => {
-            const ids = new Set(set.map((f) => f.fid));
-            return rows.filter((r) => ids.has(r.farm.fid) && r.yieldDeviation < 0).length;
-          }, format: int }
-      ])),
 
-      section('Biggest crops by harvest', { icon: 'yieldup', note: 'Expected tonnes.' },
+      section('Biggest crops by harvest', { icon: 'yieldup', half: true, note: 'Expected tonnes.' },
         barList(crops.slice(0, 12).map((crop) => ({ label: crop.type, value: crop.kilos / 1000, color: categoryColor(crop.category) })),
           { format: (v) => `${dec(v, 1)} t` })),
 

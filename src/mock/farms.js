@@ -91,13 +91,21 @@ export function enrichFarm(farm, { fieldCropPool = [] } = {}) {
   const crops = entries.map((entry) => {
     const cropRand = seeded(`crop-${farm.fid}-${entry.category}-${entry.type}`);
     const isTree = TREE_CATEGORIES.includes(entry.category);
-    const series = entry.former
-      ? [...backwardSeries(cropRand, entry.pastArea).slice(0, QUARTER_COUNT - 2), 0, 0]
-      : backwardSeries(cropRand, entry.area, { drift: isTree ? 0.02 : 0.12 });
-
-    /* A farm that has only just taken this crop up shows nothing before it. */
-    if (!entry.former && !isTree && cropRand() < 0.14) {
-      for (let i = 0; i < 3; i++) series[i] = 0;
+    /* A crop the farm no longer grows stops at some point in the record, not
+     * always at the same one — otherwise every comparison period would show the
+     * same set of farms stopping, or none at all. */
+    let series;
+    if (entry.former) {
+      const stoppedAgo = 1 + Math.floor(cropRand() * 4);
+      series = backwardSeries(cropRand, entry.pastArea);
+      for (let i = QUARTER_COUNT - stoppedAgo; i < QUARTER_COUNT; i++) series[i] = 0;
+    } else {
+      series = backwardSeries(cropRand, entry.area, { drift: isTree ? 0.02 : 0.12 });
+      /* And a farm that has only just taken a crop up shows nothing before it. */
+      if (!isTree && cropRand() < 0.2) {
+        const startedAgo = 1 + Math.floor(cropRand() * 5);
+        for (let i = 0; i < QUARTER_COUNT - startedAgo; i++) series[i] = 0;
+      }
     }
 
     /* Each holding plants on its own schedule. A few go early and a few late,

@@ -10,7 +10,6 @@ import { figures } from '../../components/figures.js';
 import { comparisonSelect } from '../../components/comparison.js';
 import { trendLine } from '../../charts/trendLine.js';
 import { dataTable } from '../../components/dataTable.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { query } from '../../data/store.js';
 import { movements, trend, hasHistoryFor } from '../../domain/change.js';
 import { EFFICIENCY, classify } from '../../domain/bands.js';
@@ -67,10 +66,6 @@ export function render({ selection }) {
         note: selection.region === 'emirate' ? 'One line for each province.' : 'The selected province.'
       }, trendLine(QUARTERS.map((q) => q.label), series, { format: (v) => Math.round(v), zeroBased: false })),
 
-      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
-        { key: 'now', label: 'Average now', value: (set) => mean(set, (f) => f.efficiency), format: (v) => (v == null ? '—' : Math.round(v)) },
-        { key: 'fell', label: 'Deteriorated', value: (set) => set.filter((f) => (moveOf.get(f.fid)?.delta ?? 0) < -0.5).length, format: int }
-      ])),
 
       section('Every farm', {
         icon: 'table',

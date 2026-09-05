@@ -2,7 +2,10 @@
  *
  * A bar per row with its value written beside it, so the reading never depends
  * on the colour. Used wherever the question is "how much of each", which in
- * this platform is most of the time. */
+ * this platform is most of the time.
+ *
+ * On a change page the bars are all one neutral colour and the signed number
+ * beside them carries the direction, tinted just enough to scan. */
 
 import { h } from '../app/dom.js';
 
@@ -16,6 +19,6 @@ export function barList(rows, { format = (v) => String(v), color = '#2a78d6', ma
       h('span', { text: row.label, title: row.label })),
     h('span', { class: 'track' },
       h('span', { class: 'fill', style: { width: `${Math.max(1.5, ((row.value || 0) / top) * 100)}%`, background: row.color || color } })),
-    h('span', { class: 'amount', text: row.amount ?? format(row.value) })
+    h('span', { class: 'amount', style: row.amountColor ? { color: row.amountColor } : null, text: row.amount ?? format(row.value) })
   )));
 }

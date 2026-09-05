@@ -10,7 +10,6 @@ import { figures } from '../../components/figures.js';
 import { summaryTable, countFormat } from '../../components/summaryTable.js';
 import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { mapBand } from '../../components/mapBand.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { dataTable } from '../../components/dataTable.js';
 import { barList } from '../../charts/barList.js';
 import { query, taxonomyTree, taxonomyEntries } from '../../data/store.js';
@@ -75,11 +74,6 @@ export function render({ selection }) {
           note: 'Click a farm to open it.'
         }))),
 
-      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
-        { key: 'palms', label: 'Date palms', value: (set) => set.reduce((a, f) => a + f.palms, 0), format: int },
-        { key: 'fruit', label: 'Fruit trees', value: (set) => set.reduce((a, f) => a + f.fruitTrees, 0), format: int },
-        { key: 'forest', label: 'Forest trees', value: (set) => set.reduce((a, f) => a + f.forestTrees, 0), format: int }
-      ])),
 
       section('Area by tree group', { icon: 'trees', half: true, note: 'Click a group to see its species.', flush: true },
         summaryTable(breakdown.rows, { measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1), totalLabel: 'All tree stands' })),

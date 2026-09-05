@@ -11,7 +11,6 @@ import { figures } from '../../components/figures.js';
 import { summaryTable, countFormat } from '../../components/summaryTable.js';
 import { filterRail, typeCounts } from '../../components/filterRail.js';
 import { mapBand } from '../../components/mapBand.js';
-import { provinceBlock } from '../../components/provinceBlock.js';
 import { dataTable } from '../../components/dataTable.js';
 import { query, taxonomyTree, taxonomyEntries } from '../../data/store.js';
 import { taxonomyBreakdown } from '../../domain/aggregate.js';
@@ -73,13 +72,6 @@ export function render({ selection }) {
           note: 'Click a farm to open it.'
         }))),
 
-      section('By province', { icon: 'land', flush: true }, provinceBlock(farms, [
-        { key: 'field', label: 'Crops (dun)', value: (set) => set.reduce((a, f) => a + f.fieldArea, 0), format: int },
-        { key: 'share', label: 'Share of farm', value: (set) => {
-            const area = set.reduce((a, f) => a + f.area, 0);
-            return area ? (set.reduce((a, f) => a + f.fieldArea, 0) / area) * 100 : 0;
-          }, format: (v) => pct(v) }
-      ])),
 
       section('Area by crop', { icon: 'crop', half: true, note: 'Click a group to see its crops.', flush: true },
         summaryTable(breakdown.rows, { measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1), totalLabel: 'All field crops' })),
