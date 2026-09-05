@@ -103,6 +103,13 @@ export function mapBand(id, options) {
     }
   }
 
+  /* Five thousand parcels across a whole emirate are specks. Below this zoom
+   * the map shows a marker per holding, coloured by the class covering most of
+   * it, and says how to see the outlines; past it the real boundaries are drawn.
+   * A pleasant side effect is that the 2.7 MB of parcel geometry is not fetched
+   * until somebody actually looks closely. */
+  const PARCEL_ZOOM = 12;
+
   let parcelCache = null;
   async function drawParcels() {
     const { parcels } = current;
@@ -147,7 +154,12 @@ export function mapBand(id, options) {
     if (!current) return;
     const { mode, farms, colorOf, labelOf } = current;
 
-    if (mode === 'parcels') { drawParcels(); return; }
+    if (mode === 'parcels') {
+      if (map.getZoom() >= PARCEL_ZOOM) { drawParcels(); setNote(current.note); return; }
+      setNote('Zoom in to see the parcel outlines. Each dot is a holding, coloured by the class covering most of it.');
+      drawFarmMarkers(farms, current.farmColor || colorOf, labelOf);
+      return;
+    }
     if (mode === 'farm') { drawFarm(); return; }
 
     if (mode === 'counts') {
@@ -182,6 +194,10 @@ export function mapBand(id, options) {
       return;
     }
 
+    drawFarmMarkers(farms, colorOf, labelOf);
+  }
+
+  function drawFarmMarkers(farms, colorOf, labelOf) {
     for (const farm of farms) {
       if (!farm.lat) continue;
       const colour = colorOf ? colorOf(farm) || NEUTRAL : NEUTRAL;
@@ -193,6 +209,11 @@ export function mapBand(id, options) {
       marker.on('click', () => { location.hash = `#/farm/${farm.fid}`; });
       markerLayer.addLayer(marker);
     }
+  }
+
+  function setNote(text) {
+    noteBox.hidden = !text;
+    if (text) noteBox.textContent = text;
   }
 
   function drawLegend(legend) {
@@ -207,7 +228,7 @@ export function mapBand(id, options) {
         entry.count != null ? h('span', { class: 'count', text: int(entry.count) }) : null))));
   }
 
-  map.on('zoomend', () => { if (current?.mode === 'counts') draw(); });
+  map.on('zoomend', () => { if (current?.mode === 'counts' || current?.mode === 'parcels') draw(); });
 
   const api = {
     element,
@@ -216,8 +237,7 @@ export function mapBand(id, options) {
       current = next;
       element.className = ['map-band', next.size || null].filter(Boolean).join(' ');
       drawLegend(next.legend);
-      noteBox.hidden = !next.note;
-      if (next.note) noteBox.textContent = next.note;
+      setNote(next.note);
       draw();
       if (first) map.setView([23.9, 54.4], 8);
       fit(first);

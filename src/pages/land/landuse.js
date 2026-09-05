@@ -21,6 +21,14 @@ import { TODAY } from '../../domain/periods.js';
 
 const CLASS_ORDER = ['Open Agriculture', 'Protected Agriculture', 'Structures', 'Barren Land'];
 
+/* The class covering most of a holding — what a dot is coloured by before the
+ * parcel outlines come in. */
+function dominantClass(farm) {
+  const totals = new Map();
+  for (const parcel of farm.landParcels) totals.set(parcel.category, (totals.get(parcel.category) || 0) + parcel.area);
+  return [...totals.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || 'Barren Land';
+}
+
 export function render({ selection }) {
   const farms = query({ region: selection.region });
 
@@ -51,9 +59,11 @@ export function render({ selection }) {
           size: 'tall',
           parcels: true,
           parcelColor: (parcel) => landuseColor(parcel.category),
+          farmColor: (farm) => landuseColor(dominantClass(farm)),
+          labelOf: (farm) => `${dominantClass(farm)} · ${dec(farm.area, 1)} dun`,
           legend: CLASS_ORDER.map((name) => ({ label: name, color: landuseColor(name) })),
           legendTitle: 'Land use class',
-          note: 'Parcel outlines load on demand — they are the only page here that needs them.'
+          note: null
         }))),
 
       section('By province', { flush: true }, provinceBlock(farms, [

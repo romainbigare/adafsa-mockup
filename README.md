@@ -1,137 +1,127 @@
-# Wafra Dashboard — Map My Crop (mockup)
+# ADAFSA Agricultural Monitoring Platform — mockup
 
-A static, **buildless** front-end mockup for a farm-monitoring platform (Abu Dhabi / Al Ain region). Two pages backed by placeholder data, served entirely from static files — no server, no build step, no npm.
-
-- **Farms Overview** (`index.html`) — **Proposal Combined.** Synthesises the three layout proposals into one experience built around **three altitudes**, sharing one screen grammar (verdict on top, map in the centre, ranked list docked below, nav on the left edge):
-  - **Altitude 1 — the Situation** (`#/overview`): the glancer's screen. The region map is coloured by one fixed lens — an **Overall health** composite score (a fee-weighted roll-up of every module's severity, so no arbitrary single module drives the landing) — with a per-farm **breakdown on hover** and red "N need attention" badges so problems glow through aggregation. A left-hand panel carries the region's headline statistics and the band breakdown; six **verdict tiles** below lead with a status pill (On track · Watch · Needs attention), a plain supporting line and a band column chart.
-  - **Altitude 2 — the Question** (`#/m/<key>`): one module owns the map. KPI strip, one legend, and a ranked attention list. Land Use & Structures browses the full taxonomy (**Map Layers**), which visibly *pauses* the module chrome instead of contradicting it.
-  - **Altitude 3 — the Farm** (`#/farm/<fid>`): a dossier drawer over the zoomed, highlighted farm — the AI's verdict in one sentence, per-module status, and an exit that ends in an **action** (export / open Farm Analysis).
-
-  **FILTERING** (a panel under the legend, minimised until opened) narrows the working set to the farms growing the picked crop / tree types — on the Overview and every analytical module. Each route filters by the taxonomy it is about: Crop Monitoring by field crops, Palms & Fruit Trees by woody perennials, the rest by both. The filter moves the map *and* every number with it, so the two can never disagree.
-
-  Two contracts hold throughout, enforced by tests: the **number contract** (every figure comes from `moduleRegistry`, so no two screens disagree) and the **colour contract** (red = needs action, amber = watch, green = fine — everywhere, including cluster badges).
-- **Farm Analysis** (`farm-analysis.html`) — per-farm view with a canvas heatmap (growth / irrigation / phenology / density), weather, soil, growth-phase, water-scheduler and advisory panels.
-
-> The data is **placeholder**. See [Data & the mock boundary](#data--the-mock-boundary).
+A clickable, static mockup of the platform ADAFSA is buying: six analysis modules, a
+farm register, and the reporting that sits over them. Built to be reviewed and demoed
+rather than deployed. **Every score, count, forecast and history on screen is
+generated** — see [Real data and invented data](#real-data-and-invented-data).
 
 ## Running it
 
-**Just open it.** Double-click any of the three `.html` files, or open them via `file://` in a browser. Everything (including the ~4.4 MB of geometry) loads through plain `<script>` tags, so no local server is required.
-
-**Optional local server** (mirrors GitHub Pages exactly):
+No build step, no dependencies, no install. The app is native ES modules served as
+static files, so it needs a server rather than a double-clicked file:
 
 ```bash
-python3 -m http.server 8137
-# then visit http://localhost:8137/index.html
+python3 -m http.server 8137     # or: npm run serve
+# then open http://localhost:8137/index.html
 ```
 
-**Deploy to GitHub Pages:** push to your repo and enable Pages on the branch root. The included `.nojekyll` file tells Pages to serve `assets/`, `js/`, and `data/` verbatim (no Jekyll processing). No build step runs.
+Deploying to GitHub Pages is a push: `.nojekyll` tells Pages to serve `src/`, `data/`
+and `vendor/` verbatim. Nothing is compiled.
+
+The only thing that needs a network is map tiles. Leaflet is vendored, so every
+figure, table and chart works offline.
+
+```bash
+node test/all.js        # or: npm test — plain Node, no runner to install
+node tools/smoke.mjs    # walks all 22 routes in a browser; needs Playwright
+```
+
+## What it contains
+
+Twenty-two pages, in the order and under the names agreed in the review
+(`docs/adafsa-mockup-review.md`, with the change list in
+`docs/adafsa-redesign-scope.md`):
+
+    Overview                        inventory of production capacity — not health
+    Crop Monitoring                 crops & cultivated area · seasonal change · fallow land
+    Tree Monitoring                 trees, species & varieties · canopy health · annual change
+    Land Use & Structures           land use · structures · change tracking
+    Irrigation Efficiency           efficiency scores · quarterly trend
+    Crop Water Calculator           monthly demand & over-allocation · seasonal water budget
+    Yield Optimisation              yield forecast · crop calendar
+    Individual Farms                register · farm profile · corrective actions
+    Support
+
+Three ideas run through all of them.
+
+**Reporting goes emirate, then province, then farm.** Each province answers to a
+different person, so the region selector is in the header of every page and never
+buried on one of them.
+
+**Maps illustrate; they do not carry the argument.** A map appears where the question
+is genuinely about a place. Change and trend pages have none — that was settled
+directly in review, and the contributor tables name farms instead.
+
+**Every number comes through one function.** Pages read their rows from
+`query()` in `src/data/store.js`. With twenty-two screens a convention that figures
+should agree would not have survived; a single call does.
 
 ## Architecture
 
-Because the app must open over `file://` (where browsers block `fetch`, `XMLHttpRequest`, and ES-module `import`), it deliberately uses **classic scripts sharing one global namespace** instead of a module bundler. Every JS file is an IIFE that reads/attaches to `window.Wafra`:
-
-```js
-(function (W) {
-  "use strict";
-  W.geo = { mercatorToLatLng, /* ... */ };
-})(window.Wafra);
+```
+index.html            the shell: nav column, sticky header, scrolling content
+assets/css/           tokens, layout and components, chart styles
+vendor/leaflet/       vendored, so only tiles need a network
+data/
+  attributes.js       GENERATED — the geometry-free farm table every page reads
+  geo/                the survey polygons, imported only when a map mounts
+tools/
+  build-attributes.mjs   regenerates data/attributes.js from data/geo
+  smoke.mjs              walks every route in a browser and reports console errors
+src/
+  app/       shell, two-level hash router, navigation model, page registry, DOM and icons
+  domain/    pure logic — taxonomy, regions, bands, periods, aggregation, change,
+             the crop calendar, the water model, the issue model, the palette
+  data/      the survey join, the query API, lazy geometry
+  charts/    hand-drawn SVG: bar lists, columns, trend lines, band bars
+  components/ figures, summary tables, the farm table, filter rail, map band, change table
+  pages/     one small file per screen
+  mock/      everything invented — the swap-for-an-API boundary
 ```
 
-The datasets are likewise plain scripts that assign `window.WafraData.*` — so they load over `file://` and GitHub Pages identically, with no `fetch`.
+**Routing and selection live in the URL.** `#/m/crop/change?region=alain&cmp=year`
+carries the page, the province, the comparison period, the taxonomy selection, the
+sort and the page number. Any view can be bookmarked or sent to a colleague. The
+platform this replaces could not do that.
 
-```
-warfa-dashboard/
-├── index.html                  # Farms Overview — thin skeleton (mounts + ordered <script>s)
-├── farm-analysis.html          # Farm Analysis — thin skeleton
-│
-├── assets/
-│   ├── tailwind-config.js       # shared Tailwind config (brand palette, fonts)
-│   └── css/
-│       ├── tokens.css           # design tokens (CSS custom properties)
-│       ├── base.css             # body + typography utilities + scrollbars
-│       ├── components.css       # glass-panel, markers, panels, table, drawer, …
-│       └── leaflet.css          # Leaflet popup/attribution/cluster overrides
-│
-├── js/
-│   ├── namespace.js             # window.Wafra = {} — must load first
-│   ├── config.js                # Wafra.config — map defaults, tiles, nav, ticker
-│   ├── lib/
-│   │   ├── geo.js               # Wafra.geo — Web-Mercator→lat/lng, rings, centroid, area
-│   │   ├── color.js             # Wafra.color — TYPE_COLORS, lerpColor, interpolateStops
-│   │   └── random.js            # Wafra.random — deterministic seeded RNG (dashboard)
-│   ├── data/loader.js           # Wafra.data.get(name) / .features(name) — reads window.WafraData
-│   ├── map/createMap.js         # Wafra.map.create() — Leaflet map + basemaps + toggle
-│   ├── ui/
-│   │   ├── sidebar.js           # Wafra.ui.renderSidebar() — shared left nav
-│   │   ├── strings.js           # Wafra.str() — user-facing copy in one place (i18n seam)
-│   │   ├── ticker.js            # Wafra.ui.renderTicker() — shared bottom status bar
-│   │   └── mapControls.js       # Wafra.ui.wireZoom / wireBasemap
-│   │
-│   ├── mock/                    # ALL placeholder/generated data — isolated (swap for a real API)
-│   │   ├── metrics.js           #   dashboard per-feature metric values + colour scales + per-farm module metrics (prepareFarmMetrics)
-│   │   ├── news.js              #   dashboard live-feed items
-│   │   └── farmAnalysis.js      #   farm RNG + heat-field noise + panel demo values
-│   │
-│   ├── dashboard/               # Farms Overview feature modules (share one state object)
-│   │   ├── taxonomy.js          #   land-use / crop trees + palettes
-│   │   ├── state.js             #   createState() — the single shared mutable state
-│   │   ├── modules.js           #   3 banded farm modules (IER / Yield / Water) + per-band severity (sev)
-│   │   ├── moduleRegistry.js    #   the SIX contract modules as one model; tri-state status + criticalCount
-│   │   ├── scorecard.js         #   module card component (big / mini / status tile) — tri-state chip
-│   │   ├── legend.js            #   one legend, scope-aware (In view / All farms) + optional stat grid
-│   │   ├── farmFilter.js        #   the working set — farms joined to their crop/tree types, per-route scope
-│   │   ├── filterPanel.js       #   FILTERING panel (minimised by default) that drives farmFilter
-│   │   ├── attentionList.js     #   ranked per-module farm table helpers (metric labels)
-│   │   ├── plotsLayer.js        #   streaming render, clustering; band-coloured dots + red "N critical" badges
-│   │   ├── dataTable.js         #   shared sortable/reorderable/exportable table factory
-│   │   ├── modulePage.js        #   Altitude 2 — module-page template (KPI strip + dial + legend + attention)
-│   │   ├── situation.js         #   Altitude 1 — the Situation: stats legend + verdict tiles (one fixed map lens)
-│   │   ├── farmDossier.js       #   Altitude 3 — the farm dossier drawer (verdict + module status + actions)
-│   │   ├── newsBell.js          #   activity feed bell (top-right; click / outside / Escape)
-│   │   ├── taxonomyLayers.js    #   Map Layers browser (Land Use only); pauses module chrome in "layers mode"
-│   │   └── router.js            #   hash router (#/overview, #/m/<key>, #/farm/<fid>); drives the single map
-│   │
-│   ├── farmAnalysis/heatmap.js  # Farm Analysis canvas heatmap overlay + colour scales
-│   │
-│   └── pages/                   # one entry point per page — bootstraps + wires everything
-│       ├── dashboard.js         #   creates the map once, wires chrome + mobile nav, hands off to the router
-│       ├── overview.js          #   thin seam — delegates Home rendering to situation.js
-│       └── farmAnalysis.js
-│
-├── data/                        # placeholder GeoJSON, wrapped as window.WafraData globals
-│   ├── plots.js                 #   500 plot features
-│   ├── crops.js                 #   2,425 crop features
-│   ├── landuse.js               #   5,320 land-use features
-│   └── farms.js                 #   3 farms (Farm Analysis)
-│
-├── .nojekyll                    # GitHub Pages: serve subfolders as-is
-└── README.md
-```
+**Geometry is loaded only where it is drawn.** The three survey files total about
+4.4 MB and most pages here have no map at all, so the counting facts are extracted
+once into a 103 KB attribute table and the polygons sit behind a dynamic import.
+Re-run `npm run build:data` after changing anything under `data/geo/`.
 
-### Script load order (per page)
+**Colour is checked rather than chosen.** `src/domain/palette.js` holds two palettes
+with two jobs: a fixed, colour-vision-validated order for the six taxonomy categories,
+and the status ramps in `src/domain/bands.js` for the places where something is being
+judged. Nothing decorative borrows the status hues. Three identity hues sit below 3:1
+against the page, so every legend and bar carries a visible label.
 
-`Tailwind CDN → assets/tailwind-config.js → assets/css/*` (in `<head>`), then at the end of `<body>`: `Leaflet (+ markercluster on the dashboard) → js/namespace.js → js/config.js → js/lib/* → js/data/loader.js → js/map/createMap.js → js/ui/* → data/*.js → js/mock/* → feature modules → js/pages/<page>.js`. Order matters (later files depend on earlier `Wafra.*`), and each page's `<script>` list encodes it.
+## Real data and invented data
 
-## Data & the mock boundary
+**From the survey:** farm boundaries and areas, crop parcels with their species,
+land-use classes and the structures on each holding. The join between the two surveys
+is documented in `src/data/compose.js` — the rule that stops the palms being counted
+twice.
 
-Everything under **`data/`** (geometry) and **`js/mock/`** (generated metrics, weather, per-farm timestamps, news, heat-fields) is placeholder. To wire up a real backend, replace those two locations:
+**Invented, in `src/mock/`:** tree counts, canopy indices, efficiency scores, metered
+water, yields, production, and all of the quarterly history. Values are seeded from the
+farm's id, so a refresh never changes a number in front of a client, and each invented
+figure is anchored to a measured area, so a holding with a lot of palm land has a lot of
+palms. Replace `src/mock/` with an API client and the pages keep working.
 
-- Swap `data/*.js` for real data (either keep the `window.WafraData.* = {...}` global form, or reintroduce `fetch()` in `js/data/loader.js` if you no longer need `file://` support).
-- Replace the generators in `js/mock/*` with real API calls. The feature/page modules consume them through `Wafra.mock.*` / `Wafra.data.*`, so nothing else needs to change.
+Provinces are assigned by longitude. The real boundaries are not in this dataset, and
+drawing approximate ones would look more authoritative than it is; the maps borrow real
+administrative boundaries and roads from the tile provider instead.
 
-## Tests
+## Notes for whoever picks this up
 
-Pure logic (the registry, band/severity model, the Situation verdict, the farm dossier, the news generator, the strings seam) is unit-tested with **plain Node — no build, no npm**:
-
-```bash
-node test/all.js        # runs every test/*.test.js in a fresh node, fails loudly
-```
-
-Run the runner, **not** `node --test test/` — the suites are plain assertion scripts (`node test/<file>.test.js`), which `node --test` mis-parses. `test/all.js` is what CI should call.
-
-## Notes
-
-- **Tailwind is loaded from the Play CDN** (`cdn.tailwindcss.com`). That's ideal for a no-build mockup but is not intended for production; for a real deployment, compile Tailwind to a static stylesheet.
-- **Two independent RNGs by design.** The dashboard uses a string-hash seeded RNG (`Wafra.random`); Farm Analysis uses its own `sin(seed*9999.123)` RNG (in `js/mock/farmAnalysis.js`). They are intentionally *not* unified — doing so would change the pre-existing pseudo-random visuals on each page.
-- External resources (Tailwind, Google Fonts, Leaflet, Esri/OSM tiles, logo) load from their CDNs over HTTPS and require network access.
+- **Arabic and right-to-left** is a real requirement for this client and is not built.
+  The layout uses logical properties throughout and all copy sits in the page modules,
+  so the work is a pass rather than a rewrite — but it is cheapest before the layout
+  hardens further.
+- **Tier 3 structures** (telling a pump room from a filtration or desalination unit)
+  are modelled but deliberately not delivered; both sides of the review doubted the
+  classifier can do it. The pages say so rather than showing an empty column.
+- **Change pages depend on history the live platform will not have** for its first two
+  quarters. They carry a designed empty state for exactly that.
+- **The deck is generated from the mockup.** The screenshots in `presentation/` are of
+  the previous design and need regenerating from these screens.
