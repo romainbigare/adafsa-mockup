@@ -20,22 +20,23 @@ const CODE = { crop: 'C', trees: 'T', land: 'L', ier: 'I', water: 'W', yield: 'Y
  * words, one idea at a time. Each one says what the screen shows and what it is
  * for, and names the contract deliverable behind it where that helps. */
 const NOTES = {
-  'crop/inventory': 'Shows what is planted on every farm and how much land each crop takes. The map gives each farm the colour of its main crop. (Module 1: crop location, crop type, cultivated area.)',
-  'crop/change': 'Shows what changed since the last season. Four tabs: farms that started a crop, stopped a crop, planted more, or planted less. (Module 1: seasonal change report.)',
-  'crop/fallow': 'Shows land that can be farmed but has nothing growing on it now. The last number is the one to act on — farms that plant less than before. (Module 1: fallow land detection.)',
-  'trees/inventory': 'Counts the trees on every farm: date palms, fruit trees and forest trees. It also gives the species and the varieties. (Module 2: tree location, tree count, species and variety.)',
-  'trees/canopy': 'Gives every farm a health score for its trees, read from the satellite. The score is for the whole farm, not for one tree. Palms and fruit trees are scored apart. (Module 2: canopy health index.)',
-  'trees/change': 'Shows how many trees were planted and how many were removed since last year. Numbers, not a map — the table names the farms. (Module 2: annual change detection.)',
-  'land/landuse': 'Shows how the land is used on every farm: fields, palms, other trees, greenhouses, buildings and empty land. Zoom in and the map draws the real shape of each piece of land.',
-  'land/structures': 'Shows what is built on the farms: houses, labour housing, sheds, water tanks, animal pens, roads and pump rooms. It gives the type of each one. (Module 3: structure detection.)',
-  'land/change': 'Shows buildings that are new and buildings that are gone. It needs two quarters of data before it can show anything.',
-  'ier/scores': 'Gives every farm a score from 0 to 100 for how well it waters its crops, and a band for that score. The tabs list the farms at 65 or more, which keep their subsidy. (Module 4: IER score, band and subsidy list.)',
-  'ier/trend': 'Shows whether the scores are getting better or worse over time. A line and hard numbers, and no map on purpose. (Module 4: quarter-on-quarter trend.)',
-  'water/demand': 'Shows how much water each farm should use this month and how much it really used. Farms using far more than they need are flagged. (Module 6: monthly water demand and over-allocation flag.)',
-  'water/budget': 'Shows how much water a crop needs for a whole season, and how much food it gives back for that water. Useful when deciding what to grow. (Module 6: seasonal water budget.)',
-  'yield/forecast': 'Shows how much each crop should produce, the average for each dunum, and how many farms are below that average. (Module 5: seasonal yield estimate.)',
-  'yield/calendar': 'Shows when each crop is in the ground, month by month. Every farm plants at its own time, so the curve rises and falls.'
+  'crop/inventory': 'Shows what is planted and where. The numbers: farms with field crops, the area under them, how many different crops, and the average share of a farm. (Module 1: crop location, crop type, cultivated area.)',
+  'crop/change': 'What changed since last season: net change, new land planted, land no longer planted, and how many farms started or stopped. Four tabs list those farms. (Module 1: seasonal change report.)',
+  'crop/fallow': 'Land that can be farmed but has nothing on it: how much, what share of all farm area, how many farms have some, and how many are planting less than before. (Module 1: fallow land detection.)',
+  'trees/inventory': 'Counts the trees: the total, date palms, fruit trees, forest trees, and how many palm varieties were found. Species break down under the map. (Module 2: tree location, count, species and variety.)',
+  'trees/canopy': 'A health score for each farm\u2019s trees, read from the satellite: average palm score, average fruit tree score, farms with stressed trees, and farms in the lowest band. (Module 2: canopy health index.)',
+  'trees/change': 'Trees since last year: net change, trees planted, trees removed, and how many farms changed. Numbers, not a map \u2014 the table names the farms. (Module 2: annual change detection.)',
+  'land/landuse': 'How the land is used: land mapped, open farmland, buildings and greenhouses, fallow land and bare ground. Zoom in and the map draws the real shape of each piece of land.',
+  'land/structures': 'What is built on the farms: structures found, farms with structures, area covered, and the main classes. Houses, sheds, water tanks, pens, roads, pump rooms. (Module 3: structure detection.)',
+  'land/change': 'Buildings that are new and buildings that are gone: net change, new structures, structures removed, and the change in area covered. It needs two quarters of data first.',
+  'ier/scores': 'A water score from 0 to 100 for every farm: farms scored, the average, how many keep their subsidy at 65 or more, how many need attention, and how many are in the lowest band. (Module 4: IER score, band and subsidy list.)',
+  'ier/trend': 'Are the scores moving? The average score now, the change since last quarter or last year, how many farms got worse and how many improved. A line, and no map. (Module 4: quarter-on-quarter trend.)',
+  'water/demand': 'Water this month: how much each farm is allowed, how much it used, how many farms use too much, and how much extra they used. (Module 6: monthly water demand and over-allocation flag.)',
+  'water/budget': 'Water over a whole season: the total water needed, the harvest expected from it, the water for one kilo of food, and the area planted. (Module 6: seasonal water budget.)',
+  'yield/forecast': 'What the harvest should be: expected tonnes, crops planted, how many farms are below the average for their crop, and how many are far below it. (Module 5: seasonal yield estimate.)',
+  'yield/calendar': 'When each crop is in the ground: crops selected, the busiest month, the quietest month, and how many farms are planting at the busiest time.'
 };
+
 
 const moduleScreens = MODULES.flatMap((module) =>
   module.pages.map((page, i) => ({
@@ -51,19 +52,19 @@ const moduleScreens = MODULES.flatMap((module) =>
 const otherScreens = [
   {
     id: 'OV', title: 'Overview', section: 'Overview', route: '#/overview',
-    note: 'The first page. It shows how many farms there are, how much land they cover, and where they are. Open a module on the left to go deeper.'
+    note: 'The first page. Four numbers at the top: how many farms, their total area, how much land is in production, and how many crops are growing this month. The map shows where the farms are.'
   },
   {
     id: 'F1', title: 'Farm register', section: 'Individual Farms', route: '#/farms',
-    note: 'The list of every farm. Search by farm number or owner, sort on any column, and open one farm. Every result in the contract is given per farm.'
+    note: 'The list of every farm: how many, their total area, how many need attention, and how many use too much water. Search by number or owner, sort any column, open one farm.'
   },
   {
     id: 'F2', title: 'Farm profile', section: 'Individual Farms', route: '#/farm/4',
-    note: 'One farm on one page: where it is, what it grows, its trees, its water score, its water use and its buildings. All six modules meet here.'
+    note: 'One farm on one page: the owner, the province, land in production, the tree count, and how many things need attention. Below that: crops, trees, water score and buildings. All six modules meet here.'
   },
   {
     id: 'F3', title: 'Corrective actions', section: 'Individual Farms', route: '#/farm/4/actions',
-    note: 'Says what is wrong on this farm and what to do about it. Each problem is written as an action, not as a number to work out. Print the page and take it to the farm visit.'
+    note: 'What is wrong on this farm and what to do: things to look at, and alerts that would go to the farmer. Each one is written as an action, not as a number to work out. Print it and take it to the visit.'
   },
   {
     id: 'S1', title: 'Support', section: 'Support', route: '#/support',

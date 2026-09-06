@@ -365,7 +365,7 @@ if (tileFailures.length) {
 }
 
 // ------------------------------------------------------- plan, then numbers --
-const plan = [{ kind: 'cover' }, { kind: 'contents' }];
+const plan = [{ kind: 'cover' }, { kind: 'live' }, { kind: 'contents' }];
 for (const section of sections) {
   plan.push({ kind: 'section', section });
   for (const screen of section.screens) plan.push({ kind: 'screen', screen, section });
@@ -446,16 +446,40 @@ for (const item of plan) {
     stat(MARGIN, String(DISTINCT), 'SCREENS');
     stat(MARGIN + 2.75, String(sections.length), 'SECTIONS');
     stat(MARGIN + 5.5, String(plan.length), 'PAGES');
-    /* A real hyperlink: the reader opens the live mockup from the slide. */
-    s.addText(pkg.homepage.replace(/^https?:\/\//, ''), {
-      x: MARGIN, y: 6.42, w: 6.4, h: 0.32, fontFace: FONT, fontSize: 12.5,
-      color: BRAND, margin: 0, hyperlink: { url: pkg.homepage, tooltip: 'Open the live mockup' }
-    });
     const wafraW = 1.75;
     s.addImage({
       path: WAFRA, x: W - MARGIN - wafraW, y: 6.72, w: wafraW, h: wafraW * WAFRA_RATIO
     });
     footer(s, item.page);
+    continue;
+  }
+
+  // ------------------------------------------------------------ the live one --
+  /* The deck is a photograph of something that is running. This page exists so
+   * that nobody in the room has to ask for the address, and so that the address
+   * is big enough to read from the back of it. */
+  if (item.kind === 'live') {
+    s.background = { color: DEEP };
+    s.addText('OPEN IT YOURSELF', {
+      x: MARGIN, y: 2.36, w: 9.0, h: 0.32, fontFace: FONT, fontSize: 12,
+      bold: true, color: PALE, charSpacing: 2.2, margin: 0
+    });
+    s.addText('The mockup is live in your browser', {
+      x: MARGIN, y: 2.86, w: 10.45, h: 0.72, fontFace: FONT, fontSize: 30,
+      bold: true, color: PAPER, valign: 'top', margin: 0
+    });
+    /* The whole line is the link, and it is set large on purpose: this is the
+     * one thing on the page. */
+    s.addText(pkg.homepage.replace(/^https?:\/\//, ''), {
+      x: MARGIN, y: 3.94, w: 10.45, h: 0.86, fontFace: FONT, fontSize: 30,
+      bold: true, color: PALE, valign: 'top', margin: 0,
+      hyperlink: { url: pkg.homepage, tooltip: 'Open the live mockup' }
+    });
+    /* No rule under it: the link draws its own underline. */
+    s.addText('Every screen in this deck is a page you can click through. Nothing to install, and it works on a phone as well as a laptop.', {
+      x: MARGIN, y: 5.02, w: 7.6, h: 0.6, fontFace: FONT, fontSize: 13, color: PALE, lineSpacing: 18, margin: 0
+    });
+    footer(s, item.page, { onDark: true });
     continue;
   }
 
