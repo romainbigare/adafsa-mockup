@@ -460,12 +460,12 @@ for (const item of plan) {
    * is big enough to read from the back of it. */
   if (item.kind === 'live') {
     s.background = { color: DEEP };
-    s.addText('OPEN IT YOURSELF', {
-      x: MARGIN, y: 2.36, w: 9.0, h: 0.32, fontFace: FONT, fontSize: 12,
+    s.addText('AN INTERACTIVE MOCKUP IS AVAILABLE', {
+      x: MARGIN, y: 2.36, w: 9.6, h: 0.32, fontFace: FONT, fontSize: 12,
       bold: true, color: PALE, charSpacing: 2.2, margin: 0
     });
-    s.addText('The mockup is live in your browser', {
-      x: MARGIN, y: 2.86, w: 10.45, h: 0.72, fontFace: FONT, fontSize: 30,
+    s.addText('This mockup exists as an interactive website', {
+      x: MARGIN, y: 2.86, w: 10.45, h: 0.72, fontFace: FONT, fontSize: 27,
       bold: true, color: PAPER, valign: 'top', margin: 0
     });
     /* The whole line is the link, and it is set large on purpose: this is the
@@ -476,7 +476,7 @@ for (const item of plan) {
       hyperlink: { url: pkg.homepage, tooltip: 'Open the live mockup' }
     });
     /* No rule under it: the link draws its own underline. */
-    s.addText('Every screen in this deck is a page you can click through. Nothing to install, and it works on a phone as well as a laptop.', {
+    s.addText('Every screen in this deck is a screenshot of the live, interactive mockup available at the url above.', {
       x: MARGIN, y: 5.02, w: 7.6, h: 0.6, fontFace: FONT, fontSize: 13, color: PALE, lineSpacing: 18, margin: 0
     });
     footer(s, item.page, { onDark: true });

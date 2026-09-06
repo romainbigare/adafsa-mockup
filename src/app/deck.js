@@ -52,7 +52,7 @@ const moduleScreens = MODULES.flatMap((module) =>
 const otherScreens = [
   {
     id: 'OV', title: 'Overview', section: 'Overview', route: '#/overview',
-    note: 'The first page. Four numbers at the top: how many farms, their total area, how much land is in production, and how many crops are growing this month. The map shows where the farms are.'
+    note: 'The first page. Four numbers at the top: how many farms, their total area, how much land is in production, and how many crops are growing this month. The map shows where the farms are, and the two tables below split every crop group by the land it covers and by how many farms grow it.'
   },
   {
     id: 'F1', title: 'Farm register', section: 'Individual Farms', route: '#/farms',
