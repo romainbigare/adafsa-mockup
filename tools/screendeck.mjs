@@ -435,17 +435,16 @@ for (const item of plan) {
     s.addText('The platform, screen by screen', {
       x: MARGIN, y: 2.72, w: 10.45, h: 0.95, fontFace: FONT, fontSize: 40, bold: true, color: INK, valign: 'top', margin: 0
     });
-    s.addText(`VERSION ${pkg.version}`, {
-      x: MARGIN, y: 3.74, w: 4.0, h: 0.28, fontFace: FONT, fontSize: 11,
-      bold: true, color: FAINT, charSpacing: 1.6, margin: 0
-    });
     const stat = (x, value, label) => {
       s.addText(value, { x, y: 4.42, w: 2.6, h: 0.9, fontFace: FONT, fontSize: 50, bold: true, color: INK, margin: 0 });
       s.addText(label, { x, y: 5.29, w: 2.6, h: 0.32, fontFace: FONT, fontSize: 11, bold: true, color: BRAND, charSpacing: 1.6, margin: 0 });
     };
+    /* The version stands with the other two rather than in a line of its own:
+     * it is the first thing anyone needs when a second copy of this deck turns
+     * up in the same inbox. The page count is on the contents page anyway. */
     stat(MARGIN, String(DISTINCT), 'SCREENS');
     stat(MARGIN + 2.75, String(sections.length), 'SECTIONS');
-    stat(MARGIN + 5.5, String(plan.length), 'PAGES');
+    stat(MARGIN + 5.5, pkg.version, 'VERSION');
     const wafraW = 1.75;
     s.addImage({
       path: WAFRA, x: W - MARGIN - wafraW, y: 6.72, w: wafraW, h: wafraW * WAFRA_RATIO
