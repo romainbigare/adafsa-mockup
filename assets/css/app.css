@@ -348,9 +348,13 @@ table.grid td.name { font-weight: 550; }
 .filter-bar .btn.is-active { border-color: var(--brand-500); color: var(--brand-800); background: var(--brand-50); }
 .bar-clear { border: 0; background: none; color: var(--focus); font-size: 12.5px; cursor: pointer; padding: 0 4px; }
 .inline-field { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-3); }
-/* The region and the crops are two different questions — a little air between
-   them, and a hairline to say so. */
-.filter-bar > .inline-field { margin-inline-end: 12px; padding-inline-end: 12px; border-inline-end: 1px solid var(--line); }
+/* Where and what are two different questions — a little air between them, and a
+   hairline to say so. */
+.filter-where { display: inline-flex; align-items: center; gap: 10px; margin-inline-end: 12px; padding-inline-end: 12px; border-inline-end: 1px solid var(--line); }
+/* A control that is built and has nothing to show yet reads as unavailable
+   rather than broken: present, legible, and plainly not in use. */
+.inline-field.is-disabled { color: var(--ink-4); }
+.inline-field.is-disabled .select { color: var(--ink-4); background: var(--none-bg); cursor: not-allowed; }
 
 /* A group chip is two controls in one shape: the name toggles the whole group,
    the chevron opens its varieties. It cannot clip its overflow — the varieties

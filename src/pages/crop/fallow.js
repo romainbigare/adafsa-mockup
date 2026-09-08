@@ -11,7 +11,7 @@
 import { section, callout } from '../../components/section.js';
 import { h } from '../../app/dom.js';
 import { figures } from '../../components/figures.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { stackedColumns } from '../../charts/stackedColumns.js';
 import { barList } from '../../charts/barList.js';
 import { query } from '../../data/store.js';
@@ -97,7 +97,7 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
-            { key: 'centre', label: 'Farm centre', value: (f) => f.farmCentre || '', cell: () => h('span', { class: 'muted', text: '—' }) },
+            farmColumns.centre,
             { key: 'planted', label: 'Under cultivation', align: 'num', value: (f) => f.cultivatedArea, cell: (f) => dec(f.cultivatedArea, 1) },
             { key: 'recent', label: 'Fallow < 12 months', align: 'num', value: (f) => f.fallowRecent, cell: (f) => dec(f.fallowRecent, 1) },
             { key: 'long', label: 'Fallow > 12 months', align: 'num', defaultSort: true, value: (f) => f.fallowLong, cell: (f) => dec(f.fallowLong, 1) },

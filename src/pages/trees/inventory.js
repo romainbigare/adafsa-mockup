@@ -14,7 +14,7 @@ import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { summaryTable, countFormat } from '../../components/summaryTable.js';
 import { mapBand } from '../../components/mapBand.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { barList } from '../../charts/barList.js';
 import { query, taxonomyEntries } from '../../data/store.js';
 import { taxonomyBreakdown } from '../../domain/aggregate.js';
@@ -103,6 +103,7 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+            farmColumns.centre,
             { key: 'trees', label: 'Trees', align: 'num', defaultSort: true, value: (f) => f.trees, cell: (f) => int(f.trees) },
             { key: 'palms', label: 'Date palms', align: 'num', value: (f) => f.palms, cell: (f) => int(f.palms) },
             { key: 'fruit', label: 'Fruit', align: 'num', value: (f) => f.fruitTrees, cell: (f) => int(f.fruitTrees) },

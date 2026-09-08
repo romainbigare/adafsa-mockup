@@ -13,6 +13,15 @@ import { icon } from '../app/icons.js';
 import { int, dec, pct } from '../domain/format.js';
 import { categoryColor } from '../domain/palette.js';
 
+/* How wide a share bar is drawn.
+ *
+ * Against a hundred per cent, not against the largest row. Scaled to the peak,
+ * the biggest category filled its cell whether it held 82% or 100% and nothing
+ * on screen told the two apart — the objection raised in review. Against the
+ * whole, the grey the fill stops short of is the rest of the answer, and the
+ * dunum table and the farms table come to mean the same thing. */
+export const barWidth = (share) => Math.min(100, Math.max(0, share || 0));
+
 export function summaryTable(rows, {
   measure = 'area',
   measureLabel = 'Dunums',
@@ -28,7 +37,6 @@ export function summaryTable(rows, {
   const open = new Set();
   const shareKey = measure === 'area' ? 'areaShare' : 'farmShare';
   const total = rows.reduce((a, r) => a + (r[measure] || 0), 0);
-  const peak = Math.max(1, ...rows.map((r) => r[measure] || 0));
 
   const body = h('tbody');
   const table = h('table', { class: 'grid' },
@@ -70,7 +78,7 @@ export function summaryTable(rows, {
         h('td', { class: 'num', text: pct(row[shareKey] || 0, 1) }),
         h('td', {}, h('span', { class: 'bar-cell' },
           h('span', { class: 'track' },
-            h('span', { class: 'fill', style: { width: `${((row[measure] || 0) / peak) * 100}%`, background: colorOf(row) } }))))));
+            h('span', { class: 'fill', style: { width: `${barWidth(row[shareKey])}%`, background: colorOf(row) } }))))));
 
       if (!expanded) continue;
       for (const child of row.children) {

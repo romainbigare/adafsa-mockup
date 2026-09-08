@@ -26,98 +26,101 @@ were both superseded later in the call.
 
 1. Rename the page (above).
 2. "Farms growing each crop" has no total and no 100% line — a farm grows several crops, so
-   the column cannot add up. The dunum table keeps its total.
-3. Cereals and fodder move off this page into C2; C1 stays the summary with the map.
+    the column cannot add up. The dunum table keeps its total.
+3. The share bars run against a hundred per cent rather than against the largest row, so a
+    category holding 82% visibly stops short of the cell and the two tables mean the same
+    thing. `[00:11:28]`, closed after the call.
+4. Cereals and fodder move off this page into C2; C1 stays the summary with the map.
 
 ## C2 — Cereals and fodder *(new page)*
 
-4. Two stacked column charts side by side: cereals on the left, fodder on the right, stacked by
-   crop, six quarters, measured in dunums. Six quarters gives both a last-quarter and a
-   last-year comparison.
-5. The page carries cultivated area **and** seasonal change — both, not one or the other.
-6. Table of crops in the shape of the pilot report: crop name and the area for each of the last
-   six quarters.
-7. Table of farms: owner, province, farm centre, then oldest to newest — 12 months ago,
-   3 months ago, current, and the change against 12 months ago.
-8. A farm row opens to show each of its crops, not only its main one.
+5. Two stacked column charts side by side: cereals on the left, fodder on the right, stacked by
+    crop, six quarters, measured in dunums. Six quarters gives both a last-quarter and a
+    last-year comparison.
+6. The page carries cultivated area **and** seasonal change — both, not one or the other.
+7. Table of crops in the shape of the pilot report: crop name and the area for each of the last
+    six quarters, with its share of what is planted and its movement — "a simplified table per
+    produce, percentage and change". `[00:35:03]`, `[00:35:09]`
+8. Table of farms: owner, province, farm centre, then oldest to newest — 12 months ago,
+    3 months ago, current, and the change against 12 months ago. Four columns, old to new, so
+    the row reads the same way as the chart above it. `[00:39:05]`, `[00:45:26]`
+9. A farm row opens to show each of its crops, not only its main one.
 
 ## C3 — Open field crops *(new page)*
 
-9. Left: area planted quarter by quarter, six quarters, for whatever the filter is showing. Not
-   stacked — there are too many vegetables for that to read.
-10. Right, when the filter is on everything: which crops moved, compared with the same quarter a
+10. Left: area planted quarter by quarter, six quarters, for whatever the filter is showing. Not
+    stacked — there are too many vegetables for that to read.
+11. Right, when the filter is on everything: which crops moved, compared with the same quarter a
     year ago. Summer to summer shows nothing, and that is correct.
-11. Right, when one crop is picked: the top twelve producers of that crop instead.
-12. Same two tables as C2 — crops by quarter, then farms.
-13. Seasonality is September to March. Summer vegetables are grown under cover and are out of
+12. Right, when one crop is picked: the top twelve producers of that crop instead.
+13. Same two tables as C2 — crops by quarter, then farms.
+14. Seasonality is September to March. Summer vegetables are grown under cover and are out of
     scope.
 
 ## C4 — Fallow land
 
-14. Remove the map. The farm centre tells a reader where a farm is.
-15. Replace "planted / part planted / fallow" with three classes: **land under cultivation**,
+15. Remove the map. The farm centre tells a reader where a farm is.
+16. Replace "planted / part planted / fallow" with three classes: **land under cultivation**,
     **fallow under 12 months** (awaiting cultivation), **fallow over 12 months** (unutilised).
-16. Draw them as a stacked bar over the last six quarters, with the year-on-year change beside it.
+17. Draw them as a stacked bar over the last six quarters, with the year-on-year change beside it.
 
 ## T1 — Tree count
 
-17. Rename the page (above).
-18. The map shows the number of farms while you are zoomed out, and breaks into smaller numbers
+18. Rename the page (above).
+19. The map shows the number of farms while you are zoomed out, and breaks into smaller numbers
     as you zoom. Only at farm level does it draw the individual trees.
-19. At farm level the trees are coloured by variety — the full classification, not the three
+20. At farm level the trees are coloured by variety — the full classification, not the three
     groups. Forest trees are left off the map.
-20. The four figures at the top keep "trees counted".
+21. The four figures at the top keep "trees counted".
 
 ## T2 — Canopy health
 
-21. Rename the page, and call the score the **canopy health index** everywhere.
-22. Keep the map — it was going to be removed with the fallow map, then kept once the score
-    became a farm average that aggregates by region and by farm centre as you zoom.
+22. Rename the page, and call the score the **canopy health index** everywhere.
+23. Keep the map — it was going to be removed with the fallow map, then kept once the score
+    became a farm average.
+24. The map reads the index at whatever altitude you are looking from: a bubble carries the
+    mean of the farms under it and takes the colour that mean would take on a single farm,
+    breaking into smaller bubbles as you zoom. "The canopy health index for the region, for
+    the farm centre, and then for the farm." `[00:54:29]`, `[00:55:30]`
 
 ## T3 — Annual change
 
-23. The chart runs year by year over three years, not quarter by quarter. Trees move slowly.
-24. It follows the filter toggles: all trees, date palm, fruit trees, forest trees.
-25. Beside it, the top three varieties that grew and the bottom three that shrank over the last
+25. The chart runs year by year over three years, not quarter by quarter. Trees move slowly.
+26. It follows the filter toggles: all trees, date palm, fruit trees, forest trees.
+27. Beside it, the top three varieties that grew and the bottom three that shrank over the last
     twelve months, with the tree count and the percentage.
-26. The table lists trees, not farms: variety, number of trees, share, and the comparison with
-    one year and two years ago.
-27. Olive trees sit with the fruit trees.
+28. The table lists trees, not farms: variety, number of trees, share of all trees, and the
+    comparison with one year ago and two years ago — comparisons, not a column of raw counts
+    per year. `[01:09:29]`, `[01:10:06]`
+29. Olive trees sit with the fruit trees.
 
 ## Across the platform
 
-28. A **farm centre** field on every farm — shown, searchable, and empty, because ADAFSA has not
-    given us the data. It is there to show the platform can hold it.
-29. Charts are not mirrored for Arabic in this version. The English layout is kept and only the
+30. A **farm centre** on every farm, in two places: a column after Province wherever a farm is
+    listed, and a filter control beside the region. Both are present and switched off, because
+    ADAFSA has given us farm ids and coordinates only. Officers search by farm centre, so the
+    control has to be visible to say the platform holds it. `[00:36:04]`, `[00:37:24]`
+31. Charts are not mirrored for Arabic in this version. The English layout is kept and only the
     words are translated.
+32. The **"All crops" button is gone from the filter bar.** Every crop it reached is reachable
+    through its own group's chevron. Asked for after the call, not in it.
 
 ## PowerPoint
 
-30. **(deck)** Version 0.0.3.
-31. **(deck)** Crop Monitoring now has four screens, C1–C4; the codes, the contents page and the
+33. **(deck)** Version 0.0.3.
+34. **(deck)** Crop Monitoring now has four screens, C1–C4; the codes, the contents page and the
     section dividers follow.
-32. **(deck)** The plain-English note under each renamed or rebuilt screen is rewritten.
+35. **(deck)** The plain-English note under each renamed or rebuilt screen is rewritten.
 
 ---
 
 ## Left open — not applied
 
-Five things the call raised and did not settle. Nothing below is in the mockup; each one
-carries a suggestion for how to close it.
+Four things the call raised and did not settle. Nothing below is in the mockup; each one
+carries a suggestion for how to close it. The share bars were the fifth and have since
+been settled — they now run against a hundred per cent, with the remainder in grey.
 
-**1. The horizontal share bars in the summary tables.** Mark liked reading them and
-distrusted them in the same breath: the longest bar fills the cell whether it stands for
-82% or 100%, and the bar in the dunum table means something different from the bar in
-the farms table. Romain said he would find another model.
-
-*Suggestion.* Scale every bar against 100% rather than against the largest row, and draw
-the remainder as a light track behind it, so a category at 82% visibly stops short. That
-is one line of arithmetic and it removes the misreading. It also makes the two tables
-mean the same thing, since both then read as a share of their own whole. The cost is
-that a table of small shares looks empty — which is honest, and is what the numbers
-beside the bars are for.
-
-**2. What "part planted" counted.** The old middle band was land whose utilisation was
+**1. What "part planted" counted.** The old middle band was land whose utilisation was
 under a hundred per cent, and Romain was not sure the survey supports it. The three new
 states sidestep the question rather than answering it.
 
@@ -125,7 +128,7 @@ states sidestep the question rather than answering it.
 is not, keep the three states as they are; if it is, "fallow under 12 months" can carry
 the partial parcels honestly instead of rounding them into one side or the other.
 
-**3. "Fallow over 12 months — that's a problem."** Mark said it and the conversation
+**2. "Fallow over 12 months — that's a problem."** Mark said it and the conversation
 moved on. It reads as a political concern rather than a design one: the number is a
 finding about how ADAFSA's own land is used.
 
@@ -134,7 +137,7 @@ all, or only inside a farm's own page. The page is built so the band can be rena
 folded into "fallow" with one edit, which is the right amount to have committed until
 that is answered.
 
-**4. Owner and manager contact details, and the service-centre hierarchy.** The
+**3. Owner and manager contact details, and the service-centre hierarchy.** The
 extension officer's Google Maps pins carry owner name, farm id and two phone numbers. We
 deliberately did not ask ADAFSA for any of it, because a leak of that list would be
 serious.
@@ -144,7 +147,7 @@ now, so the capability can be demonstrated without the data existing. If ADAFSA 
 wants it populated, that is a separate conversation about handling personal data, and
 worth having in writing before any of it is loaded.
 
-**5. Farm-centre data.** Agreed as an empty field; where the data comes from is not
+**4. Farm-centre data.** Agreed as an empty field; where the data comes from is not
 settled.
 
 *Suggestion.* Ask for the farm-centre code alongside the farm id in the same handover.

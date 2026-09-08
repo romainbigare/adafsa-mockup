@@ -7,8 +7,11 @@
  *
  * A group chip does two things, because both are wanted often. Clicking its
  * name turns the whole group on or off. Clicking its chevron opens that group's
- * varieties, so a single crop can be unticked without touching the rest. The
- * "All crops" button opens the whole taxonomy with every group already open. */
+ * varieties, so a single crop can be unticked without touching the rest.
+ *
+ * There was a second button offering the whole taxonomy in one panel. It is
+ * gone: every crop it reached is reachable through its own group's chevron, and
+ * two routes to the same list is one more than the bar can carry. */
 
 import { h } from '../app/dom.js';
 import { icon } from '../app/icons.js';
@@ -74,6 +77,23 @@ function regionField(current) {
 }
 
 /* One chip per group: the name toggles the whole group, the chevron opens it. */
+/* Farm centre — offered, and switched off.
+ *
+ * ADAFSA groups its holdings under farm centres and its officers search by
+ * them; we asked for farm ids and coordinates and nothing else. Showing the
+ * control disabled says both things at once: the platform is built to filter by
+ * it, and the data has not arrived. Hiding it would say only the second, and
+ * only to whoever thought to ask. */
+function farmCentreField() {
+  const select = h('select', {
+    class: 'select', disabled: true, 'aria-label': 'Farm centre',
+    title: 'Farm centres are not in the data ADAFSA has provided yet.'
+  }, h('option', { text: 'All farm centres' }));
+  return h('label', { class: 'inline-field is-disabled', title: 'Farm centres are not in the data ADAFSA has provided yet.' },
+    h('span', { class: 'visually-hidden', text: 'Farm centre' }),
+    select);
+}
+
 function groupChip(tree, scope, selected, category) {
   const categoryKeys = category.types.map((t) => t.key);
   const active = activeKeys(tree, scope, selected);
@@ -110,7 +130,9 @@ function groupChip(tree, scope, selected, category) {
 
 export function filterBar({ tree, scope = null, selection, showRegion = true }) {
   const bar = h('div', { class: 'filter-bar' });
-  if (showRegion) bar.append(regionField(selection.region));
+  /* Region and farm centre are one question — where — so they sit together
+   * behind a single hairline, apart from the crops. */
+  if (showRegion) bar.append(h('div', { class: 'filter-where' }, regionField(selection.region), farmCentreField()));
   if (!scope || !tree) return bar;
 
   const groups = scopeTree(tree, scope);
@@ -119,14 +141,6 @@ export function filterBar({ tree, scope = null, selection, showRegion = true }) 
   const filtering = active.size !== keys.length;
 
   for (const category of groups) bar.append(groupChip(tree, scope, selection.types, category));
-
-  /* The whole taxonomy in one panel. Each chip already opens its own group, so
-   * this is the second route rather than the first. */
-  const allButton = h('button', {
-    class: ['btn', filtering ? 'is-active' : null],
-    title: filtering ? `Choose individual crops — ${active.size} of ${keys.length} on` : 'Choose individual crops'
-  }, icon('filter', { size: 14 }), h('span', { text: 'All crops' }));
-  bar.append(withPanel(allButton, cropFilter(tree, { scope, selected: selection.types, memoryKey: 'all:' + scope }), 'all:' + scope));
 
   /* The chips already say what is on, so the only thing worth adding is a way
    * back to everything. */

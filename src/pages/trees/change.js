@@ -22,7 +22,7 @@ import { query } from '../../data/store.js';
 import { TREE_CATEGORIES } from '../../domain/taxonomy.js';
 import { COMPARE } from '../../domain/palette.js';
 import { YEARS, YEAR_COUNT } from '../../domain/periods.js';
-import { int, pct, signed, signedInt, signedPct, compact } from '../../domain/format.js';
+import { int, pct, signedInt, signedPct, compact } from '../../domain/format.js';
 import { varietyTotals, varietyPalette } from './varieties.js';
 
 const NOW = YEAR_COUNT - 1;
@@ -52,7 +52,11 @@ export function render({ selection }) {
 
   const withMovement = rows
     .map((row) => ({ ...row, delta: row.years[NOW] - row.years[LAST_YEAR] }))
-    .map((row) => ({ ...row, moved: row.years[LAST_YEAR] > 0 ? (row.delta / row.years[LAST_YEAR]) * 100 : null }));
+    .map((row) => ({
+      ...row,
+      moved: row.years[LAST_YEAR] > 0 ? (row.delta / row.years[LAST_YEAR]) * 100 : null,
+      moved2: row.years[0] > 0 ? ((row.years[NOW] - row.years[0]) / row.years[0]) * 100 : null
+    }));
 
   const grew = withMovement.filter((row) => row.delta > 0).sort((a, b) => b.delta - a.delta).slice(0, MOVERS);
   const shrank = withMovement.filter((row) => row.delta < 0).sort((a, b) => a.delta - b.delta).slice(0, MOVERS);
@@ -101,12 +105,13 @@ export function render({ selection }) {
             { key: 'group', label: 'Group', value: (r) => r.category },
             { key: 'trees', label: 'Trees', align: 'num', defaultSort: true, value: (r) => r.trees, cell: (r) => int(r.trees) },
             { key: 'share', label: 'Share', align: 'num', value: (r) => r.share, cell: (r) => pct(r.share, 1) },
-            ...YEARS.slice(0, YEAR_COUNT - 1).map((year, i) => ({
-              key: `y${i}`, label: String(year), align: 'num',
-              value: (r) => r.years[i], cell: (r) => int(r.years[i])
-            })),
+            /* Against one year ago and against two — the comparison asked for,
+             * rather than a column of raw counts per year that leaves the
+             * reader to do the subtraction. */
             { key: 'moved', label: 'vs a year ago', align: 'num',
-              value: (r) => r.moved, cell: (r) => (r.moved == null ? 'new' : signedPct(r.moved)) }
+              value: (r) => r.moved, cell: (r) => (r.moved == null ? 'new' : signedPct(r.moved)) },
+            { key: 'moved2', label: 'vs two years ago', align: 'num',
+              value: (r) => r.moved2, cell: (r) => (r.moved2 == null ? 'new' : signedPct(r.moved2)) }
           ]
         }))
     ]

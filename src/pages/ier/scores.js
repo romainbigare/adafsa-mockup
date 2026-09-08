@@ -11,7 +11,7 @@ import { h } from '../../app/dom.js';
 import { section, intro, callout } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { mapBand } from '../../components/mapBand.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { query } from '../../data/store.js';
 import { EFFICIENCY, classify, distribution, colorFor, SUBSIDY_SCORE, keepsSubsidy } from '../../domain/bands.js';
@@ -109,6 +109,7 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+            farmColumns.centre,
             { key: 'score', label: 'Score', align: 'num', defaultSort: true, defaultDir: 'asc', value: (f) => f.efficiency },
             { key: 'band', label: 'Band', value: (f) => classify(EFFICIENCY, f.efficiency)?.label || '—',
               cell: (f) => { const band = classify(EFFICIENCY, f.efficiency); return h('span', { class: 'chip', style: { background: band.color + '22', color: band.color } }, band.label); } },

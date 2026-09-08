@@ -8,6 +8,7 @@ import { cropsOf, change, at, NOW, LAST_QUARTER, LAST_YEAR } from '../src/pages/
 import { MODULES, moduleByKey } from '../src/domain/modules.js';
 import { QUARTERS } from '../src/domain/periods.js';
 import { LAND_STATE } from '../src/domain/bands.js';
+import { barWidth } from '../src/components/summaryTable.js';
 import { is, ok, close, done } from './helpers.js';
 
 const farms = allFarms();
@@ -59,5 +60,15 @@ for (const farm of farms.slice(0, 80)) {
     `farm ${farm.fid}: fallow land never exceeds the holding`);
 }
 is(LAND_STATE.length, 3, 'and the page draws three bands, not two');
+
+
+/* The share bar is drawn against a hundred per cent, not against the largest
+ * row: a category holding 82% has to look different from one holding all of it,
+ * and under the old scaling both filled the cell. */
+is(barWidth(82), 82, 'a category at 82% of the whole fills 82% of the cell');
+is(barWidth(100), 100, 'and only the whole fills it');
+is(barWidth(0), 0, 'nothing draws nothing');
+is(barWidth(undefined), 0, 'a missing share draws nothing rather than NaN');
+is(barWidth(140), 100, 'and an overlapping total is capped rather than overflowing the cell');
 
 done('crop pages');

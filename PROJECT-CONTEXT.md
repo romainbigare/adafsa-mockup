@@ -172,9 +172,20 @@ off the map — nothing names them.
 aggregates upward. Water quality varies by zone and by whether a farmer filters, which
 is the thing an average of scores can show.
 
-**Farm centre exists and is empty.** ADAFSA's officers search by it and we asked for
-farm ids and coordinates only. It is offered everywhere it would be read, so the
-platform can be seen to hold it.
+**Farm centre exists and is empty**, in two places: a column after Province wherever a
+farm is listed, and a filter beside the region. Both switched off. Their officers search
+by farm centre and we asked for farm ids and coordinates only, so the control is visible
+to say the platform holds it — hiding it would say only that we do not have the data,
+and only to whoever thought to ask.
+
+**Share bars run against the whole.** Scaled to the largest row, the biggest category
+filled its cell whether it held 82% or 100%, and the bar in the dunum table meant
+something different from the bar in the farms table. Against a hundred per cent, the
+grey a bar stops short of is the rest of the answer, and the two tables agree.
+
+**The canopy map is read at whatever altitude you are looking from.** A bubble carries
+the mean of the farms under it and takes the colour that mean would take on one farm, so
+zooming changes how finely the index is measured and never what a colour means.
 
 **Arabic charts are not mirrored in this version.** The English layout stays; only the
 words are translated.

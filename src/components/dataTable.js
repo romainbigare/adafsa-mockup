@@ -160,5 +160,13 @@ export const farmColumns = {
   id: { key: 'fid', label: 'Farm', strong: true, value: (r) => r.fid, cell: (r) => `#${r.fid}` },
   owner: { key: 'owner', label: 'Owner', value: (r) => r.owner },
   province: { key: 'province', label: 'Province', value: (r) => r.provinceLabel || r.province },
+  /* Under the province sits the farm centre, which is how ADAFSA's own officers
+   * organise the work. We hold farm ids and coordinates only, so the column is
+   * present, sortable and empty — the platform can be seen to carry it. */
+  centre: {
+    key: 'centre', label: 'Farm centre',
+    value: (r) => (r.farm ? r.farm.farmCentre : r.farmCentre) || '',
+    cell: () => h('span', { class: 'muted', text: '—' })
+  },
   area: { key: 'area', label: 'Area (dun)', align: 'num', value: (r) => r.area, cell: (r) => r.area.toFixed(1) }
 };

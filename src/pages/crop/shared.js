@@ -7,8 +7,7 @@
  * ago, now, and the year-on-year change. Written once so the two pages cannot
  * drift apart. */
 
-import { h } from '../../app/dom.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { RECENT_QUARTERS, WINDOW_QUARTERS, QUARTERS } from '../../domain/periods.js';
 import { dec, pct, signedPct } from '../../domain/format.js';
 import { regionById } from '../../domain/regions.js';
@@ -42,6 +41,9 @@ export function cropQuarterTable(rows, selection, { csvName = 'crops-by-quarter'
     for (let i = 0; i < QUARTERS.length; i++) entry.series[i] += at(row.series, i);
   }
   const crops = [...byType.values()].filter((c) => c.series.some((v) => v > 0.05));
+  /* "A simplified table per produce, percentage and change" — the share is of
+   * what is in the ground now, so the column adds to a hundred. */
+  const plantedNow = crops.reduce((total, crop) => total + crop.series[NOW], 0);
 
   const quarterColumns = RECENT_QUARTERS.map((quarter, i) => {
     const index = QUARTERS.length - WINDOW_QUARTERS + i;
@@ -61,6 +63,9 @@ export function cropQuarterTable(rows, selection, { csvName = 'crops-by-quarter'
       { key: 'type', label: 'Crop', strong: true, defaultSort: true, value: (c) => c.type },
       { key: 'group', label: 'Group', value: (c) => c.category },
       ...quarterColumns,
+      { key: 'share', label: 'Share', align: 'num',
+        value: (c) => (plantedNow ? (c.series[NOW] / plantedNow) * 100 : 0),
+        cell: (c) => pct(plantedNow ? (c.series[NOW] / plantedNow) * 100 : 0, 1) },
       { key: 'yoy', label: 'vs a year ago', align: 'num',
         value: (c) => change(c.series[LAST_YEAR], c.series[NOW]),
         cell: (c) => { const v = change(c.series[LAST_YEAR], c.series[NOW]); return v == null ? 'new' : signedPct(v); } }
@@ -68,9 +73,9 @@ export function cropQuarterTable(rows, selection, { csvName = 'crops-by-quarter'
   });
 }
 
-/* Farm by farm, oldest to newest. The farm centre is offered because ADAFSA's
- * officers search by it, and stays empty because we hold farm ids and
- * coordinates and nothing else. */
+/* Farm by farm, oldest to newest — twelve months ago, three months ago, now,
+ * and the movement against the year. Old to new, so the row reads the same way
+ * as the chart above it. */
 export function farmMovementTable(farms, selection, { categories, csvName = 'farms-by-quarter' } = {}) {
   const rows = farms
     .map((farm) => {
@@ -105,8 +110,7 @@ export function farmMovementTable(farms, selection, { categories, csvName = 'far
       { key: 'fid', label: 'Farm', strong: true, value: (r) => r.farm.fid, cell: (r) => `#${r.farm.fid}` },
       { key: 'owner', label: 'Owner', value: (r) => r.farm.owner },
       { key: 'province', label: 'Province', value: (r) => regionById(r.farm.province).label },
-      { key: 'centre', label: 'Farm centre', value: (r) => r.farm.farmCentre || '',
-        cell: () => h('span', { class: 'muted', text: '—' }) },
+      farmColumns.centre,
       { key: 'year', label: '12 months ago', align: 'num', value: (r) => r.year, cell: (r) => dec(r.year, 1) },
       { key: 'quarter', label: '3 months ago', align: 'num', value: (r) => r.quarter, cell: (r) => dec(r.quarter, 1) },
       { key: 'now', label: 'Current', align: 'num', defaultSort: true, value: (r) => r.now, cell: (r) => dec(r.now, 1) },

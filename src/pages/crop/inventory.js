@@ -10,7 +10,7 @@ import { section } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { summaryTable, countFormat } from '../../components/summaryTable.js';
 import { mapBand } from '../../components/mapBand.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { query, taxonomyEntries } from '../../data/store.js';
 import { taxonomyBreakdown } from '../../domain/aggregate.js';
 import { FIELD_CATEGORIES } from '../../domain/taxonomy.js';
@@ -88,6 +88,7 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+            farmColumns.centre,
             { key: 'area', label: 'Farm area (dun)', align: 'num', value: (f) => f.area, cell: (f) => dec(f.area, 1) },
             { key: 'field', label: 'Crops (dun)', align: 'num', defaultSort: true, value: (f) => f.fieldArea, cell: (f) => dec(f.fieldArea, 1) },
             { key: 'share', label: 'Share', align: 'num', value: (f) => (f.area ? (f.fieldArea / f.area) * 100 : 0), cell: (f) => pct(f.area ? (f.fieldArea / f.area) * 100 : 0) },

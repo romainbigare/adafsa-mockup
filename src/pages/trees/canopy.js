@@ -15,7 +15,7 @@ import { h } from '../../app/dom.js';
 import { section, intro, callout } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { mapBand } from '../../components/mapBand.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { query } from '../../data/store.js';
 import { CANOPY, classify, distribution, colorFor, worstCount } from '../../domain/bands.js';
@@ -54,16 +54,22 @@ export function render({ selection }) {
       section('Fruit trees', { icon: 'trees', half: true, note: `${int(withFruit.length)} farms have fruit trees.` },
         withFruit.length ? bandBar(distribution(CANOPY, withFruit, (f) => f.canopyFruit)) : intro('No fruit trees here.')),
 
-      section('Canopy health across the region', { icon: 'pin', note: 'One index per farm; zoom to read it closer in.', flush: true },
+      section('Canopy health across the region', { icon: 'pin', note: 'The average index for the area you are looking at; zoom in to read it closer.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('trees-canopy', {
-          mode: 'band',
+          mode: 'average',
           farms: scored,
           region: selection.region,
           size: 'short',
-          colorOf: (farm) => colorFor(CANOPY, farm.canopy),
+          valueOf: (farm) => farm.canopy,
+          /* The same scale at every altitude: a bubble takes the colour its
+           * mean would take on a single farm, so zooming changes how finely the
+           * index is measured and never what a colour means. */
+          colorOf: (farm, mean) => colorFor(CANOPY, mean ?? farm.canopy),
           labelOf: (farm) => `Canopy health index ${Math.round(farm.canopy)} · ${compact(farm.trees)} trees`,
+          unitLabel: 'Canopy health index',
           legend: CANOPY.bands.map((band) => ({ label: `${band.label} (${band.range})`, color: band.color })),
-          legendTitle: 'Canopy health index'
+          legendTitle: 'Canopy health index',
+          note: 'Each bubble is the average of the farms under it. Zoom in for the farm centre, then the farm.'
         }))),
 
 
@@ -77,6 +83,7 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+            farmColumns.centre,
             { key: 'trees', label: 'Trees', align: 'num', value: (f) => f.trees, cell: (f) => int(f.trees) },
             { key: 'palm', label: 'Palm index', align: 'num', defaultSort: true, defaultDir: 'asc', value: (f) => f.canopyPalms, cell: (f) => (f.canopyPalms == null ? '—' : f.canopyPalms) },
             { key: 'fruit', label: 'Fruit tree index', align: 'num', value: (f) => f.canopyFruit, cell: (f) => (f.canopyFruit == null ? '—' : f.canopyFruit) },

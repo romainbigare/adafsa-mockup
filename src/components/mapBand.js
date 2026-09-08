@@ -10,6 +10,12 @@
  *               close enough for it to mean something.
  *   category  — farms coloured by their dominant crop or land-use class.
  *   band      — farms coloured by a status scale, where something is judged.
+ *   average   — the same scale, but read at whatever altitude you are looking
+ *               from: a bubble carries the mean score of the farms under it and
+ *               takes their colour, breaking into smaller bubbles as you zoom
+ *               until each one is a single holding. Asked for by name in review
+ *               — "the canopy health index for the region, for the farm centre,
+ *               and then for the farm".
  *
  * The basemaps carry real administrative boundaries and real roads from the
  * tile provider, rather than approximate outlines drawn here. Mark asked for
@@ -232,6 +238,13 @@ export function mapBand(id, options) {
 
     if (mode === 'counts') { drawCounts(farms); return; }
 
+    if (mode === 'average') {
+      const cell = CELL_FOR_ZOOM(map.getZoom());
+      if (!cell) { drawFarmMarkers(farms, colorOf, labelOf); return; }
+      drawAverages(farms);
+      return;
+    }
+
     drawFarmMarkers(farms, colorOf, labelOf);
   }
 
@@ -272,6 +285,40 @@ export function mapBand(id, options) {
         }
       }
       if (shown < total) setNote(`Showing ${int(shown)} of ${int(total)} trees on the largest holdings — the mix is to scale.`);
+    }
+  }
+
+  /* One bubble per cluster, carrying the mean of the farms inside it. The
+   * number is rounded and the colour comes from the same scale a single farm
+   * would use, so zooming in never changes what a colour means — only how
+   * finely it is measured. */
+  function drawAverages(farms) {
+    const cell = CELL_FOR_ZOOM(map.getZoom());
+    const { valueOf, colorOf, unitLabel = 'score' } = current;
+    const groups = new Map();
+    for (const farm of farms) {
+      if (!farm.lat) continue;
+      const value = valueOf(farm);
+      if (value == null || Number.isNaN(value)) continue;
+      const key = `${Math.floor(farm.lat / cell)}:${Math.floor(farm.lng / cell)}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(farm);
+    }
+    for (const members of groups.values()) {
+      const lat = members.reduce((a, f) => a + f.lat, 0) / members.length;
+      const lng = members.reduce((a, f) => a + f.lng, 0) / members.length;
+      const mean = members.reduce((a, f) => a + valueOf(f), 0) / members.length;
+      const size = 30 + Math.round(Math.min(1, members.length / 40) * 22);
+      const marker = window.L.marker([lat, lng], {
+        icon: window.L.divIcon({
+          className: '',
+          html: `<div class="cluster-bubble" style="width:${size}px;height:${size}px;background:${colorOf({ ...members[0], __mean: mean }, mean)}">${Math.round(mean)}</div>`,
+          iconSize: [size, size], iconAnchor: [size / 2, size / 2]
+        })
+      });
+      marker.bindTooltip(`${unitLabel} ${Math.round(mean)} · ${int(members.length)} farm${members.length === 1 ? '' : 's'}`);
+      marker.on('click', () => map.setView([lat, lng], Math.min(16, map.getZoom() + 2)));
+      markerLayer.addLayer(marker);
     }
   }
 
@@ -337,7 +384,7 @@ export function mapBand(id, options) {
         entry.count != null ? h('span', { class: 'count', text: int(entry.count) }) : null))));
   }
 
-  const REDRAWS_ON_ZOOM = new Set(['counts', 'parcels', 'trees']);
+  const REDRAWS_ON_ZOOM = new Set(['counts', 'parcels', 'trees', 'average']);
   map.on('zoomend', () => {
     if (!REDRAWS_ON_ZOOM.has(current?.mode)) return;
     /* The variety legend belongs to the close-up and would be a puzzle over a

@@ -10,7 +10,7 @@
 import { h } from '../../app/dom.js';
 import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { mapBand } from '../../components/mapBand.js';
 import { query } from '../../data/store.js';
 import { EFFICIENCY, CANOPY, classify } from '../../domain/bands.js';
@@ -53,6 +53,7 @@ export function render({ selection }) {
           { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
           { key: 'owner', label: 'Owner', value: (f) => f.owner },
           { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+          farmColumns.centre,
           { key: 'area', label: 'Farm area (dun)', align: 'num', defaultSort: true, value: (f) => f.area, cell: (f) => dec(f.area, 1) },
           { key: 'crops', label: 'Main crops', wrap: true, value: (f) => f.crops.filter((c) => !c.former).sort((a, b) => b.area - a.area).slice(0, 3).map((c) => c.type).join(', ') || '—' },
           { key: 'trees', label: 'Trees', align: 'num', value: (f) => f.trees, cell: (f) => int(f.trees) },
