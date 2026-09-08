@@ -16,11 +16,11 @@
 import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { dataTable } from '../../components/dataTable.js';
-import { columns } from '../../charts/columns.js';
+import { stackedColumns } from '../../charts/stackedColumns.js';
 import { barList } from '../../charts/barList.js';
 import { query } from '../../data/store.js';
 import { TREE_CATEGORIES } from '../../domain/taxonomy.js';
-import { COMPARE } from '../../domain/palette.js';
+import { COMPARE, categoryColor } from '../../domain/palette.js';
 import { YEARS, YEAR_COUNT } from '../../domain/periods.js';
 import { int, pct, signedInt, signedPct, compact } from '../../domain/format.js';
 import { varietyTotals, varietyPalette } from './varieties.js';
@@ -71,6 +71,17 @@ export function render({ selection }) {
 
   const label = categories.length === TREE_CATEGORIES.length ? 'All trees' : categories.join(', ');
 
+  /* One band per tree group, in the group's own colour. Date palms dominate, so
+   * the stack is mostly one band — which is the fact, and the reader can lift
+   * the others out with the toggles above. */
+  const groupBands = categories
+    .map((category) => ({
+      label: category,
+      color: categoryColor(category),
+      values: YEARS.map((_, i) => rows.filter((r) => r.category === category).reduce((a, r) => a + r.years[i], 0))
+    }))
+    .filter((band) => band.values.some((v) => v > 0));
+
   return {
     filterScope: 'tree',
     content: [
@@ -82,9 +93,9 @@ export function render({ selection }) {
       ]),
 
       section('Trees, year by year', { icon: 'trend', half: true, note: `${label}, over three years.` },
-        columns(YEARS.map(String),
-          [{ label, color: COMPARE.current, values: YEARS.map((_, i) => totalIn(i)) }],
-          { format: compact, half: true })),
+        groupBands.length
+          ? stackedColumns(YEARS.map(String), groupBands, { format: compact, half: true, totalLabel: 'All trees' })
+          : intro('No trees in the current selection.')),
 
       section('Biggest movers', { icon: 'trees', half: true, note: 'Over the last twelve months.' },
         grew.length || shrank.length

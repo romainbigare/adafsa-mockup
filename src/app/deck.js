@@ -48,6 +48,14 @@ const moduleScreens = MODULES.flatMap((module) =>
     note: NOTES[`${module.key}/${page.key}`] || module.blurb
   })));
 
+/* A screen whose second picture is a different state of the same screen rather
+ * than the part of it that scrolled off. The map on T1 shows farm counts until
+ * you reach a holding, and a deck that only ever prints the far view never
+ * shows the half of it that took the work. */
+const INSETS = {
+  T1: { kind: 'mapZoom', label: 'Zoomed in', map: 'trees-inventory', farm: 4, zoom: 17 }
+};
+
 /* The screens that are not module sub-pages. Farm 4 is the worked example: a
  * real holding from the survey with palms, three crops and something open. */
 const otherScreens = [
@@ -74,7 +82,7 @@ const otherScreens = [
 ];
 
 export const SCREENS = Object.fromEntries(
-  [...otherScreens, ...moduleScreens].map((s) => [s.id, s])
+  [...otherScreens, ...moduleScreens].map((s) => [s.id, { ...s, inset: INSETS[s.id] || null }])
 );
 
 

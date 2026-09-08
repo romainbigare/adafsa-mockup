@@ -230,7 +230,9 @@ export function mapBand(id, options) {
     if (mode === 'farm') { drawFarm(); return; }
 
     if (mode === 'trees') {
-      if (map.getZoom() >= TREE_ZOOM) { drawTrees(); return; }
+      const close = map.getZoom() >= TREE_ZOOM;
+      announceStage(close ? 'close' : 'overview');
+      if (close) { drawTrees(); return; }
       setNote('Zoom in to a farm to see every tree and its variety.');
       drawCounts(farms);
       return;
@@ -367,6 +369,15 @@ export function mapBand(id, options) {
     }
   }
 
+  /* The page's own caption follows the map: what it says while you are looking
+   * at the emirate is not what it should say inside one holding. */
+  let stage = null;
+  function announceStage(next) {
+    if (next === stage) return;
+    stage = next;
+    current.onStage?.(next);
+  }
+
   function setNote(text) {
     noteBox.hidden = !text;
     if (text) noteBox.textContent = text;
@@ -402,6 +413,7 @@ export function mapBand(id, options) {
       current = next;
       element.className = ['map-band', next.size || null].filter(Boolean).join(' ');
       drawLegend(next.mode === 'trees' && map.getZoom() < TREE_ZOOM ? null : next.legend);
+      stage = null;                                    // a redraw re-announces
       setNote(next.note);
       draw();
       if (first) map.setView([23.9, 54.4], 8);

@@ -40,4 +40,19 @@ is(mean(farms, (f) => f.area), 20);
 is(median([5, 1, 3]), 3);
 is(mean([], (f) => f.area), null, 'an empty set has no mean rather than a zero');
 
+
+/* A class breakdown reports two measures, and both need their share. The count
+ * column was named after the shares were worked out, so every count share read
+ * 0.0% under a total of 100% — visible on the structures page. */
+const shareRows = classBreakdown([
+  { category: 'Structures', type: 'Warehouse', area: 6, count: 3 },
+  { category: 'Structures', type: 'Shed', area: 2, count: 1 },
+  { category: 'Protected Agriculture', type: 'Greenhouse', area: 2, count: 4 }
+]);
+close(shareRows.reduce((a, r) => a + r.farmShare, 0), 100, 0.01, 'the count shares add to a hundred');
+close(shareRows.find((r) => r.name === 'Structures').farmShare, 50, 0.01, 'four of eight structures is half');
+close(shareRows.find((r) => r.name === 'Structures').areaShare, 80, 0.01, 'and it covers eight tenths of the footprint');
+close(shareRows.find((r) => r.name === 'Structures').children.find((c) => c.name === 'Warehouse').farmShare,
+  37.5, 0.01, 'the types carry their share too');
+
 done('aggregate');

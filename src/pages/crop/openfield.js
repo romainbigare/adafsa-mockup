@@ -1,8 +1,12 @@
 /* Crop Monitoring — open-field crops.
  *
- * The seasonal half. Vegetables go in around September and come out by March,
- * and there are too many of them to stack: one column per quarter, in a single
- * colour, for whatever the filter is showing.
+ * The seasonal half. Vegetables go in around September and come out by March.
+ * The columns are split by crop, in tints of the open-field hue, so a quarter
+ * shows what made it up rather than only how big it was. There are eighteen
+ * crops in the survey and a stack of eighteen tints is a colour chart nobody
+ * can read, so the ones that fill the season stand on their own and the tail
+ * gathers into one band — which is the shape the pilot report found too, ten
+ * crops covering ninety per cent.
  *
  * The panel beside it changes with the filter, which is the arrangement the
  * review arrived at. Looking at everything, the useful question is which crops
@@ -12,18 +16,20 @@
 
 import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
-import { columns } from '../../charts/columns.js';
+import { stackedColumns } from '../../charts/stackedColumns.js';
 import { barList } from '../../charts/barList.js';
 import { comparisonSelect } from '../../components/comparison.js';
 import { query } from '../../data/store.js';
 import { RECENT_QUARTERS, WINDOW_QUARTERS, QUARTERS, comparisonById, historyIndices } from '../../domain/periods.js';
-import { COMPARE, categoryColor } from '../../domain/palette.js';
+import { COMPARE, categoryColor, tints, NEUTRAL } from '../../domain/palette.js';
 import { int, dec, signed, signedPct } from '../../domain/format.js';
 import { cropsOf, cropQuarterTable, farmMovementTable, change, at, NOW, LAST_YEAR } from './shared.js';
 
 const CATEGORIES = ['Open Field'];
 const OFFSET = QUARTERS.length - WINDOW_QUARTERS;
 const TOP_PRODUCERS = 12;
+/* How many crops get a band of their own before the rest gather into one. */
+const STACK_BANDS = 9;
 
 export function render({ selection }) {
   /* Year-on-year unless the reader says otherwise: a vegetable compared with
@@ -44,7 +50,31 @@ export function render({ selection }) {
   const growers = new Set(rows.filter((row) => at(row.series, NOW) > 0.05).map((row) => row.farm.fid)).size;
   const moved = change(totalAt(LAST_YEAR), area);
 
-  const series = RECENT_QUARTERS.map((_, i) => totalAt(OFFSET + i));
+  /* One band per crop, biggest first, with the tail gathered so the stack stays
+   * readable. Every band is named in the legend, so the tints never have to be
+   * told apart on their own. */
+  const byType = new Map();
+  for (const row of rows) {
+    if (!byType.has(row.type)) byType.set(row.type, new Array(QUARTERS.length).fill(0));
+    const series = byType.get(row.type);
+    for (let i = 0; i < QUARTERS.length; i++) series[i] += at(row.series, i);
+  }
+  const ranked = [...byType.entries()]
+    .filter(([, series]) => series.some((v) => v > 0.05))
+    .sort((a, b) => b[1][NOW] - a[1][NOW]);
+  const named = ranked.slice(0, STACK_BANDS);
+  const tail = ranked.slice(STACK_BANDS);
+  const shades = tints(categoryColor('Open Field'), named.length);
+  const bands = named.map(([label, series], i) => ({
+    label, color: shades[i], values: series.slice(OFFSET)
+  }));
+  if (tail.length) {
+    bands.push({
+      label: `${tail.length} other crops`,
+      color: NEUTRAL,
+      values: RECENT_QUARTERS.map((_, i) => tail.reduce((total, [, series]) => total + series[OFFSET + i], 0))
+    });
+  }
 
   /* Which crops moved, netted over the chosen comparison. */
   const byCrop = new Map();
@@ -95,10 +125,11 @@ export function render({ selection }) {
         { value: moved == null ? '—' : signedPct(moved), label: 'Change on a year ago', icon: 'trend', tone: moved != null && moved < 0 ? 'watch' : null }
       ]),
 
-      section('Area planted, quarter by quarter', { icon: 'trend', half: true, note: single ? `Dunums of ${single.toLowerCase()}.` : 'Dunums in the ground.' },
-        columns(RECENT_QUARTERS.map((quarter) => quarter.label),
-          [{ label: single || 'Open field', color: categoryColor('Open Field'), values: series }],
-          { format: (v) => int(v), half: true })),
+      section('Area planted, quarter by quarter', { icon: 'trend', half: true, note: single ? `Dunums of ${single.toLowerCase()}.` : 'Dunums in the ground, split by crop.' },
+        bands.length
+          ? stackedColumns(RECENT_QUARTERS.map((quarter) => quarter.label), bands,
+              { format: (v) => int(v), half: true, totalLabel: 'All open field' })
+          : intro('Nothing in the current selection is planted.')),
 
       rightPanel,
 

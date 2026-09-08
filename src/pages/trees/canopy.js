@@ -25,7 +25,7 @@ import { regionById } from '../../domain/regions.js';
 import { TODAY } from '../../domain/periods.js';
 
 export function render({ selection }) {
-  const farms = query({ region: selection.region });
+  const farms = query({ region: selection.region, types: selection.types });
   const withPalms = farms.filter((farm) => farm.canopyPalms != null);
   const withFruit = farms.filter((farm) => farm.canopyFruit != null);
   const scored = farms.filter((farm) => farm.canopy != null);
@@ -36,6 +36,7 @@ export function render({ selection }) {
   const severe = worstCount(CANOPY, scored, (farm) => farm.canopy);
 
   return {
+    filterScope: 'tree',
     content: [
       figures([
         { value: palmMean == null ? '—' : Math.round(palmMean), label: 'Average palm index', icon: 'trees' },

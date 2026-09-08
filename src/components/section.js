@@ -13,7 +13,9 @@ export function section(title, options = {}, ...content) {
     h('div', { class: 'card-head' },
       icon ? glyph(icon, { size: 15 }) : null,
       h('h2', { text: title }),
-      note ? h('span', { class: 'card-note', text: note }) : null,
+      /* A note is usually a string. A map that changes what it is showing as
+       * you zoom passes an element instead and rewrites it. */
+      note ? h('span', { class: 'card-note' }, note instanceof Node ? note : String(note)) : null,
       tools.length ? h('div', { class: 'card-tools' }, ...tools) : null),
     h('div', { class: ['card-body', flush ? 'flush' : null] }, ...content));
 }

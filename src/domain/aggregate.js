@@ -106,17 +106,23 @@ export function classBreakdown(entries, { order = null } = {}) {
     type.area += e.area || 0;
     type.count += e.count || 0;
   }
+  /* `farms` is the count column under another name, and it has to be set before
+   * the shares are worked out — withShares reads it. Adding it afterwards left
+   * every count share reading 0.0% under a total of 100%. */
   let rows = [...cats.values()].map((cat) => ({
     key: cat.name,
     name: cat.name,
     area: cat.area,
     count: cat.count,
-    children: [...cat.types.values()].sort((a, b) => b.area - a.area).map((t) => ({ key: cat.name + ':' + t.name, ...t }))
+    farms: cat.count,
+    children: [...cat.types.values()]
+      .sort((a, b) => b.area - a.area)
+      .map((t) => ({ key: cat.name + ':' + t.name, ...t, farms: t.count }))
   }));
   rows = order ? rows.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name)) : rows.sort((a, b) => b.area - a.area);
   const totalArea = rows.reduce((a, r) => a + r.area, 0);
   const totalCount = rows.reduce((a, r) => a + r.count, 0);
-  return withShares(rows, totalArea, totalCount).rows.map((r) => ({ ...r, farms: r.count })) ;
+  return withShares(rows, totalArea, totalCount).rows;
 }
 
 /* Province rows for the block that sits under every module's emirate summary. */

@@ -1,9 +1,9 @@
 /* Yield Optimisation — the crop calendar.
  *
- * Two bar charts for the crop you pick: dunums by month, and farms by month.
- * They read as a curve rather than a block, because a few growers plant early
- * and a few late — no tomatoes in August, six thousand farms of them in
- * September.
+ * One thing: the matrix of every crop against the twelve months. Two bar charts
+ * sat above it saying the same thing in aggregate — dunums by month and farms
+ * by month — and the four figures at the top already carry the busiest and the
+ * quietest month, which is all either chart was really being read for.
  *
  * There is no separate Abu Dhabi crop calendar to reconcile against. The crop
  * calendar is what the farms are doing, which is what this page draws. */
@@ -11,11 +11,10 @@
 import { h } from '../../app/dom.js';
 import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
-import { columns as columnChart } from '../../charts/columns.js';
 import { query, cropRows } from '../../data/store.js';
 import { monthlyCurve, windowFor, CYCLE_MONTHS } from '../../domain/cropCalendar.js';
-import { categoryColor, COMPARE, INK } from '../../domain/palette.js';
-import { int, dec } from '../../domain/format.js';
+import { categoryColor, INK } from '../../domain/palette.js';
+import { int } from '../../domain/format.js';
 import { MONTHS, TODAY } from '../../domain/periods.js';
 
 /* The strip above the charts: every crop in the selection against the twelve
@@ -68,13 +67,7 @@ export function render({ selection }) {
         { value: int(Math.max(...farmsByMonth)), label: 'Farms at the busiest month', icon: 'farms' }
       ]),
 
-      section(`Area planted — ${heading}`, { icon: 'calendar', note: 'Dunums in the ground each month.' },
-        columnChart(MONTHS, [{ label: 'Dunums in the ground', color: COMPARE.current, values: dunumsByMonth }], { format: (v) => dec(v, 0) })),
-
-      section(`Farms growing — ${heading}`, { icon: 'farms', note: 'Some plant early, some plant late.' },
-        columnChart(MONTHS, [{ label: 'Farms growing', color: categoryColor('Fodder'), values: farmsByMonth }], { format: int })),
-
-      section('The year at a glance', { icon: 'calendar', note: 'When each crop is in the ground.' },
+      section(`The year at a glance — ${heading}`, { icon: 'calendar', note: 'When each crop is in the ground.' },
         crops.length
           ? calendarStrip(crops)
           : intro('No crops selected.'))

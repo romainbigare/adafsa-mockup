@@ -157,7 +157,7 @@ const { sections } = await page.evaluate(async () => {
   const { SCREENS, SCREEN_GROUPS, DECK_OMIT } = await globalThis.adafsa.deck();
   const omit = new Set(DECK_OMIT);
   const keep = (ids) => ids.filter((id) => SCREENS[id] && !omit.has(id));
-  const pick = (s, group) => ({ id: s.id, title: s.title, note: s.note, route: s.route, group });
+  const pick = (s, group) => ({ id: s.id, title: s.title, note: s.note, route: s.route, inset: s.inset || null, group });
 
   const out = SCREEN_GROUPS
     .map((g) => ({ name: g.name, screens: keep(g.ids).map((id) => pick(SCREENS[id], g.name)) }))
@@ -279,7 +279,7 @@ for (const screen of screens) {
    * rather than taking them again — same route, same app, same picture. */
   const twin = firstFiling.get(screen.id);
   if (twin !== screen && twin.file) {
-    Object.assign(screen, { file: twin.file, hidden: twin.hidden, tail: twin.tail });
+    Object.assign(screen, { file: twin.file, hidden: twin.hidden, tail: twin.tail, tailLabel: twin.tailLabel });
     continue;
   }
 
@@ -306,12 +306,29 @@ for (const screen of screens) {
   screen.file = join(WORK, `${screen.id}.jpg`);
   screen.ink = (await shrink(raw, screen.file, SHOT_PX, { mime: 'image/jpeg', quality: SHOT_Q })).ink;
 
-  if (screen.hidden >= HIDDEN_ENOUGH) {
+  /* The second picture. Usually the part of the screen that scrolled off; for a
+   * screen that declares an inset, the same view in a different state. */
+  if (screen.inset?.kind === 'mapZoom') {
+    await page.evaluate(async ({ map, farm, zoom }) => {
+      const { farmById } = await import('/src/data/store.js');
+      const holding = farmById(farm);
+      const instance = await globalThis.adafsa.map(map);
+      instance.setView([holding.lat, holding.lng], zoom);
+    }, screen.inset);
+    await settleTiles();
+    await page.waitForTimeout(1800);              // the boundary and the tree dots
+    const insetRaw = join(WORK, `${screen.id}-inset-raw.png`);
+    await page.screenshot({ path: insetRaw, clip });
+    screen.tail = join(WORK, `${screen.id}-inset.jpg`);
+    screen.tailLabel = screen.inset.label.toUpperCase();
+    await shrink(insetRaw, screen.tail, TAIL_PX, { mime: 'image/jpeg', quality: SHOT_Q });
+  } else if (screen.hidden >= HIDDEN_ENOUGH) {
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await page.waitForTimeout(320);
     const tailRaw = join(WORK, `${screen.id}-tail-raw.png`);
     await page.screenshot({ path: tailRaw, clip });
     screen.tail = join(WORK, `${screen.id}-tail.jpg`);
+    screen.tailLabel = 'THE REST OF THIS SCREEN';
     await shrink(tailRaw, screen.tail, TAIL_PX, { mime: 'image/jpeg', quality: SHOT_Q });
     await page.evaluate(() => window.scrollTo(0, 0));
   }
@@ -584,7 +601,7 @@ for (const item of plan) {
     x: SHOT_X - bleed, y: SHOT_Y - bleed, w: shot.w + bleed * 2, h: shot.h + bleed * 2
   });
 
-  if (screen.hidden >= HIDDEN_ENOUGH) {
+  if (screen.hidden >= HIDDEN_ENOUGH && !screen.inset) {
     /* Rounded to the nearest 5%, because "about 63%" implies a precision the
      * number does not have — and stated as the share that IS shown, which is
      * the harder half to misread. */
@@ -596,7 +613,7 @@ for (const item of plan) {
 
   // The rest of a scrolling screen, in the right column.
   if (screen.tail) {
-    s.addText('THE REST OF THIS SCREEN', {
+    s.addText(screen.tailLabel || 'THE REST OF THIS SCREEN', {
       x: COL_X, y: SHOT_Y, w: COL_W, h: 0.2,
       fontFace: FONT, fontSize: 8, bold: true, color: FAINT, charSpacing: 1.2, margin: 0
     });
@@ -610,9 +627,11 @@ for (const item of plan) {
   }
 
   s.addNotes(`${screen.id} — ${screen.title}\n\n${screen.note}`
-    + (screen.hidden >= HIDDEN_ENOUGH
-        ? `\n\nThe screenshot shows ${Math.round((1 - screen.hidden) * 100)}% of this screen; the rest is in the smaller shot beside it.`
-        : ''));
+    + (screen.inset
+        ? `\n\nThe smaller shot beside it is the same screen ${screen.inset.label.toLowerCase()}.`
+        : screen.hidden >= HIDDEN_ENOUGH
+          ? `\n\nThe screenshot shows ${Math.round((1 - screen.hidden) * 100)}% of this screen; the rest is in the smaller shot beside it.`
+          : ''));
 
   footer(s, item.page);
 }
@@ -621,8 +640,10 @@ await mkdir(dirname(OUT), { recursive: true });
 await pres.writeFile({ fileName: OUT });
 await rm(WORK, { recursive: true, force: true });
 
-const scrolling = screens.filter((s) => s.hidden >= HIDDEN_ENOUGH).length;
+const scrolling = screens.filter((s) => s.hidden >= HIDDEN_ENOUGH && !s.inset).length;
+const insets = screens.filter((s) => s.inset).length;
 console.log(`${plan.length} slides -> ${OUT.replace(ROOT + '/', '')}`);
 console.log(`  cover, contents, ${sections.length} section dividers, ${screens.length} screen pages (${DISTINCT} screens)`);
 console.log(`  ${scrolling} screens carry a "scrolls" note and a second shot of the rest`);
+if (insets) console.log(`  ${insets} screen(s) show a second state instead: ${screens.filter((s) => s.inset).map((s) => `${s.id} ${s.inset.label.toLowerCase()}`).join(', ')}`);
 console.log(`  ${tileStats.hit + tileStats.fetched} map tiles served (${tileStats.fetched} fetched, ${tileStats.hit} from .tile-cache)`);

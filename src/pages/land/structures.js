@@ -7,18 +7,18 @@
  * Tier 3 asks the classifier to tell a pump room from a filtration unit from a
  * desalination skid. On these farms those sit side by side under one cover, and
  * both sides of the review doubted it can be done from imagery. The tier is
- * modelled so it can appear the day it arrives, and the page says plainly that
- * it has not. */
+ * modelled so it can appear the day it arrives; the page no longer announces
+ * that it has not, since a banner at the top of a screen reads as a fault with
+ * the screen rather than as a note about a tier nobody asked for yet. */
 
 import { h } from '../../app/dom.js';
-import { section, intro, callout } from '../../components/section.js';
+import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { summaryTable } from '../../components/summaryTable.js';
 import { mapBand } from '../../components/mapBand.js';
 import { dataTable } from '../../components/dataTable.js';
 import { query } from '../../data/store.js';
 import { classBreakdown } from '../../domain/aggregate.js';
-import { TIER3_PENDING_TYPES } from '../../data/compose.js';
 import { landuseColor, SEQUENTIAL } from '../../domain/palette.js';
 import { int, dec } from '../../domain/format.js';
 import { regionById } from '../../domain/regions.js';
@@ -30,7 +30,6 @@ export function render({ selection }) {
   const structures = farms.flatMap((farm) => farm.structures.map((s) => ({ category: s.tier1, type: s.tier2, area: s.area, count: 1 })));
   const rows = classBreakdown(structures);
   const totalArea = structures.reduce((a, s) => a + s.area, 0);
-  const pending = structures.filter((s) => TIER3_PENDING_TYPES.includes(s.type));
 
   const peak = Math.max(1, ...built.map((farm) => farm.structures.length));
 
@@ -42,8 +41,6 @@ export function render({ selection }) {
         { value: dec(totalArea, 1), unit: 'dun', label: 'Area covered', icon: 'ruler' },
         { value: int(rows.length), label: 'Main classes', icon: 'layers' }
       ]),
-
-      callout('info', `Tier 2 gives the type of each structure. Tier 3, which splits irrigation buildings further, is not available yet — ${int(pending.length)} of them are waiting for it.`),
 
       section('Where the structures are', { icon: 'pin', note: 'Bigger dots have more structures.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('land-structures', {

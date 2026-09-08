@@ -25,6 +25,11 @@ import { varietyTotals, varietyPalette, MAPPED_CATEGORIES } from './varieties.js
 import { regionById } from '../../domain/regions.js';
 import { TODAY } from '../../domain/periods.js';
 
+const CAPTIONS = {
+  overview: 'Numbers of farms growing trees',
+  close: 'Trees and their variety'
+};
+
 export function render({ selection }) {
   const all = query({ region: selection.region });
   const farms = query({ region: selection.region, types: selection.types });
@@ -52,6 +57,10 @@ export function render({ selection }) {
    * farm's. The counts live in the charts below. */
   const legend = mapped.slice(0, 10).map((row) => ({ label: row.name, color: colourOfVariety(row) }));
 
+  /* The caption says what the map is showing, and the map is showing two
+   * different things: how many farms grow trees, and then the trees. */
+  const mapCaption = h('span', { text: CAPTIONS.overview });
+
   return {
     filterScope: 'tree',
     content: [
@@ -63,13 +72,14 @@ export function render({ selection }) {
         { value: int(palmVarieties.length), label: 'Palm varieties found', icon: 'layers' }
       ]),
 
-      section('Where the trees are', { icon: 'pin', note: 'Farms while zoomed out; every tree once you reach one.', flush: true },
+      section('Where the trees are', { icon: 'pin', note: mapCaption, flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('trees-inventory', {
           mode: 'trees',
           farms: treed,
           region: selection.region,
           varietiesOf: (farm) => (farm.varieties || []).filter((v) => MAPPED_CATEGORIES.includes(v.category)),
           varietyColor: colourOfVariety,
+          onStage: (stage) => { mapCaption.textContent = CAPTIONS[stage]; },
           legend,
           legendTitle: 'Variety'
         }))),

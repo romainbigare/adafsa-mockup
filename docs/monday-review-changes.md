@@ -114,6 +114,34 @@ were both superseded later in the call.
 
 ---
 
+## After the walkthrough
+
+Changes asked for once the mockup had been walked again. None of these are in the
+transcript.
+
+- **C3** — the columns are split by crop, in tints of the open-field hue. Nine crops carry a
+  band of their own and the tail gathers into one, because a stack of eighteen tints is a
+  colour chart nobody can read. Every band is named in the legend.
+- **T1** — the caption under "Where the trees are" follows the map: *Numbers of farms growing
+  trees* while zoomed out, *Trees and their variety* once you are inside a holding. The dots
+  keep their variety colouring; canopy health stays on T2, where the review put it.
+- **T1 (deck)** — the second picture on the T1 page is the same screen zoomed into a farm,
+  headed "ZOOMED IN", rather than the part that scrolled off. The deck now supports that on
+  any screen that declares it.
+- **T2** — the crop toggles are back, and every figure, band and table on the page answers to
+  them.
+- **T3** — the year-by-year columns are stacked by tree group in each group's own colour,
+  rather than one blue bar.
+- **L2** — the tier 2 / tier 3 banner is gone from the top of the screen. The tier is still
+  modelled and the table still counts what is waiting for it.
+- **Y2** — the two monthly bar charts are gone; the matrix is the page. The four figures
+  already carry the busiest and the quietest month, which is what the charts were read for.
+- A defect found while doing this: the class breakdown named its count column after working
+  out the shares, so the Share column on L2's "Number of each type" read 0.0% under a total of
+  100%. Fixed, with a test.
+
+---
+
 ## Left open — not applied
 
 Four things the call raised and did not settle. Nothing below is in the mockup; each one

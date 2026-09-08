@@ -190,6 +190,10 @@ zooming changes how finely the index is measured and never what a colour means.
 **Arabic charts are not mirrored in this version.** The English layout stays; only the
 words are translated.
 
+**A screen can print a second state rather than its scroll tail.** T1's deck page shows
+the map zoomed into a farm beside the far view, because a deck that only ever prints the
+far view never shows the half of it that took the work. Any screen can declare one.
+
 ## 7. Decisions worth remembering
 
 **"Depths" and the three-question model were superseded.** Not wrong, but built on a
