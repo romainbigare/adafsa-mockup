@@ -144,6 +144,44 @@ function treeVarieties(rand, { palms, cultivar, species, forestTrees }) {
   });
 }
 
+/* Structures, split by class, quarter by quarter.
+ *
+ * The change page stacks the classes, so it needs a series for each rather than
+ * one total. Each class is scaled from the farm's own total and the rounding
+ * remainder goes to the largest, so the bands add up to the number the figures
+ * at the top of the page report. */
+/* One building appearing or disappearing on about a fifth of holdings, at a
+ * quarter of its own. Everywhere else the count holds, which is the truth about
+ * structures — they do not drift. */
+function builtOrRemoved(rand, count) {
+  const series = new Array(QUARTER_COUNT).fill(count);
+  if (rand() > 0.2 || count === 0) return series;
+  const when = 1 + Math.floor(rand() * (QUARTER_COUNT - 1));
+  const built = rand() < 0.62 && count > 0;
+  for (let i = 0; i < when; i++) series[i] = Math.max(0, count + (built ? -1 : 1));
+  return series;
+}
+
+function structureClassSeries(structures, totalSeries) {
+  const byClass = new Map();
+  for (const structure of structures) byClass.set(structure.tier2, (byClass.get(structure.tier2) || 0) + 1);
+  const classes = [...byClass.entries()].sort((a, b) => b[1] - a[1]);
+  if (!classes.length) return [];
+  const now = classes.reduce((a, [, count]) => a + count, 0);
+
+  return classes.map(([name, count], index) => ({
+    name,
+    count,
+    series: totalSeries.map((total, quarter) => {
+      const share = Math.round((count / now) * total);
+      if (index > 0) return Math.max(0, share);
+      /* The largest class absorbs the rounding, so the stack matches the total. */
+      const rest = classes.slice(1).reduce((a, [, other]) => a + Math.max(0, Math.round((other / now) * total)), 0);
+      return Math.max(0, Math.round(total) - rest);
+    })
+  }));
+}
+
 export function enrichFarm(farm, { fieldCropPool = [] } = {}) {
   const rand = seeded('farm-' + farm.fid);
   const month = new Date('2026-08-12T00:00:00Z').getUTCMonth();
@@ -251,7 +289,11 @@ export function enrichFarm(farm, { fieldCropPool = [] } = {}) {
 
   // ---- Structures and cultivation history ----------------------------------
   const structureSeries = backwardSeries(rand, farm.structureArea, { drift: 0.03 });
-  const structureCountSeries = backwardSeries(rand, farm.structures.length, { drift: 0.04 }).map((v) => Math.round(v));
+  /* Structures are counted, not measured, so a percentage drift rounds away to
+   * nothing on a holding with four of them and the change page draws six
+   * identical columns. What actually happens is discrete: a minority of farms
+   * put up one building, or lose one, at some point in the record. */
+  const structureCountSeries = builtOrRemoved(rand, farm.structures.length);
   const cultivationSeries = backwardSeries(rand, farm.cultivatedArea, { drift: 0.09 });
   const treeSeries = backwardSeries(rand, trees, { drift: 0.015 }).map((v) => Math.round(v));
   const fallow = fallowSeries(rand, cultivationSeries, farm.fallowArea);
@@ -288,6 +330,7 @@ export function enrichFarm(farm, { fieldCropPool = [] } = {}) {
     treeSeries,
     structureSeries,
     structureCountSeries,
+    structureClasses: structureClassSeries(farm.structures, structureCountSeries),
     lastSurveyed: QUARTERS[QUARTER_COUNT - 1].id
   };
 }

@@ -2,28 +2,36 @@
  *
  * "I'd rather have a trend line. Raw numbers. And then to list for me the farms
  * that deteriorated." A map of who improved was considered and rejected as
- * confusing, so there is none here. */
+ * confusing, so there is none here.
+ *
+ * The line stays, because an average is a line rather than a stack of parts.
+ * What has come across from the crop pages is the six-quarter window and the
+ * movers panel beside it: the three farms that improved most and the three that
+ * fell furthest, which is what the sentence above was really asking for. */
 
 import { h } from '../../app/dom.js';
 import { section, intro, callout, emptyState } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { comparisonSelect } from '../../components/comparison.js';
 import { trendLine } from '../../charts/trendLine.js';
-import { dataTable } from '../../components/dataTable.js';
+import { barList } from '../../charts/barList.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { query } from '../../data/store.js';
 import { movements, trend, hasHistoryFor } from '../../domain/change.js';
 import { EFFICIENCY, classify } from '../../domain/bands.js';
 import { mean } from '../../domain/aggregate.js';
 import { PROVINCES, regionById } from '../../domain/regions.js';
 import { COMPARE, CATEGORY_COLORS } from '../../domain/palette.js';
-import { QUARTERS, comparisonById } from '../../domain/periods.js';
+import { QUARTERS, RECENT_QUARTERS, WINDOW_QUARTERS, comparisonById } from '../../domain/periods.js';
 import { int, signed, signedPct } from '../../domain/format.js';
 
 const seriesOf = (farm) => farm.efficiencySeries;
+const OFFSET = QUARTERS.length - WINDOW_QUARTERS;
+const MOVERS = 3;
 const PROVINCE_COLORS = ['#2a78d6', '#e87ba4', '#008300'];
 
 export function render({ selection }) {
-  const farms = query({ region: selection.region });
+  const farms = query({ region: selection.region, types: selection.types });
   const period = comparisonById(selection.comparison);
 
   if (!hasHistoryFor(selection.comparison)) {
@@ -48,6 +56,7 @@ export function render({ selection }) {
   }
 
   return {
+    filterScope: 'all',
     tools: [comparisonSelect(selection.comparison)],
     content: [
       figures([
@@ -62,9 +71,24 @@ export function render({ selection }) {
         : callout('info', 'No farm scored lower than before.'),
 
       section('Average score, quarter by quarter', {
-        icon: 'trend',
+        icon: 'trend', half: true,
         note: selection.region === 'emirate' ? 'One line for each province.' : 'The selected province.'
-      }, trendLine(QUARTERS.map((q) => q.label), series, { format: (v) => Math.round(v), zeroBased: false })),
+      }, trendLine(RECENT_QUARTERS.map((q) => q.label), series.map((set) => ({ ...set, values: set.values.slice(OFFSET) })),
+        { format: (v) => Math.round(v), zeroBased: false, half: true })),
+
+      section('Biggest movers', { icon: 'water', half: true, note: `Points gained or lost ${period.label}.` },
+        rose.length || fell.length
+          ? barList([
+              ...[...rose].sort((a, b) => b.delta - a.delta).slice(0, MOVERS),
+              ...fell.slice(0, MOVERS)
+            ].map((move) => ({
+              label: `#${move.record.fid} · ${move.record.owner}`,
+              value: Math.abs(move.delta),
+              color: COMPARE.neutral,
+              amount: `${signed(move.delta, 1)} pts${move.pct == null ? '' : ` · ${signedPct(move.pct, 1)}`}`,
+              amountColor: move.delta >= 0 ? COMPARE.up : COMPARE.down
+            })), { limit: MOVERS * 2 })
+          : intro('No farm moved over this period.')),
 
 
       section('Every farm', {
@@ -80,6 +104,7 @@ export function render({ selection }) {
           { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
           { key: 'owner', label: 'Owner', value: (f) => f.owner },
           { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+          farmColumns.centre,
           { key: 'before', label: `Score ${period.id === 'year' ? 'a year ago' : 'last quarter'}`, align: 'num', value: (f) => moveOf.get(f.fid)?.before ?? null, cell: (f) => Math.round(moveOf.get(f.fid)?.before ?? 0) },
           { key: 'after', label: 'Score now', align: 'num', value: (f) => f.efficiency },
           { key: 'delta', label: 'Points', align: 'num', defaultSort: true, defaultDir: 'asc', value: (f) => moveOf.get(f.fid)?.delta ?? 0, cell: (f) => signed(moveOf.get(f.fid)?.delta ?? 0, 1) },

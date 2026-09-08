@@ -32,7 +32,7 @@ const SERIES_OF = {
 };
 
 export function render({ selection }) {
-  const farms = query({ region: selection.region });
+  const farms = query({ region: selection.region, types: selection.types });
 
   const totalAt = (state, index) =>
     farms.reduce((total, farm) => total + (SERIES_OF[state](farm)?.[index] ?? 0), 0);
@@ -64,6 +64,7 @@ export function render({ selection }) {
   });
 
   return {
+    filterScope: 'all',
     content: [
       figures([
         { value: int(longNow), unit: 'dun', label: 'Fallow over 12 months', icon: 'land', tone: longNow ? 'watch' : null },

@@ -13,31 +13,25 @@ import { section, intro } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { stackedColumns } from '../../charts/stackedColumns.js';
 import { query } from '../../data/store.js';
-import { RECENT_QUARTERS, WINDOW_QUARTERS, QUARTERS } from '../../domain/periods.js';
-import { categoryColor, tints } from '../../domain/palette.js';
+import { RECENT_QUARTERS } from '../../domain/periods.js';
+import { SERIES, SERIES_LIMIT, REST } from '../../domain/palette.js';
 import { int, dec, signed, signedPct } from '../../domain/format.js';
-import { cropsOf, cropQuarterTable, farmMovementTable, change, at, NOW, LAST_YEAR } from './shared.js';
+import { ANNUAL_CATEGORIES } from '../../domain/taxonomy.js';
+import { stackBands } from '../../components/quarterTables.js';
+import { cropsOf, byCropType, cropQuarterTable, farmMovementTable, change, at, NOW, LAST_YEAR } from './shared.js';
 
-const CATEGORIES = ['Cereals', 'Fodder'];
-const OFFSET = QUARTERS.length - WINDOW_QUARTERS;
+const CATEGORIES = ANNUAL_CATEGORIES;
 
-/* One category's crops as bands of a stack, biggest at the bottom. */
-function bandsFor(rows, category) {
-  const byType = new Map();
-  for (const row of rows) {
-    if (row.category !== category) continue;
-    if (!byType.has(row.type)) byType.set(row.type, new Array(QUARTERS.length).fill(0));
-    const series = byType.get(row.type);
-    for (let i = 0; i < QUARTERS.length; i++) series[i] += at(row.series, i);
-  }
-  const entries = [...byType.entries()]
-    .filter(([, series]) => series.some((v) => v > 0.05))
-    .sort((a, b) => b[1][NOW] - a[1][NOW]);
-  const shades = tints(categoryColor(category), entries.length);
-  return entries.map(([label, series], i) => ({
-    label, color: shades[i], values: series.slice(OFFSET)
-  }));
-}
+/* One category's crops as bands of a stack, biggest at the bottom.
+ *
+ * Five hues, far enough apart to be told apart in a stack, and a grey band for
+ * anything past them — the same rule the open-field page follows, so a stacked
+ * column means the same thing wherever it appears. Cereals and fodder run to
+ * three or four crops each, so the grey band rarely appears here at all. */
+const bandsFor = (rows, category) =>
+  stackBands(byCropType(rows.filter((row) => row.category === category)), {
+    limit: SERIES_LIMIT, palette: SERIES, rest: REST, restLabel: (n) => `${n} other crops`
+  });
 
 export function render({ selection }) {
   const farms = query({ region: selection.region, types: selection.types });
@@ -64,7 +58,7 @@ export function render({ selection }) {
   };
 
   return {
-    filterScope: 'field',
+    filterScope: 'annual',
     content: [
       figures([
         { value: int(now), unit: 'dun', label: 'Cereals and fodder now', icon: 'crop' },

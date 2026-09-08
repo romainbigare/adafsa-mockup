@@ -10,8 +10,14 @@
 
 import { h, clear } from '../app/dom.js';
 import { icon } from '../app/icons.js';
-import { int, dec, pct } from '../domain/format.js';
-import { categoryColor } from '../domain/palette.js';
+import { int, dec, pct, signedPct } from '../domain/format.js';
+import { categoryColor, COMPARE } from '../domain/palette.js';
+
+/* The number carries the direction, tinted just enough to scan — the rule the
+ * change pages follow, so a movement reads the same way everywhere. */
+const movedCell = (value) => (value == null
+  ? h('span', { class: 'muted', text: 'new' })
+  : h('span', { style: { color: value >= 0 ? COMPARE.up : COMPARE.down }, text: signedPct(value) }));
 
 /* How wide a share bar is drawn.
  *
@@ -31,6 +37,11 @@ export function summaryTable(rows, {
    * farm counts has no total and no hundred per cent line — settled in review,
    * in those words. The dunum tables still add up, and still say so. */
   showTotal = true,
+  /* An optional movement column. The landing page answers "what have we got";
+   * one more column lets it answer "and is it moving" without turning into a
+   * verdict, which is the line the review drew. */
+  movementOf = null,
+  movementLabel = 'vs a year ago',
   colorOf = (row) => categoryColor(row.name),
   emptyText = 'Nothing in the current selection.'
 } = {}) {
@@ -44,7 +55,8 @@ export function summaryTable(rows, {
       h('th', { text: 'Category' }),
       h('th', { class: 'num', text: measureLabel }),
       h('th', { class: 'num', text: 'Share' }),
-      h('th', { style: { width: '20%' }, text: '' }))),
+      movementOf ? h('th', { class: 'num', text: movementLabel }) : null,
+      h('th', { style: { width: movementOf ? '14%' : '20%' }, text: '' }))),
     body,
     showTotal
       ? h('tfoot', {}, h('tr', {},
@@ -57,7 +69,7 @@ export function summaryTable(rows, {
   function draw() {
     clear(body);
     if (!rows.length) {
-      body.append(h('tr', {}, h('td', { colspan: 4, class: 'muted', text: emptyText })));
+      body.append(h('tr', {}, h('td', { colspan: movementOf ? 5 : 4, class: 'muted', text: emptyText })));
       return;
     }
     for (const row of rows) {
@@ -76,6 +88,7 @@ export function summaryTable(rows, {
           row.name),
         h('td', { class: 'num', text: format(row[measure] || 0) }),
         h('td', { class: 'num', text: pct(row[shareKey] || 0, 1) }),
+        movementOf ? h('td', { class: 'num' }, movedCell(movementOf(row))) : null,
         h('td', {}, h('span', { class: 'bar-cell' },
           h('span', { class: 'track' },
             h('span', { class: 'fill', style: { width: `${barWidth(row[shareKey])}%`, background: colorOf(row) } }))))));
@@ -86,6 +99,7 @@ export function summaryTable(rows, {
           h('td', { text: child.name }),
           h('td', { class: 'num', text: format(child[measure] || 0) }),
           h('td', { class: 'num muted', text: pct(child[shareKey] || 0, 1) }),
+          movementOf ? h('td', { class: 'num' }, movedCell(movementOf(child))) : null,
           h('td', {})));
       }
     }

@@ -13,7 +13,7 @@ import { section, intro, callout, infoPopover } from '../../components/section.j
 import { figures } from '../../components/figures.js';
 import { bandBar } from '../../charts/bandBar.js';
 import { barList } from '../../charts/barList.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { query, cropRows } from '../../data/store.js';
 import { WATER_USE, classify, distribution } from '../../domain/bands.js';
 import { FORMULA_NOTES, WATER_CATEGORIES } from '../../domain/waterModel.js';
@@ -77,6 +77,7 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+            farmColumns.centre,
             { key: 'demand', label: 'Allowed (m³)', align: 'num', value: (f) => f.waterDemand, cell: (f) => int(f.waterDemand) },
             { key: 'actual', label: 'Used (m³)', align: 'num', value: (f) => f.waterActual, cell: (f) => int(f.waterActual) },
             { key: 'variance', label: 'Difference (m³)', align: 'num', defaultSort: true, value: (f) => f.waterActual - f.waterDemand, cell: (f) => int(f.waterActual - f.waterDemand) },

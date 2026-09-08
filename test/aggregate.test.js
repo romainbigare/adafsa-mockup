@@ -1,5 +1,6 @@
 import { taxonomyBreakdown, classBreakdown, byProvince, rank, sum, mean, median } from '../src/domain/aggregate.js';
 import { is, close, done } from './helpers.js';
+import { signed, signedPct } from '../src/domain/format.js';
 
 const farm = (fid, province, area, taxonomy) => ({ fid, province, area, taxonomy });
 const farms = [
@@ -54,5 +55,17 @@ close(shareRows.find((r) => r.name === 'Structures').farmShare, 50, 0.01, 'four 
 close(shareRows.find((r) => r.name === 'Structures').areaShare, 80, 0.01, 'and it covers eight tenths of the footprint');
 close(shareRows.find((r) => r.name === 'Structures').children.find((c) => c.name === 'Warehouse').farmShare,
   37.5, 0.01, 'the types carry their share too');
+
+
+/* A movement that rounds to nothing must read as nothing. "−0%" claims a
+ * direction the number does not have, and one of them in a column costs the
+ * whole column its credibility. */
+is(signedPct(-0.4), '0%', 'a hair below zero is zero');
+is(signedPct(0.4), '0%', 'and so is a hair above it');
+is(signedPct(-13), '−13%', 'a real fall keeps its sign');
+is(signedPct(13), '+13%', 'and so does a real rise');
+is(signed(-0.02, 1), '0.0', 'the same rule for a plain signed number');
+is(signed(-674), '−674', 'and a real loss keeps its minus');
+is(signedPct(null), '—', 'nothing to compare reads as nothing');
 
 done('aggregate');

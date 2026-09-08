@@ -45,6 +45,16 @@ export const STATUS = {
 
 export const SEQUENTIAL = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95'];
 
+/* A short series set, for the handful of members of one group drawn side by
+ * side — the five biggest open-field crops, say. Tints of a single hue were
+ * tried and could not be told apart in a stack, so these are the Okabe–Ito
+ * hues: five colours chosen to stay distinct under every common form of
+ * colour blindness. Five is the whole set on purpose. Anything past it is
+ * REST, which says "everything else" rather than pretending to name it. */
+export const SERIES = ['#0072b2', '#e69f00', '#009e73', '#cc79a7', '#56b4e9'];
+export const SERIES_LIMIT = SERIES.length;
+export const REST = '#9ca3af';
+
 /* Change and comparison. `neutral` draws the bars; `up` and `down` tint only
  * the number beside them. */
 export const COMPARE = {

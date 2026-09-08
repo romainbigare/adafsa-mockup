@@ -10,16 +10,16 @@
 
 import { h } from '../../app/dom.js';
 import { section, intro, callout } from '../../components/section.js';
+import { quarterTable } from '../../components/quarterTables.js';
 import { figures } from '../../components/figures.js';
-import { barList } from '../../charts/barList.js';
 import { bandBar } from '../../charts/bandBar.js';
-import { dataTable } from '../../components/dataTable.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { query, cropRows } from '../../data/store.js';
 import { YIELD_DEVIATION, classify, distribution } from '../../domain/bands.js';
 import { categoryColor } from '../../domain/palette.js';
 import { int, dec, pct, signedPct, compact } from '../../domain/format.js';
 import { regionById } from '../../domain/regions.js';
-import { TODAY } from '../../domain/periods.js';
+import { TODAY, QUARTERS } from '../../domain/periods.js';
 
 export function render({ selection }) {
   const all = query({ region: selection.region });
@@ -39,6 +39,18 @@ export function render({ selection }) {
     const below = crop.rows.filter((row) => row.tonnesPerDunum < average).length;
     return { ...crop, average, farms: crop.rows.length, below, belowShare: crop.rows.length ? (below / crop.rows.length) * 100 : 0 };
   }).sort((a, b) => b.kilos - a.kilos);
+
+  /* Harvest follows the area planted: what a crop yields per dunum is a
+   * property of the crop, so the quarterly record of its area carries through
+   * to a quarterly record of its harvest. */
+  const harvestRows = [...byCrop.values()].map((crop) => {
+    const perDunum = crop.area ? crop.kilos / crop.area / 1000 : 0;
+    return {
+      name: crop.type,
+      group: crop.category,
+      series: QUARTERS.map((_, i) => crop.rows.reduce((total, row) => total + (row.series?.[i] ?? 0), 0) * perDunum)
+    };
+  });
 
   const production = rows.reduce((total, row) => total + row.expectedKg, 0);
   const belowAverage = rows.filter((row) => row.yieldDeviation < 0).length;
@@ -76,9 +88,15 @@ export function render({ selection }) {
         bandBar(distribution(YIELD_DEVIATION, rows, (row) => row.yieldDeviation, (row) => row.area))),
 
 
-      section('Biggest crops by harvest', { icon: 'yieldup', half: true, note: 'Expected tonnes.' },
-        barList(crops.slice(0, 12).map((crop) => ({ label: crop.type, value: crop.kilos / 1000, color: categoryColor(crop.category) })),
-          { format: (v) => `${dec(v, 1)} t` })),
+      /* The pilot-report shape, on the harvest: a row per crop, six quarters
+       * wide, with its share and its movement. The bar list that stood here
+       * ranked the same crops the table above already ranks. */
+      section('Harvest, quarter by quarter', { icon: 'yieldup', note: 'Expected tonnes, from the area planted.', flush: true },
+        quarterTable(harvestRows, selection, {
+          csvName: 'harvest-by-quarter', nameLabel: 'Crop',
+          format: (v) => dec(v, 1), footNote: 'Tonnes, oldest quarter first.',
+          emptyText: 'Nothing planted in this selection.'
+        })),
 
       section('Every planting', {
         icon: 'table',
@@ -94,6 +112,7 @@ export function render({ selection }) {
           { key: 'fid', label: 'Farm', strong: true, value: (r) => r.farm.fid, cell: (r) => `#${r.farm.fid}` },
           { key: 'owner', label: 'Owner', value: (r) => r.farm.owner },
           { key: 'province', label: 'Province', value: (r) => regionById(r.farm.province).label },
+          farmColumns.centre,
           { key: 'crop', label: 'Crop', value: (r) => r.type },
           { key: 'area', label: 'Dunums', align: 'num', value: (r) => r.area, cell: (r) => dec(r.area, 1) },
           { key: 'yield', label: 'Yield (t/dun)', align: 'num', value: (r) => r.tonnesPerDunum, cell: (r) => dec(r.tonnesPerDunum, 2) },

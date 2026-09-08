@@ -93,9 +93,26 @@ export function buildTaxonomy({ cropTypes = [], cropCategories = [], landTypes =
   })).filter((c) => c.types.length);
 }
 
-/* Which slice of the taxonomy a page filters by. A crop page offering tree
- * filters, or the reverse, is noise. */
-export const SCOPES = { field: FIELD_CATEGORIES, tree: TREE_CATEGORIES, all: CATEGORY_ORDER };
+/* Which slice of the taxonomy a page filters by.
+ *
+ * A page offers the groups it actually counts and no others. A crop page
+ * offering tree filters is noise; so is a cereals-and-fodder page offering an
+ * open-field toggle that nothing on the screen answers to, which is worse than
+ * noise because a reader will tick it and see nothing move. */
+export const ANNUAL_CATEGORIES = ['Cereals', 'Fodder'];
+export const SEASONAL_CATEGORIES = ['Open Field'];
+/* Forest trees are nobody's crop: nothing names them, nothing is grown from
+ * them, and they do not belong on a page about how the planting is moving. */
+export const ORCHARD_CATEGORIES = ['Date Palm', 'Fruit Trees'];
+
+export const SCOPES = {
+  field: FIELD_CATEGORIES,
+  annual: ANNUAL_CATEGORIES,
+  seasonal: SEASONAL_CATEGORIES,
+  tree: TREE_CATEGORIES,
+  orchard: ORCHARD_CATEGORIES,
+  all: CATEGORY_ORDER
+};
 
 export function scopeTree(tree, scope = 'all') {
   const allowed = SCOPES[scope] || SCOPES.all;

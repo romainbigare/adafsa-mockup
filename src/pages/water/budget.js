@@ -13,12 +13,13 @@ import { h } from '../../app/dom.js';
 import { section, intro, infoPopover } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { barList } from '../../charts/barList.js';
-import { columns as columnChart } from '../../charts/columns.js';
-import { dataTable } from '../../components/dataTable.js';
+import { stackedColumns } from '../../charts/stackedColumns.js';
+import { dataTable, farmColumns } from '../../components/dataTable.js';
 import { query, cropRows } from '../../data/store.js';
 import { FORMULA_NOTES, WATER_CATEGORIES, monthlyDemand } from '../../domain/waterModel.js';
 import { CYCLE_MONTHS, monthlyCurve } from '../../domain/cropCalendar.js';
-import { categoryColor, COMPARE } from '../../domain/palette.js';
+import { CATEGORY_ORDER } from '../../domain/taxonomy.js';
+import { categoryColor } from '../../domain/palette.js';
 import { int, dec, compact } from '../../domain/format.js';
 import { regionById } from '../../domain/regions.js';
 import { TODAY, MONTHS } from '../../domain/periods.js';
@@ -56,8 +57,18 @@ export function render({ selection }) {
 
   /* Crop coverage across the year — the supporting figure, as a chart rather
    * than a map. */
-  const monthly = MONTHS.map((_, month) =>
-    rows.reduce((total, row) => total + monthlyDemand(row.category, row.area * monthlyCurve(row.category, row.type)[month], month), 0));
+  /* One band per crop group, in the group's own colour: the shape of the year
+   * is mostly a question of which crops are in the ground when, and a single
+   * blue bar hides exactly that. */
+  const monthlyBands = CATEGORY_ORDER
+    .map((category) => ({
+      label: category,
+      color: categoryColor(category),
+      values: MONTHS.map((_, month) => rows
+        .filter((row) => row.category === category)
+        .reduce((total, row) => total + monthlyDemand(row.category, row.area * monthlyCurve(row.category, row.type)[month], month), 0))
+    }))
+    .filter((band) => band.values.some((value) => value > 0));
 
   return {
     tools: [infoPopover('How this is worked out', 'Water model inputs', FORMULA_NOTES)],
@@ -92,7 +103,9 @@ export function render({ selection }) {
           { format: (v) => `${dec(v, 2)} m³/kg`, limit: 12 })),
 
       section('Water needed each month', { icon: 'calendar', half: true, note: 'Follows what the farms plant.' },
-        columnChart(MONTHS, [{ label: 'Water demand (m³)', color: COMPARE.current, values: monthly }], { format: compact, half: true })),
+        monthlyBands.length
+          ? stackedColumns(MONTHS, monthlyBands, { format: compact, half: true, totalLabel: 'All crops' })
+          : intro('Nothing planted in this selection.')),
 
       section('Water per kilo, by farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(farms.filter((farm) => farm.expectedKg > 0), {
@@ -104,6 +117,7 @@ export function render({ selection }) {
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
+            farmColumns.centre,
             { key: 'water', label: 'Water per season (m³)', align: 'num', value: (f) => f.seasonalWater, cell: (f) => int(f.seasonalWater) },
             { key: 'kilos', label: 'Harvest (t)', align: 'num', value: (f) => f.expectedKg / 1000, cell: (f) => dec(f.expectedKg / 1000, 1) },
             { key: 'perkilo', label: 'Water per kilo (m³)', align: 'num', defaultSort: true, value: (f) => f.seasonalWater / f.expectedKg, cell: (f) => dec(f.seasonalWater / f.expectedKg, 2) }

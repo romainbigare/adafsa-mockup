@@ -13,15 +13,22 @@ import { section, intro, callout } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
 import { mapBand } from '../../components/mapBand.js';
 import { barList } from '../../charts/barList.js';
-import { trendLine } from '../../charts/trendLine.js';
+import { stackedColumns } from '../../charts/stackedColumns.js';
 import { icon } from '../../app/icons.js';
 import { farmById } from '../../data/store.js';
-import { CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION, classify } from '../../domain/bands.js';
+import { CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION, LAND_STATE, classify } from '../../domain/bands.js';
 import { openIssues } from '../../domain/issues.js';
-import { categoryColor, COMPARE } from '../../domain/palette.js';
+import { categoryColor } from '../../domain/palette.js';
 import { int, dec, pct, signedPct, compact } from '../../domain/format.js';
 import { regionById } from '../../domain/regions.js';
-import { QUARTERS, TODAY, MONTHS } from '../../domain/periods.js';
+import { QUARTERS, RECENT_QUARTERS, WINDOW_QUARTERS, TODAY, MONTHS } from '../../domain/periods.js';
+
+const OFFSET = QUARTERS.length - WINDOW_QUARTERS;
+const LAND_SERIES = {
+  cultivated: (farm) => farm.cultivationSeries,
+  restingRecent: (farm) => farm.fallowRecentSeries,
+  restingLong: (farm) => farm.fallowLongSeries
+};
 
 const chip = (band) => band
   ? h('span', { class: 'chip', style: { background: band.color + '22', color: band.color } }, band.label)
@@ -55,6 +62,7 @@ export function render({ place, selection }) {
       figures([
         { value: `#${farm.fid}`, label: farm.owner, icon: 'farms' },
         { value: dec(farm.area, 1), unit: 'dun', label: regionById(farm.province).label, icon: 'land' },
+        { value: farm.farmCentre || '—', label: 'Farm centre', icon: 'pin' },
         { value: pct(farm.cultivatedShare), label: 'Land in production', icon: 'crop' },
         { value: compact(farm.trees), label: 'Trees', icon: 'trees' },
         { value: int(issues.length), label: 'Needs attention', icon: 'alert', tone: issues.some((i) => i.severity === 'act') ? 'act' : issues.length ? 'watch' : null }
@@ -77,15 +85,22 @@ export function render({ place, selection }) {
               { format: (v) => `${dec(v, 1)} dun`, limit: 14 })
           : intro('No crops found on this farm.')),
 
-      section('Trees', { icon: 'trees', half: true }, readout([
-          ['Date palms', int(farm.palms)],
-          ['Fruit trees', int(farm.fruitTrees)],
-          ['Forest trees', int(farm.forestTrees)],
-          farm.cultivar ? ['Main variety', farm.cultivar] : null,
-          ['Palm health score', farm.canopyPalms == null ? '—' : String(farm.canopyPalms)],
-          ['Fruit tree health score', farm.canopyFruit == null ? '—' : String(farm.canopyFruit)],
-          ['Tree health', chip(classify(CANOPY, farm.canopy))]
-        ])),
+      section('Trees', { icon: 'trees', half: true, note: 'Every variety on this holding.' },
+        farm.varieties.length
+          ? h('div', {},
+              readout([
+                ['Date palms', int(farm.palms)],
+                ['Fruit trees', int(farm.fruitTrees)],
+                ['Forest trees', int(farm.forestTrees)],
+                ['Palm canopy health index', farm.canopyPalms == null ? '—' : String(farm.canopyPalms)],
+                ['Fruit tree canopy health index', farm.canopyFruit == null ? '—' : String(farm.canopyFruit)],
+                ['Canopy health', chip(classify(CANOPY, farm.canopy))]
+              ]),
+              h('div', { style: { marginTop: '12px' } },
+                barList([...farm.varieties].sort((a, b) => b.trees - a.trees).map((variety) => ({
+                  label: variety.name, value: variety.trees, color: categoryColor(variety.category)
+                })), { format: int, limit: 12 })))
+          : intro('No trees found on this farm.')),
 
       section('Irrigation efficiency', { icon: 'water', half: true }, readout([
           ['Score', String(farm.efficiency)],
@@ -126,10 +141,16 @@ export function render({ place, selection }) {
                     h('td', { class: 'num', text: crop.yieldDeviation == null ? '—' : signedPct(crop.yieldDeviation) }))))))) 
             : null)),
 
-      section('Land in production, quarter by quarter', { icon: 'trend' },
-        trendLine(QUARTERS.map((q) => q.label), [
-          { label: 'Dunums in production', color: COMPARE.current, values: farm.cultivationSeries }
-        ], { format: (v) => dec(v, 1), zeroBased: false }))
+      /* The same three states the fallow page counts, on the holding they
+       * belong to, so a farm's own page and the emirate page agree. */
+      section('Land, quarter by quarter', { icon: 'trend', note: 'Dunums, in three states.' },
+        stackedColumns(RECENT_QUARTERS.map((quarter) => quarter.label),
+          LAND_STATE.map((state) => ({
+            label: state.label,
+            color: state.color,
+            values: RECENT_QUARTERS.map((_, i) => LAND_SERIES[state.id](farm)[OFFSET + i] ?? 0)
+          })),
+          { format: (v) => dec(v, 1), totalLabel: 'All land on this farm' }))
     ]
   };
 }

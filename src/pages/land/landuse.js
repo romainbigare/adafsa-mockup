@@ -29,7 +29,7 @@ function dominantClass(farm) {
 }
 
 export function render({ selection }) {
-  const farms = query({ region: selection.region });
+  const farms = query({ region: selection.region, types: selection.types });
 
   /* Parcels on the farms in view, so the page follows the region selector. The
    * survey-wide totals are shown alongside for the emirate view. */
@@ -40,6 +40,7 @@ export function render({ selection }) {
   const fallow = parcels.filter((p) => p.type === 'Fallow Land').reduce((a, p) => a + p.area, 0);
 
   return {
+    filterScope: 'all',
     content: [
       figures([
         { value: int(total), unit: 'dun', label: 'Land mapped', icon: 'land' },

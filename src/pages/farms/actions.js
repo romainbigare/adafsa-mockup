@@ -51,6 +51,7 @@ export function render({ place }) {
       figures([
         { value: `#${farm.fid}`, label: farm.owner, icon: 'farms' },
         { value: regionById(farm.province).label, label: 'Province', icon: 'land' },
+        { value: farm.farmCentre || '—', label: 'Farm centre', icon: 'pin' },
         { value: int(issues.length), label: 'Things to look at', icon: 'alert', tone: issues.some((i) => i.severity === 'act') ? 'act' : issues.length ? 'watch' : null },
         { value: int(alerts.length), label: 'Alerts for the farmer', icon: 'water' }
       ]),

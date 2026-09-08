@@ -82,16 +82,22 @@ export function render({ selection }) {
         bandBar(distribution(EFFICIENCY, farms, (farm) => farm.efficiency))),
 
 
-      section('Where the weak scores are', { icon: 'pin', half: true, note: 'Colour shows the score band.', flush: true },
+      section('Scores across the region', { icon: 'pin', half: true, note: 'The average score for the area you are looking at.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('ier-scores', {
-          mode: 'band',
+          /* The score averages the same way the canopy index does, so the map
+           * reads it at whatever altitude you are looking from rather than
+           * scattering five hundred dots across an emirate. */
+          mode: 'average',
           farms,
           region: selection.region,
           size: 'short',
-          colorOf: (farm) => colorFor(EFFICIENCY, farm.efficiency),
+          valueOf: (farm) => farm.efficiency,
+          colorOf: (farm, mean) => colorFor(EFFICIENCY, mean ?? farm.efficiency),
           labelOf: (farm) => `Score ${farm.efficiency} · ${classify(EFFICIENCY, farm.efficiency)?.label}`,
+          unitLabel: 'Efficiency score',
           legend: EFFICIENCY.bands.map((band) => ({ label: `${band.label} (${band.range})`, color: band.color })),
-          legendTitle: 'Efficiency score'
+          legendTitle: 'Efficiency score',
+          note: 'Each bubble is the average of the farms under it. Zoom in for the farm centre, then the farm.'
         }))),
 
       section('Every farm', {

@@ -82,8 +82,9 @@ src/
   domain/    pure logic — taxonomy, regions, bands, periods, aggregation, change,
              the crop calendar, the water model, the issue model, the palette
   data/      the survey join, the query API, lazy geometry
-  charts/    hand-drawn SVG: bar lists, columns, trend lines, band bars
-  components/ figures, summary tables, the farm table, the filter bar, map band, change table
+  charts/    hand-drawn SVG: bar lists, stacked columns, trend lines, band bars
+  components/ figures, summary tables, the farm table, the quarter tables, the
+              filter bar, map band, change table
   pages/     one small file per screen
   mock/      everything invented — the swap-for-an-API boundary
 ```

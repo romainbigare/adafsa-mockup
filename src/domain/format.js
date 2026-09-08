@@ -20,8 +20,21 @@ export function compact(n) {
 
 export const dunums = (n) => int(n) + NBSP + 'dun';
 export const pct = (n, places = 0) => (n == null || Number.isNaN(n) ? '—' : n.toFixed(places) + '%');
-export const signedPct = (n, places = 0) => (n == null || Number.isNaN(n) ? '—' : (n > 0 ? '+' : '') + n.toFixed(places) + '%');
-export const signed = (n, places = 0) => (n == null || Number.isNaN(n) ? '—' : (n > 0 ? '+' : '') + n.toFixed(places));
+/* A movement that rounds to nothing reads as nothing. "−0%" and "+0%" both
+ * claim a direction the number does not have, and a reader who spots one stops
+ * trusting the column. */
+export const signedPct = (n, places = 0) => {
+  if (n == null || Number.isNaN(n)) return '—';
+  const rounded = Number(n.toFixed(places));
+  if (rounded === 0) return (0).toFixed(places) + '%';
+  return (rounded > 0 ? '+' : '−') + Math.abs(rounded).toFixed(places) + '%';
+};
+export const signed = (n, places = 0) => {
+  if (n == null || Number.isNaN(n)) return '—';
+  const rounded = Number(n.toFixed(places));
+  if (rounded === 0) return (0).toFixed(places);
+  return (rounded > 0 ? '+' : '−') + Math.abs(rounded).toFixed(places);
+};
 
 /* A signed whole number that keeps its thousands separator — a headline change
  * of four thousand trees should read as 3,935 rather than as 3935. */

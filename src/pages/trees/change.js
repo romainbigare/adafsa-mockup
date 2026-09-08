@@ -4,10 +4,12 @@
  * fast enough for a quarter to say anything, and reading four quarters of noise
  * as a trend is how a page misleads a reader who trusts it.
  *
+ * Forest trees are not on this page at all — not in the chart, not in the
+ * table, not in the filter. Nothing names them, nobody plants them as a crop,
+ * and a page about how the planting is moving has nothing to say about a stand
+ * of windbreak.
+ *
  * The chart follows the filter rather than splitting into pages of its own.
- * Date palms are the overwhelming majority here, so a stack of them beside the
- * fruit trees would show one band and three slivers; the reader picks the group
- * and the chart answers.
  *
  * Beside it, the three varieties that grew most and the three that shrank most
  * over the last twelve months. Below, the trees themselves — the review was
@@ -19,7 +21,7 @@ import { dataTable } from '../../components/dataTable.js';
 import { stackedColumns } from '../../charts/stackedColumns.js';
 import { barList } from '../../charts/barList.js';
 import { query } from '../../data/store.js';
-import { TREE_CATEGORIES } from '../../domain/taxonomy.js';
+import { ORCHARD_CATEGORIES } from '../../domain/taxonomy.js';
 import { COMPARE, categoryColor } from '../../domain/palette.js';
 import { YEARS, YEAR_COUNT } from '../../domain/periods.js';
 import { int, pct, signedInt, signedPct, compact } from '../../domain/format.js';
@@ -30,12 +32,12 @@ const LAST_YEAR = YEAR_COUNT - 2;
 const MOVERS = 3;
 
 /* Which tree groups the filter has left on screen. With everything ticked the
- * chart is one column of all trees; with one group ticked it is that group. */
+ * chart carries both groups; with one ticked it is that group. */
 function selectedCategories(selection) {
-  if (!selection.types.size) return TREE_CATEGORIES;
-  const chosen = TREE_CATEGORIES.filter((category) =>
+  if (!selection.types.size) return ORCHARD_CATEGORIES;
+  const chosen = ORCHARD_CATEGORIES.filter((category) =>
     [...selection.types].some((key) => key.startsWith(category + ':')));
-  return chosen.length ? chosen : TREE_CATEGORIES;
+  return chosen.length ? chosen : ORCHARD_CATEGORIES;
 }
 
 export function render({ selection }) {
@@ -69,7 +71,7 @@ export function render({ selection }) {
     amountColor: row.delta >= 0 ? COMPARE.up : COMPARE.down
   });
 
-  const label = categories.length === TREE_CATEGORIES.length ? 'All trees' : categories.join(', ');
+  const label = categories.length === ORCHARD_CATEGORIES.length ? 'Palms and fruit trees' : categories.join(', ');
 
   /* One band per tree group, in the group's own colour. Date palms dominate, so
    * the stack is mostly one band — which is the fact, and the reader can lift
@@ -83,10 +85,10 @@ export function render({ selection }) {
     .filter((band) => band.values.some((v) => v > 0));
 
   return {
-    filterScope: 'tree',
+    filterScope: 'orchard',
     content: [
       figures([
-        { value: compact(now), label: 'Trees counted', icon: 'trees' },
+        { value: compact(now), label: 'Palms and fruit trees', icon: 'trees' },
         { value: signedInt(net), label: 'Change on a year ago', icon: 'trend', tone: net < 0 ? 'watch' : null },
         { value: moved == null ? '—' : signedPct(moved), label: 'Change as a share', icon: 'trend' },
         { value: int(rows.length), label: 'Varieties counted', icon: 'layers' }
@@ -94,7 +96,7 @@ export function render({ selection }) {
 
       section('Trees, year by year', { icon: 'trend', half: true, note: `${label}, over three years.` },
         groupBands.length
-          ? stackedColumns(YEARS.map(String), groupBands, { format: compact, half: true, totalLabel: 'All trees' })
+          ? stackedColumns(YEARS.map(String), groupBands, { format: compact, half: true, totalLabel: 'All counted here' })
           : intro('No trees in the current selection.')),
 
       section('Biggest movers', { icon: 'trees', half: true, note: 'Over the last twelve months.' },

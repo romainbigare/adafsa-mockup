@@ -142,6 +142,54 @@ transcript.
 
 ---
 
+## Alignment pass
+
+The walkthrough covered crop and tree monitoring. These carry its decisions across the
+pages it did not reach, so a reader learns each shape once.
+
+**Filters say what a page counts.** C2 offers cereals and fodder and nothing else; C3
+offers open field; T3 offers palms and fruit trees, with forest trees off the page
+entirely — chart, table and filter. A toggle that moves nothing when ticked is worse than
+no toggle. Five pages that showed no toggles at all now carry them and answer to them:
+fallow land, land use, structures, change tracking, the irrigation trend.
+
+**Stacked columns mean one thing everywhere.** Five colours far enough apart to be told
+apart in a stack, a grey band for the tail, named in the legend. Used on C2, C3, the
+fallow page, change tracking, the monthly water demand and the farm profile.
+
+**Change pages read the same way.** Change tracking is rebuilt on the crop pattern: six
+quarters of columns split by structure class, the biggest movers beside them, then the
+classes themselves, then the farms running oldest to newest. The irrigation trend gains
+the movers panel and the six-quarter window.
+
+**Maps read at the altitude you are looking from.** The efficiency map now averages the
+way the canopy map does — the score for the region, then the farm centre, then the farm.
+
+**Farm centre is everywhere a farm is named**, including the farm profile and the
+corrective-actions header.
+
+**The overview says whether the inventory is moving.** One "vs a year ago" column on the
+area table. It stays an inventory; it just answers the first question anyone asks of one.
+
+**Yield leads with the harvest by quarter.** The bar list that ranked the same crops the
+table above it already ranked is gone, replaced by the pilot-report shape on expected
+tonnes.
+
+**No screen mentions a tier.** The column went the way the banner did. A tier is our word
+for how the contract is staged.
+
+**Colour carries the subject.** Every chart with a subject takes its subject's colours —
+crop groups, tree groups, land states, structure classes. The one plain blue left is the
+average line on the irrigation trend, which is a comparison rather than a thing.
+
+Two things found while doing it: the invented structure history was so flat that the
+change page drew six identical columns and reported nothing moving, so structures now
+appear and disappear discretely on about a fifth of holdings, which is what actually
+happens; and a movement that rounded to nothing was printing "−0%", which costs a column
+its credibility.
+
+---
+
 ## Left open — not applied
 
 Four things the call raised and did not settle. Nothing below is in the mockup; each one
