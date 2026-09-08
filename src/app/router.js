@@ -41,6 +41,9 @@ export function selection(params = currentParams()) {
     region: regionById(params.get('region') || DEFAULT_REGION).id,
     types: new Set(types),
     comparison: comparisonById(params.get('cmp') || DEFAULT_COMPARISON).id,
+    /* Null until the reader picks one, so a page can hold its own default —
+     * the tree pages compare years, the crop pages quarters. */
+    comparisonSet: params.get('cmp') || null,
     search: params.get('q') || '',
     sort: params.get('sort') || '',
     direction: params.get('dir1') || 'increased',
@@ -60,7 +63,6 @@ export function paramsFor(patch, base = currentParams()) {
     else params.set(key, String(value));
   }
   if (params.get('region') === DEFAULT_REGION) params.delete('region');
-  if (params.get('cmp') === DEFAULT_COMPARISON) params.delete('cmp');
   return params;
 }
 

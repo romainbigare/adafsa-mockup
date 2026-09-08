@@ -77,7 +77,7 @@ export function render({ selection }) {
         note: 'A farm can grow several crops.',
         flush: true
       }, summaryTable(breakdown.rows, {
-        measure: 'farms', measureLabel: 'Farms', format: countFormat, totalLabel: 'Farms with crops'
+        measure: 'farms', measureLabel: 'Farms', format: countFormat, showTotal: false
       }))
     ]
   };

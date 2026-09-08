@@ -64,6 +64,11 @@ export function composeFarm(record, dictionaries) {
 
   return {
     ...record,
+    /* ADAFSA groups farms under a farm centre and its officers search by it.
+     * We asked for farm ids and coordinates only, so the field exists, is
+     * offered everywhere it would be read, and stays empty until the data
+     * arrives. */
+    farmCentre: null,
     taxonomy,
     landParcels,
     structures,

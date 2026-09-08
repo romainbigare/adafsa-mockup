@@ -129,9 +129,12 @@ const PORT = server.address().port;
 // ---------------------------------------------------------------- browser --
 await mkdir(WORK, { recursive: true });
 const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
-const browser = await chromium.launch(
-  proxy ? { proxy: { server: proxy, bypass: '<-loopback>,localhost,127.0.0.1' } } : {}
-);
+/* A machine may carry a Chromium that predates this Playwright; pointing at it
+ * is cheaper than downloading a second copy. */
+const browser = await chromium.launch({
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined,
+  ...(proxy ? { proxy: { server: proxy, bypass: '<-loopback>,localhost,127.0.0.1' } } : {})
+});
 const page = await browser.newPage({ viewport: VIEW, deviceScaleFactor: SCALE });
 await page.addInitScript((relay) => { globalThis.ADAFSA_TILE_RELAY = relay; }, `http://127.0.0.1:${PORT}/__tiles`);
 

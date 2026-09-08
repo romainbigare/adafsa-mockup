@@ -15,7 +15,9 @@ const ROUTES = [
   ['overview', '#/overview'],
   ['overview-filtered', '#/overview?region=alain&types=Open%20Field%3ATomato'],
   ['crop-inventory', '#/m/crop/inventory'],
-  ['crop-change', '#/m/crop/change'],
+  ['crop-annuals', '#/m/crop/annuals'],
+  ['crop-openfield', '#/m/crop/openfield'],
+  ['crop-openfield-single', '#/m/crop/openfield?types=Open%20Field%3ATomato'],
   ['crop-fallow', '#/m/crop/fallow'],
   ['trees-inventory', '#/m/trees/inventory'],
   ['trees-canopy', '#/m/trees/canopy'],
@@ -36,7 +38,13 @@ const ROUTES = [
 ];
 
 const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
-const browser = await chromium.launch(proxy ? { proxy: { server: proxy, bypass: '<-loopback>,localhost,127.0.0.1' } } : {});
+/* A machine may carry a Chromium that predates this Playwright; pointing at it
+ * is cheaper than downloading a second copy. */
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined;
+const browser = await chromium.launch({
+  executablePath,
+  ...(proxy ? { proxy: { server: proxy, bypass: '<-loopback>,localhost,127.0.0.1' } } : {})
+});
 const page = await browser.newPage({ viewport: { width: 1440, height: 950 } });
 
 const problems = [];

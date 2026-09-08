@@ -71,3 +71,39 @@ export const LANDUSE_COLORS = {
 };
 
 export const landuseColor = (name) => LANDUSE_COLORS[name] || NEUTRAL;
+
+/* Tints of one identity hue, for the members of a single category.
+ *
+ * A stacked column of cereals is wheat and sorghum — the same thing seen twice,
+ * not two unrelated things — so they are drawn as two steps of the cereal hue
+ * rather than as two new colours. The lightness runs from dark to light in a
+ * fixed order, so a crop keeps its shade as long as the sort does, and every
+ * band carries its name in the legend regardless. */
+export function tints(baseColor, count) {
+  if (count <= 1) return [baseColor];
+  const [h, s, l] = toHsl(baseColor);
+  const from = Math.max(0.2, l - 0.14);
+  const to = Math.min(0.84, l + 0.3);
+  return Array.from({ length: count }, (_, i) => fromHsl(h, s, from + ((to - from) * i) / (count - 1)));
+}
+
+function toHsl(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const d = max - min;
+  if (!d) return [0, 0, l];
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  const h = max === r ? ((g - b) / d + (g < b ? 6 : 0)) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h / 6, s, l];
+}
+
+function fromHsl(h, s, l) {
+  const f = (n) => {
+    const k = (n + h * 12) % 12;
+    const a = s * Math.min(l, 1 - l);
+    return Math.round((l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))) * 255);
+  };
+  return '#' + [f(0), f(8), f(4)].map((v) => v.toString(16).padStart(2, '0')).join('');
+}

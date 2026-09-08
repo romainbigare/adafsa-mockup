@@ -2,7 +2,7 @@
  *
  * Every summary table in the platform is one of a small number of shapes: a
  * total, a breakdown by taxonomy category that opens into its types, or a
- * breakdown by province. Writing those once here is what keeps twenty-two pages
+ * breakdown by province. Writing those once here is what keeps twenty-one pages
  * from each inventing their own arithmetic — and what makes the number contract
  * enforceable rather than merely intended.
  *

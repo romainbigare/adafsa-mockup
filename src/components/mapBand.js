@@ -3,6 +3,11 @@
  * Three modes, and the review decided which pages get which:
  *   counts    — bubbles carrying the number of farms, breaking down as you zoom
  *               in, with no colour and no legend. This is the overview map.
+ *   trees     — the same bubbles until you reach a farm, and then every tree on
+ *               it as a dot coloured by variety. The review was firm that
+ *               species colouring above the farm is meaningless — every holding
+ *               is a mix — so the map simply does not offer it until you are
+ *               close enough for it to mean something.
  *   category  — farms coloured by their dominant crop or land-use class.
  *   band      — farms coloured by a status scale, where something is judged.
  *
@@ -19,6 +24,7 @@ import { icon } from '../app/icons.js';
 import { int } from '../domain/format.js';
 import { NEUTRAL, SEQUENTIAL } from '../domain/palette.js';
 import { regionById, isEmirate } from '../domain/regions.js';
+import { seeded } from '../mock/rng.js';
 
 /* A build that photographs the app has no direct route to the tile servers, so
  * it serves them from its own cache and points this at it. Empty in a browser,
@@ -44,7 +50,47 @@ const BASEMAPS = {
  * bubble into smaller ones until, close enough in, every farm stands alone. */
 const CELL_FOR_ZOOM = (zoom) => (zoom < 9 ? 0.4 : zoom < 10 ? 0.2 : zoom < 11 ? 0.09 : zoom < 12 ? 0.04 : zoom < 13 ? 0.015 : 0);
 
+/* Where the tree map stops counting farms and starts drawing trees. */
+const TREE_ZOOM = 15;
+const TREE_DOT_CAP = 500;
+
+const inRing = (ring, lat, lng) => {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [ay, ax] = ring[i];
+    const [by, bx] = ring[j];
+    if ((ay > lat) !== (by > lat) && lng < ((bx - ax) * (lat - ay)) / (by - ay) + ax) inside = !inside;
+  }
+  return inside;
+};
+
+/* Tree positions are invented, so they are invented the same way every time:
+ * seeded from the farm id, scattered inside the holding's real boundary. */
+function scatter(rings, count, seed) {
+  const ring = rings?.[0];
+  if (!ring || !ring.length) return [];
+  let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+  for (const [lat, lng] of ring) {
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+    if (lng < minLng) minLng = lng;
+    if (lng > maxLng) maxLng = lng;
+  }
+  const rand = seeded(String(seed));
+  const points = [];
+  for (let tries = 0; points.length < count && tries < count * 40; tries++) {
+    const lat = minLat + rand() * (maxLat - minLat);
+    const lng = minLng + rand() * (maxLng - minLng);
+    if (inRing(ring, lat, lng)) points.push([lat, lng]);
+  }
+  return points;
+}
+
 const instances = new Map();
+
+/* The map objects, by id. Only the route walk uses this — it drives a map to a
+ * farm to check the close-up draws — and nothing in the interface reads it. */
+export const mapInstance = (id) => instances.get(id)?.map || null;
 
 export function mapBand(id, options) {
   const existing = instances.get(id);
@@ -177,39 +223,87 @@ export function mapBand(id, options) {
     }
     if (mode === 'farm') { drawFarm(); return; }
 
-    if (mode === 'counts') {
-      const cell = CELL_FOR_ZOOM(map.getZoom());
-      const groups = new Map();
-      for (const farm of farms) {
-        if (!farm.lat) continue;
-        const key = cell ? `${Math.floor(farm.lat / cell)}:${Math.floor(farm.lng / cell)}` : String(farm.fid);
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key).push(farm);
-      }
-      const biggest = Math.max(...[...groups.values()].map((g) => g.length), 1);
-      for (const members of groups.values()) {
-        const lat = members.reduce((a, f) => a + f.lat, 0) / members.length;
-        const lng = members.reduce((a, f) => a + f.lng, 0) / members.length;
-        const weight = members.length / biggest;
-        const size = 26 + Math.round(Math.sqrt(weight) * 26);
-        const shade = SEQUENTIAL[Math.min(SEQUENTIAL.length - 1, 2 + Math.floor(weight * 3))];
-        const marker = window.L.marker([lat, lng], {
-          icon: window.L.divIcon({
-            className: '',
-            html: `<div class="cluster-bubble" style="width:${size}px;height:${size}px;background:${shade}">${int(members.length)}</div>`,
-            iconSize: [size, size], iconAnchor: [size / 2, size / 2]
-          })
-        });
-        const area = members.reduce((a, f) => a + f.area, 0);
-        marker.bindTooltip(`${int(members.length)} farm${members.length === 1 ? '' : 's'} · ${int(area)} dunums`);
-        if (members.length === 1) marker.on('click', () => { location.hash = `#/farm/${members[0].fid}`; });
-        else marker.on('click', () => map.setView([lat, lng], Math.min(15, map.getZoom() + 2)));
-        markerLayer.addLayer(marker);
-      }
+    if (mode === 'trees') {
+      if (map.getZoom() >= TREE_ZOOM) { drawTrees(); return; }
+      setNote('Zoom in to a farm to see every tree and its variety.');
+      drawCounts(farms);
       return;
     }
 
+    if (mode === 'counts') { drawCounts(farms); return; }
+
     drawFarmMarkers(farms, colorOf, labelOf);
+  }
+
+  /* Every tree on every farm in view, coloured by variety. Nothing is drawn
+   * beyond the farms actually on screen, which is what keeps a close-up
+   * affordable. */
+  async function drawTrees() {
+    const drawnNow = current;
+    setNote(null);
+    const bounds = map.getBounds();
+    const visible = drawnNow.farms.filter((farm) => farm.lat && bounds.contains([farm.lat, farm.lng])).slice(0, 24);
+    if (!visible.length) { setNote('No farm with trees in view.'); return; }
+
+    const { farmBoundaries } = await import('../data/geometry.js');
+    const index = await farmBoundaries();
+    if (drawnNow !== current) return;
+
+    for (const farm of visible) {
+      const rings = index.get(String(farm.fid));
+      if (!rings) continue;
+      markerLayer.addLayer(window.L.polygon(rings, { color: '#ffffff', weight: 1.2, fill: false, opacity: 0.8 }));
+
+      const stands = (drawnNow.varietiesOf ? drawnNow.varietiesOf(farm) : []).filter((v) => v.trees > 0);
+      const total = stands.reduce((a, v) => a + v.trees, 0);
+      if (!total) continue;
+      const shown = Math.min(total, TREE_DOT_CAP);
+      const points = scatter(rings, shown, `trees-${farm.fid}`);
+      let cursor = 0;
+      for (const stand of stands) {
+        const dots = Math.round((stand.trees / total) * points.length);
+        const colour = drawnNow.varietyColor ? drawnNow.varietyColor(stand) : NEUTRAL;
+        for (let i = 0; i < dots && cursor < points.length; i++, cursor++) {
+          const dot = window.L.circleMarker(points[cursor], {
+            radius: 3, fillColor: colour, fillOpacity: 0.95, color: '#00000055', weight: 0.5
+          });
+          dot.bindTooltip(`<strong>${stand.name}</strong>#${farm.fid} · ${farm.owner}`);
+          markerLayer.addLayer(dot);
+        }
+      }
+      if (shown < total) setNote(`Showing ${int(shown)} of ${int(total)} trees on the largest holdings — the mix is to scale.`);
+    }
+  }
+
+  function drawCounts(farms) {
+    const cell = CELL_FOR_ZOOM(map.getZoom());
+    const groups = new Map();
+    for (const farm of farms) {
+      if (!farm.lat) continue;
+      const key = cell ? `${Math.floor(farm.lat / cell)}:${Math.floor(farm.lng / cell)}` : String(farm.fid);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(farm);
+    }
+    const biggest = Math.max(...[...groups.values()].map((g) => g.length), 1);
+    for (const members of groups.values()) {
+      const lat = members.reduce((a, f) => a + f.lat, 0) / members.length;
+      const lng = members.reduce((a, f) => a + f.lng, 0) / members.length;
+      const weight = members.length / biggest;
+      const size = 26 + Math.round(Math.sqrt(weight) * 26);
+      const shade = SEQUENTIAL[Math.min(SEQUENTIAL.length - 1, 2 + Math.floor(weight * 3))];
+      const marker = window.L.marker([lat, lng], {
+        icon: window.L.divIcon({
+          className: '',
+          html: `<div class="cluster-bubble" style="width:${size}px;height:${size}px;background:${shade}">${int(members.length)}</div>`,
+          iconSize: [size, size], iconAnchor: [size / 2, size / 2]
+        })
+      });
+      const area = members.reduce((a, f) => a + f.area, 0);
+      marker.bindTooltip(`${int(members.length)} farm${members.length === 1 ? '' : 's'} · ${int(area)} dunums`);
+      if (members.length === 1) marker.on('click', () => { location.hash = `#/farm/${members[0].fid}`; });
+      else marker.on('click', () => map.setView([lat, lng], Math.min(16, map.getZoom() + 2)));
+      markerLayer.addLayer(marker);
+    }
   }
 
   function drawFarmMarkers(farms, colorOf, labelOf) {
@@ -243,15 +337,24 @@ export function mapBand(id, options) {
         entry.count != null ? h('span', { class: 'count', text: int(entry.count) }) : null))));
   }
 
-  map.on('zoomend', () => { if (current?.mode === 'counts' || current?.mode === 'parcels') draw(); });
+  const REDRAWS_ON_ZOOM = new Set(['counts', 'parcels', 'trees']);
+  map.on('zoomend', () => {
+    if (!REDRAWS_ON_ZOOM.has(current?.mode)) return;
+    /* The variety legend belongs to the close-up and would be a puzzle over a
+     * map of farm counts, so it comes and goes with the trees. */
+    if (current.mode === 'trees') drawLegend(map.getZoom() >= TREE_ZOOM ? current.legend : null);
+    draw();
+  });
+  map.on('moveend', () => { if (current?.mode === 'trees' && map.getZoom() >= TREE_ZOOM) draw(); });
 
   const api = {
     element,
+    map,
     update(next) {
       const first = !current;
       current = next;
       element.className = ['map-band', next.size || null].filter(Boolean).join(' ');
-      drawLegend(next.legend);
+      drawLegend(next.mode === 'trees' && map.getZoom() < TREE_ZOOM ? null : next.legend);
       setNote(next.note);
       draw();
       if (first) map.setView([23.9, 54.4], 8);

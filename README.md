@@ -23,19 +23,20 @@ figure, table and chart works offline.
 
 ```bash
 node test/all.js        # or: npm test — plain Node, no runner to install
-node tools/smoke.mjs    # walks all 22 routes in a browser; needs Playwright
+node tools/smoke.mjs    # walks every route in a browser; needs Playwright
 node tools/screendeck.mjs   # rebuilds docs/ADAFSA_Platform_Screens.pptx from the live app
 ```
 
 ## What it contains
 
-Twenty-two pages, in the order and under the names agreed in the review
+Twenty-one pages, in the order and under the names agreed in the review
 (`docs/adafsa-mockup-review.md`, with the change list in
 `docs/adafsa-redesign-scope.md`):
 
     Overview                        inventory of production capacity — not health
-    Crop Monitoring                 crops & cultivated area · seasonal change · fallow land
-    Tree Monitoring                 trees, species & varieties · canopy health · annual change
+    Crop Monitoring                 crops & area summary · cereals and fodder ·
+                                    open field crops · fallow land
+    Tree Monitoring                 tree count · canopy health · annual change
     Land Use & Structures           land use · structures · change tracking
     Irrigation Efficiency           efficiency scores · quarterly trend
     Crop Water Calculator           monthly demand & over-allocation · seasonal water budget
@@ -52,11 +53,14 @@ ticked when a page opens, so the bar shows what is being counted rather than an 
 list, and a filter moves the map, the figures and every table together.
 
 **Maps illustrate; they do not carry the argument.** A map appears where the question
-is genuinely about a place. Change and trend pages have none — that was settled
-directly in review, and the contributor tables name farms instead.
+is genuinely about a place. Change and trend pages have none, and neither does fallow
+land — that was settled directly in review, and the ranked tables name farms instead.
+Where a map stays, it only shows detail at the altitude where the detail is real: the
+tree map counts farms across the emirate and draws individual trees by variety only once
+you are inside a holding.
 
 **Every number comes through one function.** Pages read their rows from
-`query()` in `src/data/store.js`. With twenty-two screens a convention that figures
+`query()` in `src/data/store.js`. With twenty-one screens a convention that figures
 should agree would not have survived; a single call does.
 
 ## Architecture

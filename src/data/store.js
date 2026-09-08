@@ -2,7 +2,7 @@
  *
  * Every screen in the platform reads its rows through query() here. That is
  * what makes the number contract enforceable rather than merely intended: with
- * twenty-two pages, a convention that "figures should agree" would not survive,
+ * twenty-one pages, a convention that "figures should agree" would not survive,
  * but a single function they all call will.
  *
  * The store is built once, on first use, and held. It carries no geometry — see

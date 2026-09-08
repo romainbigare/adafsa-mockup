@@ -27,7 +27,12 @@ export function dataTable(rows, {
   csvName = 'export',
   pageSize = PAGE_SIZE,
   emptyText = 'No rows match the current selection.',
-  footNote = null
+  footNote = null,
+  /* Rows inside a row. A farm growing four vegetables is one line until the
+   * reader opens it, and then it is four — asked for directly in review, so
+   * that a holding is never reduced to its main crop. Returns an array of cell
+   * arrays, one per child, aligned with the columns. */
+  expand = null
 } = {}) {
   const sortKey = selection.sort || columns.find((c) => c.defaultSort)?.key || columns[0].key;
   const sortDir = selection.dir || (columns.find((c) => c.key === sortKey)?.defaultDir || 'desc');
@@ -66,12 +71,35 @@ export function dataTable(rows, {
   }
   for (const row of slice) {
     const target = hrefFor ? hrefFor(row) : null;
+    const children = expand ? expand(row) : null;
+    let open = false;
+    let shown = [];
+
+    const disclose = children && children.length
+      ? h('button', {
+          class: 'disclose', 'aria-expanded': 'false', 'aria-label': 'Show the crops on this farm',
+          onclick: (event) => {
+            event.stopPropagation();
+            open = !open;
+            disclose.setAttribute('aria-expanded', String(open));
+            if (!open) { shown.forEach((el) => el.remove()); shown = []; return; }
+            shown = children.map((cells) => h('tr', { class: 'row-child' },
+              ...cells.map((content, i) => h('td', {
+                class: [columns[i]?.align === 'num' ? 'num' : null]
+              }, content instanceof Node ? content : String(content ?? '—')))));
+            let after = tr;
+            for (const el of shown) { after.after(el); after = el; }
+          }
+        }, icon('chevron', { size: 13 }))
+      : null;
+
     const tr = h('tr', {
       class: target ? 'is-clickable' : null,
       onclick: target ? () => { location.hash = target.replace(/^#/, '#'); } : null
-    }, ...columns.map((col) => {
+    }, ...columns.map((col, i) => {
       const content = col.cell ? col.cell(row) : col.value(row);
       return h('td', { class: [col.align === 'num' ? 'num' : null, col.strong ? 'name' : null, col.wrap ? 'wrap' : null] },
+        i === 0 && disclose ? disclose : null,
         content instanceof Node ? content : String(content ?? '—'));
     }));
     body.append(tr);

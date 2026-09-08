@@ -19,7 +19,7 @@ connected to any real data.
 
 Two things live here:
 
-1. **The platform itself** — twenty-two clickable pages, good enough to demo from a
+1. **The platform itself** — twenty-one clickable pages, good enough to demo from a
    laptop.
 2. **The case for it** — `presentation/`, plus the research behind it.
 
@@ -126,7 +126,7 @@ farm, each opening from a category down to the crop.
 every module has a change-tracking one. That took the navigation from eight entries to
 about twenty-five, and it is what the review asked for in those words.
 
-**Two page archetypes carry twenty of the twenty-two screens.** An inventory page —
+**Two page archetypes carry nineteen of the twenty-one screens.** An inventory page —
 figures, a map band, distribution tables, a farm table — and a change page, which has
 no map at all: net movement, a trend line, four direction tabs and the farms behind the
 movement. Building those two well was most of the work.
@@ -143,6 +143,41 @@ Two rules held from the first design and still hold:
   read through, and by tests.
 - **Colour means one thing.** The status ramp appears only where something is judged;
   inventory pages colour by classification from a separately validated palette.
+
+## 6b. What the September walkthrough changed
+
+A second walkthrough with Mark, screen by screen through crop and tree monitoring. The
+full list is in `docs/monday-review-changes.md`; the shape of it:
+
+**Seasonal change became two pages.** Cereals and fodder grow all year and have three or
+four crops between them, so they stack cleanly into two charts over six quarters. Open
+field is seasonal and runs to eighteen crops, so it gets one plain column chart and a
+panel that changes with the filter — which crops moved when everything is on, the top
+producers when one crop is picked. One chart could not have served both.
+
+**Six quarters, and three years for trees.** Six is the smallest window carrying both a
+last-quarter and a last-year reading. Trees move too slowly for quarters at all.
+
+**Fallow land has three states.** Under cultivation; resting under a year and waiting
+for a crop; resting over a year and not being used. The last one is a policy question
+and is never added to the middle one. Its map went — the farm centre and the ranked
+table say where a farm is.
+
+**The tree map only shows species at the farm.** Every holding here is a mix, so a
+province coloured by its commonest cultivar would be an invention. Zoomed out it counts
+farms; inside a holding it draws every tree in its variety's colour. Forest trees are
+off the map — nothing names them.
+
+**Canopy health kept its map**, once it was clear the index is a farm average that
+aggregates upward. Water quality varies by zone and by whether a farmer filters, which
+is the thing an average of scores can show.
+
+**Farm centre exists and is empty.** ADAFSA's officers search by it and we asked for
+farm ids and coordinates only. It is offered everywhere it would be read, so the
+platform can be seen to hold it.
+
+**Arabic charts are not mirrored in this version.** The English layout stays; only the
+words are translated.
 
 ## 7. Decisions worth remembering
 
@@ -207,6 +242,7 @@ Tone rules, learned the hard way and still worth following:
 | What | Where |
 |---|---|
 | The review that drove the redesign | `docs/adafsa-mockup-review.md` |
+| The September walkthrough's change list | `docs/monday-review-changes.md` |
 | The change list and page-by-page spec | `docs/adafsa-redesign-scope.md` |
 | How the mockup runs and is structured | `README.md` |
 | Evidence: captured production pages | `docs/design/` |

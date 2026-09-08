@@ -73,7 +73,9 @@ async function draw(route) {
  * walk both use it, and neither has to know how the router is put together. */
 globalThis.adafsa = {
   go: (hash) => { location.hash = hash; },
-  deck: () => import('./deck.js')
+  deck: () => import('./deck.js'),
+  /* So a check can drive a map to a farm and look at what it drew there. */
+  map: async (id) => (await import('../components/mapBand.js')).mapInstance(id)
 };
 
 onRouteChange(draw);

@@ -26,6 +26,19 @@ export function quarterSeries(count = 8, end = CURRENT_QUARTER) {
 
 export const QUARTERS = quarterSeries();
 
+/* Six quarters is the window the review settled on for the crop pages: enough
+ * to read last quarter and the same quarter a year ago, and no wider than a
+ * chart can carry legibly. The series held per crop is eight quarters long, so
+ * the window is the tail of it. */
+export const WINDOW_QUARTERS = 6;
+export const RECENT_QUARTERS = QUARTERS.slice(-WINDOW_QUARTERS);
+export const recentWindow = (series = []) => series.slice(-WINDOW_QUARTERS);
+
+/* Trees are read year by year rather than quarter by quarter — they move too
+ * slowly for a quarter to say anything. Three years, oldest first. */
+export const YEAR_COUNT = 3;
+export const YEARS = Array.from({ length: YEAR_COUNT }, (_, i) => CURRENT_QUARTER.year - (YEAR_COUNT - 1 - i));
+
 export const previousQuarter = (id = CURRENT_QUARTER.id) => {
   const i = QUARTERS.findIndex((x) => x.id === id);
   return QUARTERS[(i < 0 ? QUARTERS.length - 1 : i) - 1] || QUARTERS[0];

@@ -19,9 +19,14 @@ export const MODULES = [
     icon: 'grass',
     scope: 'field',
     blurb: 'What is growing, on how much land, and how that has moved since last season.',
+    /* Seasonal change was one page and is now two. Cereals and fodder are grown
+     * all year and stack cleanly into three or four crops; open-field
+     * vegetables are seasonal and run to dozens. One chart cannot serve both,
+     * so neither is asked to. */
     pages: [
-      { key: 'inventory', label: 'Crops and area', kind: 'inventory' },
-      { key: 'change', label: 'Seasonal change', kind: 'change' },
+      { key: 'inventory', label: 'Crops and area summary', kind: 'inventory' },
+      { key: 'annuals', label: 'Cereals and fodder', kind: 'change' },
+      { key: 'openfield', label: 'Open field crops', kind: 'change' },
       { key: 'fallow', label: 'Fallow land', kind: 'inventory' }
     ]
   },
@@ -32,8 +37,8 @@ export const MODULES = [
     scope: 'tree',
     blurb: 'Date palms, fruit trees and forest stands — counts, species, canopy condition.',
     pages: [
-      { key: 'inventory', label: 'Trees and species', kind: 'inventory' },
-      { key: 'canopy', label: 'Tree health', kind: 'inventory' },
+      { key: 'inventory', label: 'Tree count', kind: 'inventory' },
+      { key: 'canopy', label: 'Canopy health', kind: 'inventory' },
       { key: 'change', label: 'Annual change', kind: 'change' }
     ]
   },

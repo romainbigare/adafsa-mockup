@@ -18,6 +18,10 @@ export function summaryTable(rows, {
   measureLabel = 'Dunums',
   format = (v) => dec(v, 1),
   totalLabel = 'All categories',
+  /* A farm growing three crops is counted against all three, so a column of
+   * farm counts has no total and no hundred per cent line — settled in review,
+   * in those words. The dunum tables still add up, and still say so. */
+  showTotal = true,
   colorOf = (row) => categoryColor(row.name),
   emptyText = 'Nothing in the current selection.'
 } = {}) {
@@ -34,11 +38,13 @@ export function summaryTable(rows, {
       h('th', { class: 'num', text: 'Share' }),
       h('th', { style: { width: '20%' }, text: '' }))),
     body,
-    h('tfoot', {}, h('tr', {},
-      h('td', { text: totalLabel }),
-      h('td', { class: 'num', text: format(total) }),
-      h('td', { class: 'num', text: '100%' }),
-      h('td', {}))));
+    showTotal
+      ? h('tfoot', {}, h('tr', {},
+          h('td', { text: totalLabel }),
+          h('td', { class: 'num', text: format(total) }),
+          h('td', { class: 'num', text: '100%' }),
+          h('td', {})))
+      : null);
 
   function draw() {
     clear(body);

@@ -1,9 +1,15 @@
 /* Tree Monitoring — canopy health.
  *
- * The important correction from the review: canopy health is scored per farm,
- * not per tree. The holdings here are small, share one water source and are
- * managed as a unit, so the farm is the cluster. Two numbers are enough — one
- * for palms and one for fruit trees. */
+ * The important correction from the review: the canopy health index is scored
+ * per farm, not per tree. The holdings here are small, share one water source
+ * and are managed as a unit, so the farm is the cluster. Two numbers are enough
+ * — one for palms and one for fruit trees.
+ *
+ * The map stays. It was going to go with the fallow map until it became clear
+ * what it is: one index averaged upwards, so it answers at province, at farm
+ * centre and at farm as you zoom. Water quality varies by zone and by whether a
+ * farmer filters, which is exactly the thing an average of scores can show and
+ * a list of farms cannot. */
 
 import { h } from '../../app/dom.js';
 import { section, intro, callout } from '../../components/section.js';
@@ -32,8 +38,8 @@ export function render({ selection }) {
   return {
     content: [
       figures([
-        { value: palmMean == null ? '—' : Math.round(palmMean), label: 'Average palm score', icon: 'trees' },
-        { value: fruitMean == null ? '—' : Math.round(fruitMean), label: 'Average fruit tree score', icon: 'trees' },
+        { value: palmMean == null ? '—' : Math.round(palmMean), label: 'Average palm index', icon: 'trees' },
+        { value: fruitMean == null ? '—' : Math.round(fruitMean), label: 'Average fruit tree index', icon: 'trees' },
         { value: int(stressed.length), label: 'Farms with stressed trees', icon: 'alert', tone: stressed.length ? 'watch' : null },
         { value: int(severe), label: 'Farms in the lowest band', icon: 'alert', tone: severe ? 'act' : null }
       ]),
@@ -48,16 +54,16 @@ export function render({ selection }) {
       section('Fruit trees', { icon: 'trees', half: true, note: `${int(withFruit.length)} farms have fruit trees.` },
         withFruit.length ? bandBar(distribution(CANOPY, withFruit, (f) => f.canopyFruit)) : intro('No fruit trees here.')),
 
-      section('Where the stressed trees are', { icon: 'pin', note: 'One score per farm.', flush: true },
+      section('Canopy health across the region', { icon: 'pin', note: 'One index per farm; zoom to read it closer in.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('trees-canopy', {
           mode: 'band',
           farms: scored,
           region: selection.region,
           size: 'short',
           colorOf: (farm) => colorFor(CANOPY, farm.canopy),
-          labelOf: (farm) => `Health ${Math.round(farm.canopy)} · ${compact(farm.trees)} trees`,
+          labelOf: (farm) => `Canopy health index ${Math.round(farm.canopy)} · ${compact(farm.trees)} trees`,
           legend: CANOPY.bands.map((band) => ({ label: `${band.label} (${band.range})`, color: band.color })),
-          legendTitle: 'Tree health score'
+          legendTitle: 'Canopy health index'
         }))),
 
 
@@ -65,15 +71,15 @@ export function render({ selection }) {
         dataTable(scored, {
           selection,
           searchable: true,
-          csvName: 'canopy-health',
+          csvName: 'canopy-health-index',
           hrefFor: (farm) => `#/farm/${farm.fid}`,
           columns: [
             { key: 'fid', label: 'Farm', strong: true, value: (f) => f.fid, cell: (f) => `#${f.fid}` },
             { key: 'owner', label: 'Owner', value: (f) => f.owner },
             { key: 'province', label: 'Province', value: (f) => regionById(f.province).label },
             { key: 'trees', label: 'Trees', align: 'num', value: (f) => f.trees, cell: (f) => int(f.trees) },
-            { key: 'palm', label: 'Palm score', align: 'num', defaultSort: true, defaultDir: 'asc', value: (f) => f.canopyPalms, cell: (f) => (f.canopyPalms == null ? '—' : f.canopyPalms) },
-            { key: 'fruit', label: 'Fruit tree score', align: 'num', value: (f) => f.canopyFruit, cell: (f) => (f.canopyFruit == null ? '—' : f.canopyFruit) },
+            { key: 'palm', label: 'Palm index', align: 'num', defaultSort: true, defaultDir: 'asc', value: (f) => f.canopyPalms, cell: (f) => (f.canopyPalms == null ? '—' : f.canopyPalms) },
+            { key: 'fruit', label: 'Fruit tree index', align: 'num', value: (f) => f.canopyFruit, cell: (f) => (f.canopyFruit == null ? '—' : f.canopyFruit) },
             { key: 'band', label: 'Status', value: (f) => classify(CANOPY, f.canopy)?.label || '—',
               cell: (f) => { const band = classify(CANOPY, f.canopy); return band ? h('span', { class: 'chip', style: { background: band.color + '22', color: band.color } }, band.label) : '—'; } }
           ]

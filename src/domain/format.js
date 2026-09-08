@@ -22,6 +22,10 @@ export const dunums = (n) => int(n) + NBSP + 'dun';
 export const pct = (n, places = 0) => (n == null || Number.isNaN(n) ? '—' : n.toFixed(places) + '%');
 export const signedPct = (n, places = 0) => (n == null || Number.isNaN(n) ? '—' : (n > 0 ? '+' : '') + n.toFixed(places) + '%');
 export const signed = (n, places = 0) => (n == null || Number.isNaN(n) ? '—' : (n > 0 ? '+' : '') + n.toFixed(places));
+
+/* A signed whole number that keeps its thousands separator — a headline change
+ * of four thousand trees should read as 3,935 rather than as 3935. */
+export const signedInt = (n) => (n == null || Number.isNaN(n) ? '—' : (n > 0 ? '+' : n < 0 ? '−' : '') + int(Math.abs(n)));
 export const m3 = (n) => int(n) + NBSP + 'm³';
 
 export const share = (part, whole) => (whole ? (part / whole) * 100 : 0);

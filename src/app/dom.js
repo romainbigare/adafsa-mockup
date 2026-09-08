@@ -1,6 +1,6 @@
 /* A very small element builder.
  *
- * Twenty-two pages of tables and figures is a lot of markup, and building it by
+ * Twenty-one pages of tables and figures is a lot of markup, and building it by
  * concatenating strings invites both quoting bugs and injected text. `h` takes
  * values as values: anything that ends up as text goes through textContent, so
  * an owner's name can contain whatever it contains. */

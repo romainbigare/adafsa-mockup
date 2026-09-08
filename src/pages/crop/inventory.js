@@ -76,7 +76,7 @@ export function render({ selection }) {
         summaryTable(breakdown.rows, { measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1), totalLabel: 'All field crops' })),
 
       section('Farms growing each crop', { icon: 'farms', half: true, note: 'A farm can grow several crops.', flush: true },
-        summaryTable(breakdown.rows, { measure: 'farms', measureLabel: 'Farms', format: countFormat, totalLabel: 'Farms with field crops' })),
+        summaryTable(breakdown.rows, { measure: 'farms', measureLabel: 'Farms', format: countFormat, showTotal: false })),
 
       section('Every farm', { icon: 'table', note: 'Click a column title to sort.', flush: true },
         dataTable(farms, {

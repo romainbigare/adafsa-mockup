@@ -7,7 +7,8 @@
 const PAGES = {
   overview: () => import('../pages/overview.js'),
   'crop/inventory': () => import('../pages/crop/inventory.js'),
-  'crop/change': () => import('../pages/crop/change.js'),
+  'crop/annuals': () => import('../pages/crop/annuals.js'),
+  'crop/openfield': () => import('../pages/crop/openfield.js'),
   'crop/fallow': () => import('../pages/crop/fallow.js'),
   'trees/inventory': () => import('../pages/trees/inventory.js'),
   'trees/canopy': () => import('../pages/trees/canopy.js'),

@@ -15,11 +15,30 @@ export const UNKNOWN_COLOR = NEUTRAL;
 
 const scale = (key, label, bands) => ({ key, label, bands, worstSev: Math.max(...bands.map((b) => b.sev)) });
 
-export const CULTIVATION = scale('cultivation', 'Cultivated share', [
-  { id: 'cultivated', label: 'Planted', range: '≥ 66%', color: STATUS.good, sev: 0, test: (v) => v >= 66 },
-  { id: 'partial', label: 'Part planted', range: '33–66%', color: STATUS.watch, sev: 1, test: (v) => v >= 33 && v < 66 },
-  { id: 'fallow', label: 'Fallow', range: '< 33%', color: STATUS.poor, sev: 2, test: (v) => v < 33 }
-]);
+/* Land, in the three states the review settled on: what is being farmed, what
+ * has been resting for less than a year and is waiting for a crop, and what has
+ * been resting for more than a year and is simply not being used. The middle
+ * one is a season; the last one is a policy question, which is why they are
+ * counted apart. */
+export const LAND_STATE = [
+  { id: 'cultivated', label: 'Under cultivation', color: STATUS.good },
+  { id: 'restingRecent', label: 'Fallow under 12 months', color: STATUS.watch },
+  { id: 'restingLong', label: 'Fallow over 12 months', color: STATUS.poor }
+];
+
+export const landStateColor = (id) => LAND_STATE.find((s) => s.id === id)?.color || NEUTRAL;
+
+/* A farm reads as whichever of the three covers most of it — no thresholds to
+ * argue about, and it moves with the data. */
+export function landState(farm) {
+  const parts = [
+    ['cultivated', farm.cultivatedArea || 0],
+    ['restingRecent', farm.fallowRecent || 0],
+    ['restingLong', farm.fallowLong || 0]
+  ].sort((a, b) => b[1] - a[1]);
+  if (!parts[0][1]) return null;
+  return LAND_STATE.find((s) => s.id === parts[0][0]);
+}
 
 export const CANOPY = scale('canopy', 'Canopy health index', [
   { id: 'healthy', label: 'Healthy', range: '≥ 80', color: STATUS.good, sev: 0, test: (v) => v >= 80 },

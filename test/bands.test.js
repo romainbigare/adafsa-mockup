@@ -1,12 +1,12 @@
 /* Band scales must be disjoint and complete, or a farm falls through the floor
  * and shows as unclassified on a page that claims to score every farm. */
 import {
-  CULTIVATION, CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION,
+  CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION, LAND_STATE, landState,
   classify, distribution, worstCount, SUBSIDY_SCORE, keepsSubsidy
 } from '../src/domain/bands.js';
 import { is, ok, close, done } from './helpers.js';
 
-const scales = [CULTIVATION, CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION];
+const scales = [CANOPY, EFFICIENCY, WATER_USE, YIELD_DEVIATION];
 for (const scale of scales) {
   for (let v = -60; v <= 340; v += 0.5) {
     const matches = scale.bands.filter((b) => b.test(v));
@@ -40,5 +40,15 @@ is(rows.length, 5, 'one row per band, including empty ones');
 is(rows.find((r) => r.id === 'excellent').count, 1, 'counts land in the right band');
 close(rows.find((r) => r.id === 'critical').shareOfArea, 50, 0.01, 'unscored records are excluded from the totals');
 is(worstCount(EFFICIENCY, records, (r) => r.score), 1, 'worst-band count drives the alert, not a chart');
+
+/* Land is reported in three states and a farm reads as whichever covers most
+ * of it. The two fallow states are never added together on a page, so nothing
+ * here should ever quietly merge them. */
+is(LAND_STATE.length, 3, 'land has three states, not two');
+is(LAND_STATE.map((s) => s.id).join(','), 'cultivated,restingRecent,restingLong', 'and they are named as the review named them');
+is(new Set(LAND_STATE.map((s) => s.color)).size, 3, 'each state has its own colour');
+is(landState({ cultivatedArea: 8, fallowRecent: 2, fallowLong: 1 }).id, 'cultivated', 'a mostly planted farm reads as planted');
+is(landState({ cultivatedArea: 1, fallowRecent: 2, fallowLong: 9 }).id, 'restingLong', 'a mostly unused farm reads as unused');
+ok(landState({ cultivatedArea: 0, fallowRecent: 0, fallowLong: 0 }) === null, 'a farm with no land at all is unclassified');
 
 done('bands');

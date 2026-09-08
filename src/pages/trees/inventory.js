@@ -1,8 +1,13 @@
-/* Tree Monitoring — trees, species and varieties.
+/* Tree Monitoring — tree count.
  *
- * Tree location, tree count and species classification belong on one page with
- * a map coloured by species. That was agreed directly in review, and it is the
- * module with the largest share of the contract, so it is the one to show. */
+ * Tree location, tree count and species classification belong on one page. The
+ * map counts farms while you are looking at the emirate and only breaks into
+ * individual trees once you have zoomed into a holding, because species
+ * colouring above the farm says nothing: every farm here is a mix, and a
+ * province coloured by its commonest cultivar would be an invention.
+ *
+ * It is the module with the largest share of the contract, so it is the one to
+ * show. */
 
 import { h } from '../../app/dom.js';
 import { section, intro } from '../../components/section.js';
@@ -16,12 +21,9 @@ import { taxonomyBreakdown } from '../../domain/aggregate.js';
 import { TREE_CATEGORIES } from '../../domain/taxonomy.js';
 import { categoryColor } from '../../domain/palette.js';
 import { int, dec, compact } from '../../domain/format.js';
+import { varietyTotals, varietyPalette, MAPPED_CATEGORIES } from './varieties.js';
 import { regionById } from '../../domain/regions.js';
 import { TODAY } from '../../domain/periods.js';
-
-const dominantTree = (farm) =>
-  farm.palms >= farm.fruitTrees && farm.palms >= farm.forestTrees ? 'Date Palm'
-    : farm.fruitTrees >= farm.forestTrees ? 'Fruit Trees' : 'Forest Trees';
 
 export function render({ selection }) {
   const all = query({ region: selection.region });
@@ -34,21 +36,21 @@ export function render({ selection }) {
   const fruit = treed.reduce((total, farm) => total + farm.fruitTrees, 0);
   const forest = treed.reduce((total, farm) => total + farm.forestTrees, 0);
 
-  const cultivars = new Map();
-  for (const farm of treed) {
-    if (!farm.cultivar) continue;
-    cultivars.set(farm.cultivar, (cultivars.get(farm.cultivar) || 0) + farm.palms);
-  }
   const species = new Map();
   for (const farm of treed) {
     for (const entry of farm.species) species.set(entry.name, (species.get(entry.name) || 0) + entry.trees);
   }
 
-  const legend = TREE_CATEGORIES.map((name) => ({
-    label: name,
-    color: categoryColor(name),
-    count: treed.filter((farm) => dominantTree(farm) === name).length
-  })).filter((entry) => entry.count > 0);
+  /* The map's own vocabulary: every cultivar and species on screen, each with
+   * its own tint, drawn only once the reader is close enough to a farm for the
+   * distinction to be real. */
+  const mapped = varietyTotals(treed, { categories: MAPPED_CATEGORIES });
+  const colourOfVariety = varietyPalette(mapped);
+  const palmVarieties = mapped.filter((row) => row.category === 'Date Palm');
+  /* A key rather than a tally: the map is showing one farm by the time these
+   * colours matter, and an emirate-wide count beside it would be read as that
+   * farm's. The counts live in the charts below. */
+  const legend = mapped.slice(0, 10).map((row) => ({ label: row.name, color: colourOfVariety(row) }));
 
   return {
     filterScope: 'tree',
@@ -58,19 +60,18 @@ export function render({ selection }) {
         { value: compact(palms), label: 'Date palms', icon: 'trees' },
         { value: compact(fruit), label: 'Fruit trees', icon: 'trees' },
         { value: compact(forest), label: 'Forest trees', icon: 'trees' },
-        { value: int(cultivars.size), label: 'Palm varieties found', icon: 'layers' }
+        { value: int(palmVarieties.length), label: 'Palm varieties found', icon: 'layers' }
       ]),
 
-      section('Where the trees are', { icon: 'pin', note: 'Colour shows the main tree group.', flush: true },
+      section('Where the trees are', { icon: 'pin', note: 'Farms while zoomed out; every tree once you reach one.', flush: true },
         h('div', { style: { padding: '0 16px 16px' } }, mapBand('trees-inventory', {
-          mode: 'category',
+          mode: 'trees',
           farms: treed,
           region: selection.region,
-          colorOf: (farm) => categoryColor(dominantTree(farm)),
-          labelOf: (farm) => `${compact(farm.trees)} trees · ${dominantTree(farm)}`,
+          varietiesOf: (farm) => (farm.varieties || []).filter((v) => MAPPED_CATEGORIES.includes(v.category)),
+          varietyColor: colourOfVariety,
           legend,
-          legendTitle: 'Main stand',
-          note: 'Click a farm to open it.'
+          legendTitle: 'Variety'
         }))),
 
 
@@ -78,12 +79,12 @@ export function render({ selection }) {
         summaryTable(breakdown.rows, { measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1), totalLabel: 'All tree stands' })),
 
       section('Farms with each group', { icon: 'farms', half: true, note: 'A farm can have several groups.', flush: true },
-        summaryTable(breakdown.rows, { measure: 'farms', measureLabel: 'Farms', format: countFormat, totalLabel: 'Farms with trees' })),
+        summaryTable(breakdown.rows, { measure: 'farms', measureLabel: 'Farms', format: countFormat, showTotal: false })),
 
       section('Date palm varieties', { icon: 'trees', half: true, note: 'Number of palms of each variety.' },
-        cultivars.size
-          ? barList([...cultivars.entries()].map(([name, trees]) => ({ label: name, value: trees }))
-              .sort((a, b) => b.value - a.value), { format: compact, color: categoryColor('Date Palm') })
+        palmVarieties.length
+          ? barList(palmVarieties.map((row) => ({ label: row.name, value: row.trees, color: colourOfVariety(row) })),
+              { format: compact })
           : intro('No palms selected.')),
 
       section('Fruit tree species', { icon: 'trees', half: true, note: 'Number of trees of each species.' },
