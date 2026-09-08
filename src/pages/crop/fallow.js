@@ -32,7 +32,11 @@ const SERIES_OF = {
 };
 
 export function render({ selection }) {
-  const farms = query({ region: selection.region, types: selection.types });
+  /* No crop filter here. The page counts land, not what is grown on it, so a
+   * crop toggle would narrow the farms without changing the question — and a
+   * reader who ticked one would be looking at a different number under the same
+   * heading. */
+  const farms = query({ region: selection.region });
 
   const totalAt = (state, index) =>
     farms.reduce((total, farm) => total + (SERIES_OF[state](farm)?.[index] ?? 0), 0);
@@ -64,7 +68,6 @@ export function render({ selection }) {
   });
 
   return {
-    filterScope: 'all',
     content: [
       figures([
         { value: int(longNow), unit: 'dun', label: 'Fallow over 12 months', icon: 'land', tone: longNow ? 'watch' : null },

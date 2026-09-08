@@ -114,21 +114,29 @@ export function farmQuarterTable(farms, selection, {
 }
 
 /* The bands of a stacked column chart: the biggest few named, the tail in one
- * grey band, over the six-quarter window. `entries` are { name, series }. */
-export function stackBands(entries, { limit, palette, rest, restLabel = (n) => `${n} others` }) {
+ * grey band. `entries` are { name, series }; `palette` is a function of how
+ * many bands were named, so a ramp can be cut to fit rather than picked from a
+ * fixed list. `indices` says which positions in the record become columns —
+ * the six-quarter window by default, or the close of each year. */
+const WINDOW_INDICES = RECENT_QUARTERS.map((_, i) => OFFSET + i);
+
+export function stackBands(entries, {
+  limit, palette, rest, restLabel = (n) => `${n} others`, indices = WINDOW_INDICES
+}) {
   const ranked = [...entries]
     .filter((entry) => entry.series.some((value) => value > 0.05))
     .sort((a, b) => at(b.series, NOW) - at(a.series, NOW));
   const named = ranked.slice(0, limit);
   const tail = ranked.slice(limit);
+  const shades = palette(named.length);
   const bands = named.map((entry, i) => ({
-    label: entry.name, color: palette[i], values: entry.series.slice(OFFSET)
+    label: entry.name, color: shades[i], values: indices.map((index) => at(entry.series, index))
   }));
   if (tail.length) {
     bands.push({
       label: restLabel(tail.length),
       color: rest,
-      values: RECENT_QUARTERS.map((_, i) => tail.reduce((sum, entry) => sum + at(entry.series, OFFSET + i), 0))
+      values: indices.map((index) => tail.reduce((sum, entry) => sum + at(entry.series, index), 0))
     });
   }
   return bands;

@@ -2,9 +2,9 @@
  *
  * The seasonal half. Vegetables go in around September and come out by March.
  * The columns are split by crop, so a quarter shows what made it up rather than
- * only how big it was. Five crops carry a band of their own, in five hues far
- * enough apart to be told apart in a stack, and everything else is one grey
- * band. Eighteen crops cannot each have a colour anybody could name.
+ * only how big it was. Five crops carry a band of their own, in five steps of
+ * the open-field hue, and everything else is one grey band. Eighteen crops
+ * cannot each have a colour anybody could name.
  *
  * The panel beside it changes with the filter, which is the arrangement the
  * review arrived at. Looking at everything, the useful question is which crops
@@ -19,7 +19,7 @@ import { barList } from '../../charts/barList.js';
 import { comparisonSelect } from '../../components/comparison.js';
 import { query } from '../../data/store.js';
 import { RECENT_QUARTERS, comparisonById, historyIndices } from '../../domain/periods.js';
-import { COMPARE, categoryColor, SERIES, SERIES_LIMIT, REST } from '../../domain/palette.js';
+import { COMPARE, categoryColor, tints, SERIES_LIMIT, REST } from '../../domain/palette.js';
 import { int, dec, signed, signedPct } from '../../domain/format.js';
 import { SEASONAL_CATEGORIES } from '../../domain/taxonomy.js';
 import { stackBands } from '../../components/quarterTables.js';
@@ -51,7 +51,9 @@ export function render({ selection }) {
    * Every band is named in the legend, so a colour never has to carry a name on
    * its own. */
   const bands = stackBands(byCropType(rows), {
-    limit: SERIES_LIMIT, palette: SERIES, rest: REST,
+    limit: SERIES_LIMIT,
+    palette: (count) => tints(categoryColor('Open Field'), count),
+    rest: REST,
     restLabel: (n) => `${n} other crops`
   });
 

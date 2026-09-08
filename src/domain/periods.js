@@ -39,6 +39,15 @@ export const recentWindow = (series = []) => series.slice(-WINDOW_QUARTERS);
 export const YEAR_COUNT = 3;
 export const YEARS = Array.from({ length: YEAR_COUNT }, (_, i) => CURRENT_QUARTER.year - (YEAR_COUNT - 1 - i));
 
+/* Where each of those years closes in the quarterly record. A count of things
+ * standing — trees, buildings — is a stock rather than a flow, so a year is
+ * read at its last quarter rather than summed across it. The current year is
+ * read at the latest quarter held, which is as far as the record goes. */
+export const YEAR_END_INDICES = YEARS.map((year) => {
+  const last = QUARTERS.map((q, i) => (q.year === year ? i : -1)).filter((i) => i >= 0).pop();
+  return last ?? 0;
+});
+
 export const previousQuarter = (id = CURRENT_QUARTER.id) => {
   const i = QUARTERS.findIndex((x) => x.id === id);
   return QUARTERS[(i < 0 ? QUARTERS.length - 1 : i) - 1] || QUARTERS[0];

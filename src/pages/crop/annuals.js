@@ -14,7 +14,7 @@ import { figures } from '../../components/figures.js';
 import { stackedColumns } from '../../charts/stackedColumns.js';
 import { query } from '../../data/store.js';
 import { RECENT_QUARTERS } from '../../domain/periods.js';
-import { SERIES, SERIES_LIMIT, REST } from '../../domain/palette.js';
+import { categoryColor, tints, SERIES_LIMIT, REST } from '../../domain/palette.js';
 import { int, dec, signed, signedPct } from '../../domain/format.js';
 import { ANNUAL_CATEGORIES } from '../../domain/taxonomy.js';
 import { stackBands } from '../../components/quarterTables.js';
@@ -22,15 +22,17 @@ import { cropsOf, byCropType, cropQuarterTable, farmMovementTable, change, at, N
 
 const CATEGORIES = ANNUAL_CATEGORIES;
 
-/* One category's crops as bands of a stack, biggest at the bottom.
- *
- * Five hues, far enough apart to be told apart in a stack, and a grey band for
- * anything past them — the same rule the open-field page follows, so a stacked
- * column means the same thing wherever it appears. Cereals and fodder run to
- * three or four crops each, so the grey band rarely appears here at all. */
+/* One category's crops as bands of a stack, biggest at the bottom, in steps of
+ * the category's own hue. Cereals are wheat and sorghum — the same thing seen
+ * twice, not two unrelated things — so a ramp says more than two new colours
+ * would. Cereals and fodder run to three or four crops each, so the grey band
+ * for the tail rarely appears here at all. */
 const bandsFor = (rows, category) =>
   stackBands(byCropType(rows.filter((row) => row.category === category)), {
-    limit: SERIES_LIMIT, palette: SERIES, rest: REST, restLabel: (n) => `${n} other crops`
+    limit: SERIES_LIMIT,
+    palette: (count) => tints(categoryColor(category), count),
+    rest: REST,
+    restLabel: (n) => `${n} other crops`
   });
 
 export function render({ selection }) {

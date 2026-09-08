@@ -18,12 +18,9 @@ import { mapBand } from '../components/mapBand.js';
 import { query, taxonomyEntries } from '../data/store.js';
 import { taxonomyBreakdown } from '../domain/aggregate.js';
 import { int, dec } from '../domain/format.js';
-import { TODAY, QUARTERS } from '../domain/periods.js';
+import { TODAY } from '../domain/periods.js';
 import { monthlyCurve } from '../domain/cropCalendar.js';
 import { regionById } from '../domain/regions.js';
-
-const NOW = QUARTERS.length - 1;
-const LAST_YEAR = NOW - 4;
 
 export function render({ selection }) {
   const farms = query({ region: selection.region, types: selection.types });
@@ -38,28 +35,6 @@ export function render({ selection }) {
       .filter((entry) => monthlyCurve(entry.category, entry.type)[month] > 0)
       .map((entry) => entry.type)
   ).size;
-
-  /* Area now against the same quarter a year ago, per category and per crop.
-   * The landing page stays an inventory; the extra column only says whether the
-   * inventory is growing, which is the first question anyone asks of one. */
-  const movement = new Map();
-  for (const farm of farms) {
-    for (const crop of farm.crops) {
-      if (!selection.types.size || selection.types.has(crop.key)) {
-        for (const key of [crop.category, `${crop.category}:${crop.type}`]) {
-          const entry = movement.get(key) || { now: 0, before: 0 };
-          entry.now += crop.series?.[NOW] ?? 0;
-          entry.before += crop.series?.[LAST_YEAR] ?? 0;
-          movement.set(key, entry);
-        }
-      }
-    }
-  }
-  const movementOf = (row) => {
-    const entry = movement.get(row.key);
-    if (!entry || entry.before <= 0.05) return null;
-    return ((entry.now - entry.before) / entry.before) * 100;
-  };
 
   const filtering = selection.types.size > 0;
   const regionName = regionById(selection.region).label;
@@ -94,8 +69,7 @@ export function render({ selection }) {
         note: 'Click a group to see its crops.',
         flush: true
       }, summaryTable(breakdown.rows, {
-        measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1),
-        totalLabel: 'All land in production', movementOf
+        measure: 'area', measureLabel: 'Dunums', format: (v) => dec(v, 1), totalLabel: 'All land in production'
       })),
 
       section('Crops by number of farms', {

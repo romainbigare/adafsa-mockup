@@ -406,3 +406,11 @@ table.grid td.name { font-weight: 550; }
 @media (prefers-reduced-motion: reduce) {
   .nav-fold, .nav-item.has-children, .nav-chevron { transition: none; }
 }
+
+/* Support: a row of contacts, each a button with its detail written under it,
+   so the page works printed as well as clicked. */
+.contact-row { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; }
+.contact { display: flex; flex-direction: column; gap: 6px; }
+.contact .btn { justify-content: center; }
+.contact-detail { font-size: 12px; color: var(--ink-3); text-align: center; letter-spacing: .01em; }
+.brand-mark { display: block; margin-bottom: 12px; height: auto; }

@@ -6,9 +6,13 @@
  * away, even if there are only five of them.
  *
  * It reads the way the crop change pages read, because it answers the same
- * question about a different thing: six quarters of columns split by class,
- * then the classes themselves, then the farms behind them running oldest to
- * newest. Nothing here is a shape a reader has to learn twice. */
+ * question about a different thing: columns split by class, then the classes
+ * themselves, then the farms behind them running oldest to newest.
+ *
+ * The columns are years rather than quarters. A building is a stock, not a
+ * flow: it stands until somebody takes it down, and a quarter is not long
+ * enough for anything to happen. So each column is where a year closes, and
+ * the tables underneath keep the quarterly detail for anyone who wants it. */
 
 import { section, intro, callout } from '../../components/section.js';
 import { figures } from '../../components/figures.js';
@@ -18,8 +22,8 @@ import { barList } from '../../charts/barList.js';
 import { quarterTable, farmQuarterTable, stackBands, at, change, NOW, LAST_YEAR } from '../../components/quarterTables.js';
 import { query } from '../../data/store.js';
 import { movements, netMovement, contributors } from '../../domain/change.js';
-import { SERIES, SERIES_LIMIT, REST, COMPARE } from '../../domain/palette.js';
-import { RECENT_QUARTERS, QUARTERS, comparisonById } from '../../domain/periods.js';
+import { landuseColor, tints, SERIES_LIMIT, REST, COMPARE } from '../../domain/palette.js';
+import { QUARTERS, YEARS, YEAR_END_INDICES, comparisonById } from '../../domain/periods.js';
 import { int, dec, signed, signedPct } from '../../domain/format.js';
 
 const countSeries = (farm) => farm.structureCountSeries;
@@ -46,7 +50,11 @@ export function render({ selection }) {
   }
   const rows = [...classes.values()];
   const bands = stackBands(rows, {
-    limit: SERIES_LIMIT, palette: SERIES, rest: REST, restLabel: (n) => `${n} other classes`
+    limit: SERIES_LIMIT,
+    palette: (count) => tints(landuseColor('Structures'), count),
+    rest: REST,
+    restLabel: (n) => `${n} other classes`,
+    indices: YEAR_END_INDICES
   });
 
   /* Which classes moved over the year — the panel the tree page carries too. */
@@ -72,9 +80,9 @@ export function render({ selection }) {
         ? callout('watch', `${int(movers.length)} farms built or removed something in this period.`)
         : callout('info', 'No farm built or removed anything in this period.'),
 
-      section('Structures, quarter by quarter', { icon: 'trend', half: true, note: 'Counted, split by class.' },
+      section('Structures, year by year', { icon: 'trend', half: true, note: 'Counted at the close of each year, split by class.' },
         bands.length
-          ? stackedColumns(RECENT_QUARTERS.map((quarter) => quarter.label), bands,
+          ? stackedColumns(YEARS.map(String), bands,
               { format: int, half: true, totalLabel: 'All structures' })
           : intro('Nothing built in this selection.')),
 

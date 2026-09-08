@@ -34,7 +34,14 @@ const PATHS = {
   calendar: '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   table: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M9.5 9.5V19.5"/>',
   scale: '<path d="M12 4v16"/><path d="M5 8h14"/><path d="m5 8-2.5 6h5Z"/><path d="m19 8-2.5 6h5Z"/>',
-  ruler: '<rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/>'
+  ruler: '<rect x="2.5" y="8" width="19" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/>',
+  phone: '<path d="M6 3h3l1.6 4.2-2 1.4a12 12 0 0 0 6.8 6.8l1.4-2L21 15v3a3 3 0 0 1-3.2 3A16.5 16.5 0 0 1 3 6.2 3 3 0 0 1 6 3Z"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+  /* A speech bubble with a handset in it — the shape everyone reads as a
+     messaging app, without redrawing anyone\'s trademark. */
+  chat: '<path d="M21 12a8 8 0 0 1-11.7 7.1L3.5 20.5l1.4-5.6A8 8 0 1 1 21 12Z"/><path d="M9.4 9.2h1.3l.7 1.8-.9.6a5 5 0 0 0 2.9 2.9l.6-.9 1.8.7v1.3a1.3 1.3 0 0 1-1.4 1.3A7 7 0 0 1 8.1 10.6a1.3 1.3 0 0 1 1.3-1.4Z"/>',
+  copy: '<rect x="9" y="3.5" width="11.5" height="11.5" rx="2"/><path d="M15 18.5a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2"/>',
+  book: '<path d="M4 4.5A2 2 0 0 1 6 3h13v15H6a2 2 0 0 0-2 2Z"/><path d="M4 19.5A2 2 0 0 1 6 18h13v3H6a2 2 0 0 1-2-1.5Z"/>'
 };
 
 export function icon(name, { size = 16, title = null } = {}) {

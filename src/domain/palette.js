@@ -45,14 +45,11 @@ export const STATUS = {
 
 export const SEQUENTIAL = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95'];
 
-/* A short series set, for the handful of members of one group drawn side by
- * side — the five biggest open-field crops, say. Tints of a single hue were
- * tried and could not be told apart in a stack, so these are the Okabe–Ito
- * hues: five colours chosen to stay distinct under every common form of
- * colour blindness. Five is the whole set on purpose. Anything past it is
- * REST, which says "everything else" rather than pretending to name it. */
-export const SERIES = ['#0072b2', '#e69f00', '#009e73', '#cc79a7', '#56b4e9'];
-export const SERIES_LIMIT = SERIES.length;
+/* How many members of a group get a band of their own in a stacked column
+ * before the rest gather into one. Past five, a monochromatic ramp runs out of
+ * steps a reader can tell apart. REST says "everything else" rather than
+ * pretending to name it. */
+export const SERIES_LIMIT = 5;
 export const REST = '#9ca3af';
 
 /* Change and comparison. `neutral` draws the bars; `up` and `down` tint only
@@ -85,16 +82,25 @@ export const landuseColor = (name) => LANDUSE_COLORS[name] || NEUTRAL;
 /* Tints of one identity hue, for the members of a single category.
  *
  * A stacked column of cereals is wheat and sorghum — the same thing seen twice,
- * not two unrelated things — so they are drawn as two steps of the cereal hue
- * rather than as two new colours. The lightness runs from dark to light in a
- * fixed order, so a crop keeps its shade as long as the sort does, and every
- * band carries its name in the legend regardless. */
+ * not two unrelated things — so they are drawn as steps of the cereal hue
+ * rather than as new colours.
+ *
+ * The steps run across a fixed lightness range rather than around the base
+ * colour, because a hue that happens to be dark or pale would otherwise give a
+ * ramp with nowhere to go, and adjacent bands that cannot be told apart. The
+ * saturation falls as the lightness rises, which is how a tint reads naturally
+ * and adds a second difference between neighbours. Dark to light in a fixed
+ * order, so a crop keeps its shade as long as the sort does, and every band
+ * carries its name in the legend regardless. */
+const RAMP = { from: 0.26, to: 0.80, fade: 0.34 };
+
 export function tints(baseColor, count) {
   if (count <= 1) return [baseColor];
-  const [h, s, l] = toHsl(baseColor);
-  const from = Math.max(0.2, l - 0.14);
-  const to = Math.min(0.84, l + 0.3);
-  return Array.from({ length: count }, (_, i) => fromHsl(h, s, from + ((to - from) * i) / (count - 1)));
+  const [h, s] = toHsl(baseColor);
+  return Array.from({ length: count }, (_, i) => {
+    const step = i / (count - 1);
+    return fromHsl(h, s * (1 - RAMP.fade * step), RAMP.from + (RAMP.to - RAMP.from) * step);
+  });
 }
 
 function toHsl(hex) {

@@ -29,7 +29,7 @@ const NOTES = {
   'trees/change': 'Trees year by year over three years, following whichever group is selected. Beside it, the three varieties that grew most and the three that shrank most in the last twelve months. The table lists varieties, not farms. (Module 2: annual change detection.)',
   'land/landuse': 'How the land is used: land mapped, open farmland, buildings and greenhouses, fallow land and bare ground. Zoom in and the map draws the real shape of each piece of land.',
   'land/structures': 'What is built on the farms: structures found, farms with structures, area covered, and the main classes. Houses, sheds, water tanks, pens, roads, pump rooms. (Module 3: structure detection.)',
-  'land/change': 'Buildings that are new and buildings that are gone: net change, new structures, structures removed, and the change in area covered. It needs two quarters of data first.',
+  'land/change': 'Buildings that are new and buildings that are gone: net change, new structures, structures removed, and the change in area covered. The chart runs year by year, because a building stands until somebody takes it down. (Module 3: change tracking.)',
   'ier/scores': 'A water score from 0 to 100 for every farm: farms scored, the average, how many keep their subsidy at 65 or more, how many need attention, and how many are in the lowest band. (Module 4: IER score, band and subsidy list.)',
   'ier/trend': 'Are the scores moving? The average score now, the change since last quarter or last year, how many farms got worse and how many improved. A line, and no map. (Module 4: quarter-on-quarter trend.)',
   'water/demand': 'Water this month: how much each farm is allowed, how much it used, how many farms use too much, and how much extra they used. (Module 6: monthly water demand and over-allocation flag.)',
@@ -77,7 +77,7 @@ const otherScreens = [
   },
   {
     id: 'S1', title: 'Support', section: 'Support', route: '#/support',
-    note: 'Where to ask for help, and a note on what is real data and what is made up in this mockup. One page — in the old platform, more than half the menu was support and settings.'
+    note: 'How to reach a person: telephone, WhatsApp and email, when someone answers, and how to send the exact screen you are looking at. Also who builds the platform, and a note on what is real data and what is made up. One page — in the old platform, more than half the menu was support and settings.'
   }
 ];
 

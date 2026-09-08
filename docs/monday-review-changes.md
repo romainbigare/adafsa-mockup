@@ -153,14 +153,19 @@ entirely — chart, table and filter. A toggle that moves nothing when ticked is
 no toggle. Five pages that showed no toggles at all now carry them and answer to them:
 fallow land, land use, structures, change tracking, the irrigation trend.
 
-**Stacked columns mean one thing everywhere.** Five colours far enough apart to be told
-apart in a stack, a grey band for the tail, named in the legend. Used on C2, C3, the
-fallow page, change tracking, the monthly water demand and the farm profile.
+**Stacked columns mean one thing everywhere.** The members of a group are steps of that
+group's own hue — cereals are wheat and sorghum, the same thing seen twice, not two
+unrelated things — running across a fixed lightness range so neighbouring bands stay
+apart. Five bands at most, then one grey band for the tail, and every band named in the
+legend. Where the bands are different things rather than members of one — crop groups,
+tree groups, land states — they keep their identity colours instead.
 
-**Change pages read the same way.** Change tracking is rebuilt on the crop pattern: six
-quarters of columns split by structure class, the biggest movers beside them, then the
-classes themselves, then the farms running oldest to newest. The irrigation trend gains
-the movers panel and the six-quarter window.
+**Change pages read the same way.** Change tracking is rebuilt on the crop pattern: the
+biggest movers beside the chart, then the classes themselves, then the farms running
+oldest to newest. Its columns are years rather than quarters — a building stands until
+somebody takes it down, and a quarter is not long enough for anything to happen — with
+the quarterly detail kept in the tables underneath. The irrigation trend gains the movers
+panel and the six-quarter window.
 
 **Maps read at the altitude you are looking from.** The efficiency map now averages the
 way the canopy map does — the score for the region, then the farm centre, then the farm.
@@ -168,8 +173,15 @@ way the canopy map does — the score for the region, then the farm centre, then
 **Farm centre is everywhere a farm is named**, including the farm profile and the
 corrective-actions header.
 
-**The overview says whether the inventory is moving.** One "vs a year ago" column on the
-area table. It stays an inventory; it just answers the first question anyone asks of one.
+**A page offers the filters it answers to, and no others.** The fallow page has none at
+all: it counts land rather than what is grown on it, so a crop toggle would narrow the
+farms without changing the question, and a reader who ticked one would be looking at a
+different number under the same heading.
+
+**Support is a page rather than a note.** How to reach a person — telephone, WhatsApp,
+email — when someone answers, how to send the exact screen you are looking at, how to
+ask for training or a report, and who builds the thing. Every contact detail is a
+placeholder and the card says so at the top.
 
 **Yield leads with the harvest by quarter.** The bar list that ranked the same crops the
 table above it already ranked is gone, replaced by the pilot-report shape on expected
