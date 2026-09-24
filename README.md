@@ -25,6 +25,7 @@ figure, table and chart works offline.
 node test/all.js        # or: npm test — plain Node, no runner to install
 node tools/smoke.mjs    # walks every route in a browser; needs Playwright
 node tools/screendeck.mjs   # rebuilds docs/ADAFSA_Platform_Screens.pptx from the live app
+node tools/tourdeck.mjs     # rebuilds docs/ADAFSA_Platform_Tour_EN_AZ.pptx, the short English/Azerbaijani tour
 ```
 
 ## What it contains
@@ -77,6 +78,9 @@ tools/
   smoke.mjs              walks every route in a browser and reports console errors
   screendeck.mjs         photographs every screen and typesets the review deck;
                          serves the map tiles itself and keeps them in .tile-cache
+  tourdeck.mjs           a short bilingual tour (English/Azerbaijani) at tablet
+                         width, with numbered markers; its words are in tour/
+  lib/stage.mjs          the server, tile relay and browser both decks share
 src/
   app/       shell, two-level hash router, navigation model, page registry, DOM and icons
   domain/    pure logic — taxonomy, regions, bands, periods, aggregation, change,
