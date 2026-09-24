@@ -102,6 +102,76 @@ a { color: inherit; }
 .nav-foot a { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink-3); text-decoration: none; padding: 6px 0; }
 .nav-foot a:hover { color: var(--ink); }
 
+/* ---- The narrow menu --------------------------------------------------- */
+/* The fold control, and the two pieces only the narrow menu shows: a brand
+   mark in place of the name, and the module's name over its flyout. */
+.nav-mark, .nav-fly-title { display: none; }
+.nav-collapse {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  margin-top: 2px; padding: 6px 0; border: 0; background: none; cursor: pointer;
+  font-size: 12.5px; color: var(--ink-4); text-align: start;
+}
+.nav-collapse:hover { color: var(--ink); }
+/* It points the way the menu will go: back towards the edge, or out again. */
+.nav-collapse .icon { transform: scaleX(-1); }
+[dir="rtl"] .nav-collapse .icon { transform: none; }
+
+/* Only where there is a menu column to narrow. Below 760px the menu is a
+   drawer, and the drawer keeps its labels. */
+@media (min-width: 761px) {
+  body.nav-compact { --nav-w: 64px; }
+  /* Visible overflow, so a flyout can hang outside the column; above the
+     sticky page bar, so it hangs over it rather than under it. */
+  body.nav-compact .nav { overflow: visible; z-index: 620; padding-top: 14px; }
+  body.nav-compact .nav-brand { padding: 0 0 14px; display: flex; justify-content: center; }
+  body.nav-compact .nav-brand strong, body.nav-compact .nav-brand > span { display: none; }
+  body.nav-compact .nav-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 9px; background: var(--brand-700); color: #fff;
+  }
+  body.nav-compact .nav-list { padding: 0 10px; }
+  body.nav-compact .nav-item { position: relative; }
+  body.nav-compact .nav-item > a { justify-content: center; padding: 9px 0; border-inline-start-width: 0; }
+  body.nav-compact .nav-item > a .nav-label,
+  body.nav-compact .nav-chevron { display: none; }
+  body.nav-compact .nav-item.has-children.is-open { padding-bottom: 0; }
+  /* With its pages folded away, the module you are in carries the highlight
+     its open list would have carried. */
+  body.nav-compact .nav-item.is-open > a { background: var(--brand-50); color: var(--brand-800); }
+  body.nav-compact .nav-item.is-open > a .icon,
+  body.nav-compact .nav-item > a[aria-current] .icon { color: var(--brand-700); }
+
+  body.nav-compact .nav-fold {
+    display: none; position: absolute; inset-inline-start: calc(100% + 8px); top: -6px; z-index: 700;
+    min-width: 210px; padding: 6px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-lg);
+  }
+  /* A bridge over the gap, so the pointer can travel into the flyout. */
+  body.nav-compact .nav-fold::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: -10px; width: 10px; }
+  body.nav-compact .nav-item:hover > .nav-fold,
+  body.nav-compact .nav-item:focus-within > .nav-fold { display: block; }
+  body.nav-compact .nav-fold > .nav-sub { overflow: visible; padding: 0; }
+  body.nav-compact .nav-fly-title {
+    display: block; padding: 5px 10px 4px; font-size: 10.5px; font-weight: 650;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--ink-4);
+  }
+
+  body.nav-compact .nav-foot { padding: 8px 0 0; margin: 8px 10px 0; display: grid; justify-items: center; gap: 2px; }
+  body.nav-compact .nav-foot a { position: relative; padding: 8px; }
+  body.nav-compact .nav-foot .nav-label { display: none; }
+  body.nav-compact .nav-collapse { justify-content: center; padding: 8px; width: auto; }
+  body.nav-compact .nav-collapse .icon { transform: none; }
+  [dir="rtl"] body.nav-compact .nav-collapse .icon { transform: scaleX(-1); }
+
+  /* An entry with no pages under it names itself on hover, as a tag. */
+  body.nav-compact .nav-item:not(.has-children) > a:is(:hover, :focus-visible) .nav-label,
+  body.nav-compact .nav-foot a:is(:hover, :focus-visible) .nav-label {
+    display: block; position: absolute; inset-inline-start: calc(100% + 8px); top: 50%; transform: translateY(-50%);
+    z-index: 700; white-space: nowrap; padding: 4px 8px; border-radius: var(--r-sm);
+    background: var(--ink); color: #fff; font-size: 12px; font-weight: 500;
+  }
+}
+
 .app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
 .app-bar {
@@ -327,6 +397,7 @@ table.grid td.name { font-weight: 550; }
   }
   body.nav-open .nav { transform: none; }
   .nav-toggle { display: inline-flex; }
+  .nav-collapse { display: none; }
   .page-body { padding: 16px 14px 48px; }
   .page-header { padding: 10px 14px; }
 }

@@ -32,16 +32,17 @@ for (const screen of SCREENS) {
   ok(screen.markers.every((m) => typeof m.sel === 'string' && m.sel.length), `${screen.id}: every marker names an element`);
 }
 
-/* Room on the slide, in characters. The columns are 3.4 inches wide: two lines
- * of title, four of intro, one of heading and three of text per point. The
- * build does not check fit, so this is the guard against a translation that
- * runs into the next block. */
-const LIMITS = { title: 40, intro: 150, head: 30, text: 100 };
+/* Room on the slide, in characters. Titles and intros run across half the
+ * slide — one line of title, two of intro; the points sit in columns 2.25
+ * inches wide down the sides of the laptop — two lines of heading at most and
+ * three of text. The build does not check fit, so this is the guard against a
+ * translation that runs into the next block. */
+const LIMITS = { title: 36, intro: 150, head: 26, text: 75 };
 for (const screen of SCREENS) {
   for (const lang of LANGS) {
     const copy = screen[lang];
-    ok(copy.title.length <= LIMITS.title, `${screen.id}/${lang}: title fits two lines — "${copy.title}"`);
-    ok(copy.intro.length <= LIMITS.intro, `${screen.id}/${lang}: intro fits four lines`);
+    ok(copy.title.length <= LIMITS.title, `${screen.id}/${lang}: title fits one line — "${copy.title}"`);
+    ok(copy.intro.length <= LIMITS.intro, `${screen.id}/${lang}: intro fits two lines`);
     for (const p of copy.points) {
       ok(p.head.length <= LIMITS.head, `${screen.id}/${lang}: "${p.head}" fits one line`);
       ok(p.text.length <= LIMITS.text, `${screen.id}/${lang}: "${p.text}" fits three lines`);
@@ -88,7 +89,11 @@ is(issues[0].id, 'canopy', 'the example farm\'s most urgent problem is its trees
 is(issues[0].severity, 'act', 'and it is in the band the copy calls very stressed');
 ok(issues[0].action.includes('pests'), 'the suggested action names pests, as the slide says');
 
-/* "Here the farm used only 70% of the water it is allowed." */
+/* "Here: 59 palms, with a health score of 46." */
+ok(says('farm', 3, String(example.palms)), `the farm slide quotes its ${example.palms} palms`);
+ok(says('farm', 3, String(Math.round(example.canopyPalms))), 'and their health score');
+
+/* "The farm used only 70% of the water it is allowed." */
 const used = Math.round(example.waterUsePct);
 ok(issues.some((i) => i.id === 'under-water'), 'the example farm is short of water, the possible cause');
 ok(says('actions', 3, String(used)), `the actions slide quotes the ${used}% the farm used`);

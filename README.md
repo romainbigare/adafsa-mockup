@@ -45,13 +45,18 @@ Twenty-one pages, in the order and under the names agreed in the review
     Individual Farms                register · farm profile · corrective actions
     Support
 
-Three ideas run through all of them.
+A few ideas run through all of them.
 
 **One filter bar under the page header.** It carries the region and a chip for each
 crop group. A chip's name turns the whole group on or off; its chevron opens that
 group's varieties. The funnel button opens the whole taxonomy at once. Everything is
 ticked when a page opens, so the bar shows what is being counted rather than an empty
 list, and a filter moves the map, the figures and every table together.
+
+**The menu can fold to a narrow column of icons**, with the button at its foot,
+giving a laptop screen back a fifth of its width. A module's pages then open
+beside its icon on hover. It opens wide until somebody folds it, and the browser
+remembers the choice.
 
 **Maps illustrate; they do not carry the argument.** A map appears where the question
 is genuinely about a place. Change and trend pages have none, and neither does fallow
@@ -78,8 +83,9 @@ tools/
   smoke.mjs              walks every route in a browser and reports console errors
   screendeck.mjs         photographs every screen and typesets the review deck;
                          serves the map tiles itself and keeps them in .tile-cache
-  tourdeck.mjs           a short bilingual tour (English/Azerbaijani) at tablet
-                         width, with numbered markers; its words are in tour/
+  tourdeck.mjs           a short bilingual tour (English/Azerbaijani) on laptop
+                         screens with the narrow menu and numbered markers; its
+                         words are in tour/
   lib/stage.mjs          the server, tile relay and browser both decks share
 src/
   app/       shell, two-level hash router, navigation model, page registry, DOM and icons

@@ -8,19 +8,18 @@
  * with what it is in plain words, in both languages, and small numbered
  * markers on the picture that match the numbered points beside it.
  *
- * The look is the Wafra farm-app deck, followed closely: English on the left,
- * the screen in a device frame in the middle, Azerbaijani on the right; a
- * spaced green label over each column, a two-line title, a short intro, then
- * up to four numbered points; dark green number discs with a white ring, on
- * the picture and beside the points alike. The cover and the closing page are
- * that deck's too.
+ * The look is the Wafra farm-app deck: a spaced green label over each
+ * language, a bold title, a short intro, then up to four numbered points; dark
+ * green number discs with a white ring, on the picture and beside the points
+ * alike. The cover and the closing page are that deck's too.
  *
- * The one thing that could not be copied is the device. That deck shows a
- * phone app; this is a website. A desktop screenshot shrunk into the middle
- * column would be unreadable, so the website is photographed as it really
- * draws at tablet width — its own narrow layout, not a crop — and framed as a
- * tablet. The middle column is wider than the phone's to hold it, and the two
- * text columns give up that width.
+ * The device is not. That deck shows a phone app, standing tall between its
+ * two text columns; this is a website, and it is shown as it looks on a
+ * laptop — 1280 × 800, with the menu folded to its narrow column of icons so
+ * the page gets the width. A laptop lies on its side, so the page is arranged
+ * around it: both titles across the top, English on the left and Azerbaijani
+ * on the right, the laptop in the middle, and each language's numbered points
+ * down its own side.
  *
  * The words and the marker anchors live in tools/tour/content.mjs. Markers are
  * placed by finding their element on the page at capture time, so they follow
@@ -33,24 +32,29 @@ import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import pptxgen from 'pptxgenjs';
 import { ROOT, openStage, stopOnProblems } from './lib/stage.mjs';
+import { NAV_COMPACT_KEY } from '../src/app/navPrefs.js';
 import { COVER, SCREENS, CLOSING } from './tour/content.mjs';
 
 const WORK = join(ROOT, '.deck-work', 'tour');
 const outFlag = process.argv.indexOf('--out');
 const OUT = join(ROOT, outFlag > -1 ? process.argv[outFlag + 1] : 'docs/ADAFSA_Platform_Tour_EN_AZ.pptx');
 
-/* Under 760 CSS pixels the website folds its menu away and takes the full
- * width, which is the layout that reads at this size. The height gives the
- * frame roughly the proportions of a tablet held upright. */
-const VIEW = { width: 720, height: 1030 };
-const SCALE = 2;                   // about 330 dpi at the size it is printed
-const BEZEL = 18;                  // CSS pixels of dark frame around the screen
-const OUTER_R = 40;
-const INNER_R = 22;
+/* A common laptop screen, in CSS pixels. */
+const VIEW = { width: 1280, height: 800 };
+const SCALE = 2;
 const SHOT_Q = 0.92;
 const MIN_INK = 0.04;              // below this a "screenshot" is a blank sheet, and the build stops
-const FRAME = { w: VIEW.width + BEZEL * 2, h: VIEW.height + BEZEL * 2 };
-const MARKER_GAP = 50;             // CSS pixels between marker centres; a disc is about 44 across
+
+/* The laptop, in CSS pixels around the screen: the lid's bezel, a slightly
+ * deeper chin, the base that sticks out either side, and room for its shadow. */
+const LID = { side: 14, top: 20, chin: 22, r: 16 };
+const BASE = { h: 16, overhang: 60 };
+const SHADOW = 12;
+const FRAME = {
+  w: VIEW.width + LID.side * 2 + BASE.overhang * 2,
+  h: VIEW.height + LID.top + LID.chin + BASE.h + SHADOW
+};
+const SCREEN_AT = { x: BASE.overhang + LID.side, y: LID.top };
 
 // ----------------------------------------------------------------- palette --
 /* Read off the reference deck, not chosen here. */
@@ -65,63 +69,106 @@ const PALE = 'BDE0D0';
 const SOFT = '8EC9AE';
 const QUIET = '5F6D66';
 const WHITE = 'FFFFFF';
-const BEZEL_INK = '#141c19';
+
+// ------------------------------------------------------------------ layout --
+/* Inches, on a 13.33 × 7.5 slide. Worked out here, before capture, because the
+ * marker spacing check needs to know how large a disc lands on the screen. */
+const W = 13.333, H = 7.5;
+const MARGIN = 0.55;
+const SIDE_W = 2.25;               // each language's column of points
+const GUTTER = 0.25;
+const LAPTOP_W = W - MARGIN * 2 - SIDE_W * 2 - GUTTER * 2;
+const LAPTOP_H = LAPTOP_W * (FRAME.h / FRAME.w);
+const LAPTOP_X = (W - LAPTOP_W) / 2;
+const BAND_BOTTOM = 2.15;          // the titles and intros sit above this
+const LAPTOP_Y = BAND_BOTTOM + (7.0 - BAND_BOTTOM - LAPTOP_H) / 2;
+const DISC = 0.25;
+/* Two discs closer than a disc and a bit, in screen pixels, touch. */
+const MARKER_GAP = (DISC * 1.12) / (LAPTOP_W / FRAME.w);
 
 // ------------------------------------------------------------------ capture --
 await mkdir(WORK, { recursive: true });
-const stage = await openStage({ viewport: VIEW, scale: SCALE });
+/* The narrow menu is set the way a person would set it — through the
+ * preference the website itself remembers — so the screens show a state the
+ * website really has. */
+const stage = await openStage({ viewport: VIEW, scale: SCALE, storage: { [NAV_COMPACT_KEY]: '1' } });
 const { page } = stage;
 
-/* The tablet frame and its shadowless dark bezel are baked into the pixels,
- * as the phone was in the reference: a picture prints the same everywhere,
- * a PowerPoint effect does not. The paper colour behind the rounded corners is
- * passed in, because the cover sits the frame on a tinted panel. */
+/* The laptop is drawn into the pixels, as the phone was in the reference: a
+ * picture prints the same everywhere, a PowerPoint effect does not. The paper
+ * colour behind it is passed in, because the cover sits it on a tinted panel. */
 async function frame(src, out, paper) {
   const b64 = (await readFile(src)).toString('base64');
-  const shot = await page.evaluate(async ({ data, scale, bezel, outerR, innerR, paper, ink, quality }) => {
+  const shot = await page.evaluate(async ({ data, scale, lid, base, shadow, frameW, frameH, at, paper, quality }) => {
     const img = new Image();
     img.src = `data:image/png;base64,${data}`;
     await img.decode();
-    const b = bezel * scale;
-    const w = img.width + b * 2;
-    const h = img.height + b * 2;
+    const k = scale;
     const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
+    canvas.width = frameW * k;
+    canvas.height = frameH * k;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = paper;
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = ink;
-    ctx.beginPath(); ctx.roundRect(0, 0, w, h, outerR * scale); ctx.fill();
-    /* A lighter rim, as the phone had, so the frame reads as an object. */
-    ctx.strokeStyle = 'rgba(255,255,255,0.13)';
-    ctx.lineWidth = 2 * scale;
-    ctx.beginPath(); ctx.roundRect(scale, scale, w - 2 * scale, h - 2 * scale, outerR * scale - scale); ctx.stroke();
-    /* The camera. */
-    ctx.fillStyle = '#2b3833';
-    ctx.beginPath(); ctx.arc(w / 2, b / 2, 2.6 * scale, 0, Math.PI * 2); ctx.fill();
+    const lidX = base.overhang * k;
+    const lidW = (frameW - base.overhang * 2) * k;
+    const lidH = (frameH - base.h - shadow) * k;
+    const baseY = lidH;
+    const baseH = base.h * k;
 
+    /* A soft shadow on the table under the base. */
     ctx.save();
-    ctx.beginPath(); ctx.roundRect(b, b, img.width, img.height, innerR * scale); ctx.clip();
-    ctx.drawImage(img, b, b);
+    ctx.filter = `blur(${5 * k}px)`;
+    ctx.fillStyle = 'rgba(15, 23, 20, 0.28)';
+    ctx.beginPath();
+    ctx.ellipse(canvas.width / 2, baseY + baseH + 1 * k, canvas.width / 2 - 26 * k, 5 * k, 0, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
 
-    const px = ctx.getImageData(b, b, img.width, img.height).data;
+    /* The lid: a dark bezel, rounder at the top than where it meets the base. */
+    ctx.fillStyle = '#141c19';
+    ctx.beginPath(); ctx.roundRect(lidX, 0, lidW, lidH, [lid.r * k, lid.r * k, 4 * k, 4 * k]); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+    ctx.lineWidth = 1.5 * k;
+    ctx.beginPath(); ctx.roundRect(lidX + k, k, lidW - 2 * k, lidH - 2 * k, [lid.r * k - k, lid.r * k - k, 3 * k, 3 * k]); ctx.stroke();
+    ctx.fillStyle = '#2b3833';
+    ctx.beginPath(); ctx.arc(canvas.width / 2, (lid.top / 2) * k, 2.4 * k, 0, Math.PI * 2); ctx.fill();
+
+    /* The base: brushed aluminium, a notch to open it by. */
+    const metal = ctx.createLinearGradient(0, baseY, 0, baseY + baseH);
+    metal.addColorStop(0, '#eceff1');
+    metal.addColorStop(0.45, '#d3d8db');
+    metal.addColorStop(1, '#9aa1a6');
+    ctx.fillStyle = metal;
+    ctx.beginPath(); ctx.roundRect(0, baseY, canvas.width, baseH, [2 * k, 2 * k, 9 * k, 9 * k]); ctx.fill();
+    ctx.fillStyle = '#b3babe';
+    ctx.beginPath(); ctx.roundRect(canvas.width / 2 - 75 * k, baseY, 150 * k, 5 * k, [0, 0, 5 * k, 5 * k]); ctx.fill();
+
+    /* The screen. */
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(at.x * k, at.y * k, img.width, img.height, 3 * k); ctx.clip();
+    ctx.drawImage(img, at.x * k, at.y * k);
+    ctx.restore();
+
+    const px = ctx.getImageData(at.x * k, at.y * k, img.width, img.height).data;
     let inked = 0, seen = 0;
     for (let i = 0; i < px.length; i += 4 * 37) {
       seen++;
       if (px[i] < 246 || px[i + 1] < 246 || px[i + 2] < 246) inked++;
     }
     return { data: canvas.toDataURL('image/jpeg', quality).split(',')[1], ink: inked / seen };
-  }, { data: b64, scale: SCALE, bezel: BEZEL, outerR: OUTER_R, innerR: INNER_R, paper, ink: BEZEL_INK, quality: SHOT_Q });
+  }, {
+    data: b64, scale: SCALE, lid: LID, base: BASE, shadow: SHADOW,
+    frameW: FRAME.w, frameH: FRAME.h, at: SCREEN_AT, paper, quality: SHOT_Q
+  });
   await writeFile(out, Buffer.from(shot.data, 'base64'));
   return shot.ink;
 }
 
 /* Put a map where the slide needs it. A farm is framed close enough for its
- * trees to be drawn; `fitFarms` frames every holding on the map, which at
- * tablet width is tighter than the page's own opening view. */
+ * trees to be drawn; `fitFarms` frames every holding on the map, which is
+ * tighter than the page's own opening view. */
 async function placeMap(spec) {
   if (!spec) return;
   await page.evaluate(async ({ id, farm, zoom, fitFarms }) => {
@@ -152,7 +199,12 @@ async function measure(markers) {
       const root = m.within ? find(m.within.sel, m.within.text) : document;
       const el = root && find(m.sel, m.text, root);
       if (!el) return { missing: `${m.sel}${m.text ? ` containing "${m.text}"` : ''}` };
-      const r = el.getBoundingClientRect();
+      /* `ink` measures the words rather than their box: a figure's number sits
+       * in a box as wide as its card, and "beside the number" means beside the
+       * digits. */
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const r = m.ink ? range.getBoundingClientRect() : el.getBoundingClientRect();
       const x = m.x ?? 'left';
       const dx = m.dx ?? (x === 'left' ? -8 : 0);
       return {
@@ -170,6 +222,7 @@ for (const screen of SCREENS) {
   await stage.settleTiles();
   await placeMap(screen.map);
   await page.evaluate(() => window.scrollTo(0, 0));
+  await page.mouse.move(VIEW.width - 2, VIEW.height - 2);   // no hover state in the picture
   await page.waitForTimeout(200);
 
   screen.at = await measure(screen.markers);
@@ -204,8 +257,6 @@ async function glyph(name, colour, px = 256) {
     const { icon } = await import('/src/app/icons.js');
     const svg = icon(name, { size: px });
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svg.setAttribute('stroke', colour);
-    svg.style.color = colour;
     const markup = svg.outerHTML.replaceAll('currentColor', colour);
     const img = new Image();
     img.src = `data:image/svg+xml;base64,${btoa(markup)}`;
@@ -236,19 +287,12 @@ if (blank.length) {
 }
 
 // -------------------------------------------------------------- typesetting --
-const W = 13.333, H = 7.5;
-const MARGIN = 0.55;
-const GUTTER = 0.35;
-const IMG_H = 6.6, IMG_Y = 0.45;
-const IMG_W = IMG_H * (FRAME.w / FRAME.h);
-const IMG_X = (W - IMG_W) / 2;
-const COL_W = IMG_X - GUTTER - MARGIN;
-const COLUMNS = [
-  { lang: 'en', label: 'ENGLISH', x: MARGIN },
-  { lang: 'az', label: 'AZƏRBAYCANCA', x: IMG_X + IMG_W + GUTTER }
-];
-const DISC = 0.27;
 const TOTAL = SCREENS.length + 2;
+const BAND_W = W / 2 - MARGIN - 0.2;
+const LANGS = [
+  { lang: 'en', label: 'ENGLISH', bandX: MARGIN, sideX: MARGIN },
+  { lang: 'az', label: 'AZƏRBAYCANCA', bandX: W / 2 + 0.2, sideX: LAPTOP_X + LAPTOP_W + GUTTER }
+];
 
 const pres = new pptxgen();
 pres.layout = 'LAYOUT_WIDE';
@@ -261,7 +305,7 @@ const text = (s, value, options) => s.addText(value, { fontFace: FONT, margin: 0
 const disc = (s, n, x, y) => text(s, String(n), {
   shape: pres.shapes.OVAL, x, y, w: DISC, h: DISC,
   fill: { color: DEEP }, line: { color: WHITE, width: 1.25 },
-  fontSize: 10.5, bold: true, color: WHITE, align: 'center', valign: 'middle'
+  fontSize: 10, bold: true, color: WHITE, align: 'center', valign: 'middle'
 });
 
 const pageNumber = (s, n, colour = QUIET) => text(s, `${n} / ${TOTAL}`, {
@@ -275,12 +319,12 @@ const WAFRA_RATIO = 416 / 133;                     // the file's own proportions
 {
   const s = pres.addSlide();
   s.background = { color: WHITE };
-  const PANEL_X = 8.1;
+  const PANEL_X = 7.3;
   s.addShape(pres.shapes.RECTANGLE, { x: PANEL_X, y: 0, w: W - PANEL_X, h: H, fill: { color: PANEL }, line: { color: PANEL } });
   const cover = SCREENS.find((sc) => sc.id === COVER.screen);
-  const coverH = 6.1;
-  const coverW = coverH * (FRAME.w / FRAME.h);
-  s.addImage({ path: cover.coverFile, x: PANEL_X + (W - PANEL_X - coverW) / 2, y: (H - coverH) / 2, w: coverW, h: coverH });
+  const coverW = W - PANEL_X - 0.5;
+  const coverH = coverW * (FRAME.h / FRAME.w);
+  s.addImage({ path: cover.coverFile, x: PANEL_X + 0.25, y: (H - coverH) / 2, w: coverW, h: coverH });
 
   const logoH = 0.57;
   s.addImage({ path: WAFRA, x: 0.75, y: 0.68, w: logoH * WAFRA_RATIO, h: logoH });
@@ -304,31 +348,34 @@ const WAFRA_RATIO = 416 / 133;                     // the file's own proportions
 SCREENS.forEach((screen, index) => {
   const s = pres.addSlide();
   s.background = { color: WHITE };
-  s.addImage({ path: screen.file, x: IMG_X, y: IMG_Y, w: IMG_W, h: IMG_H });
+  s.addImage({ path: screen.file, x: LAPTOP_X, y: LAPTOP_Y, w: LAPTOP_W, h: LAPTOP_H });
 
-  /* Viewport pixels to slide inches: through the bezel, then to scale. */
+  /* Viewport pixels to slide inches: through the frame, then to scale. */
   screen.at.forEach((p, i) => {
-    const x = IMG_X + ((BEZEL + p.x) / FRAME.w) * IMG_W;
-    const y = IMG_Y + ((BEZEL + p.y) / FRAME.h) * IMG_H;
+    const x = LAPTOP_X + ((SCREEN_AT.x + p.x) / FRAME.w) * LAPTOP_W;
+    const y = LAPTOP_Y + ((SCREEN_AT.y + p.y) / FRAME.h) * LAPTOP_H;
     disc(s, i + 1, x - DISC / 2, y - DISC / 2);
   });
 
+  /* Points start level with the top of the screen and share the height the
+   * laptop takes, so the two sides and the picture read as one block. */
   const count = screen.en.points.length;
-  const pitch = count <= 3 ? 1.12 : 0.975;
-  for (const column of COLUMNS) {
-    const copy = screen[column.lang];
-    text(s, column.label, {
-      x: column.x, y: 0.55, w: COL_W, h: 0.26, fontSize: 10, bold: true, color: LABEL, charSpacing: 2, valign: 'middle'
+  const top = LAPTOP_Y + (SCREEN_AT.y / FRAME.h) * LAPTOP_H;
+  const pitch = Math.min(1.2, (7.0 - top) / count);
+  for (const side of LANGS) {
+    const copy = screen[side.lang];
+    text(s, side.label, {
+      x: side.bandX, y: 0.5, w: BAND_W, h: 0.26, fontSize: 10, bold: true, color: LABEL, charSpacing: 2, valign: 'middle'
     });
-    text(s, copy.title, { x: column.x, y: 0.86, w: COL_W, h: 0.9, fontSize: 24, bold: true, color: INK, valign: 'top' });
-    text(s, copy.intro, { x: column.x, y: 1.82, w: COL_W, h: 1.05, fontSize: 14, color: BODY, valign: 'top' });
+    text(s, copy.title, { x: side.bandX, y: 0.8, w: BAND_W, h: 0.5, fontSize: 24, bold: true, color: INK, valign: 'top' });
+    text(s, copy.intro, { x: side.bandX, y: 1.34, w: BAND_W, h: 0.64, fontSize: 14, color: BODY, valign: 'top' });
     copy.points.forEach((point, i) => {
-      const y = 3.065 + i * pitch;
-      disc(s, i + 1, column.x + 0.005, y);
+      const y = top + i * pitch;
+      disc(s, i + 1, side.sideX, y);
       text(s, [
-        { text: point.head, options: { fontSize: 13.5, bold: true, color: INK, breakLine: true, paraSpaceAfter: 2 } },
-        { text: point.text, options: { fontSize: 12, color: BODY, paraSpaceAfter: 2 } }
-      ], { x: column.x + 0.42, y: y + 0.005, w: COL_W - 0.42, h: pitch - 0.08, valign: 'top' });
+        { text: point.head, options: { fontSize: 13, bold: true, color: INK, breakLine: true, paraSpaceAfter: 2 } },
+        { text: point.text, options: { fontSize: 11.5, color: BODY } }
+      ], { x: side.sideX + 0.36, y: y + 0.005, w: SIDE_W - 0.36, h: pitch - 0.08, valign: 'top' });
     });
   }
 
@@ -387,5 +434,5 @@ await mkdir(dirname(OUT), { recursive: true });
 await pres.writeFile({ fileName: OUT });
 if (!process.argv.includes('--keep')) await rm(WORK, { recursive: true, force: true });
 console.log(`${TOTAL} slides -> ${OUT.replace(ROOT + '/', '')}`);
-console.log(`  ${SCREENS.length} screens at ${VIEW.width}×${VIEW.height}, ${SCREENS.reduce((n, s) => n + s.markers.length, 0)} markers`);
+console.log(`  ${SCREENS.length} screens at ${VIEW.width}×${VIEW.height} on a laptop, narrow menu, ${SCREENS.reduce((n, s) => n + s.markers.length, 0)} markers`);
 console.log(`  ${stage.tileStats.hit + stage.tileStats.fetched} map tiles served (${stage.tileStats.fetched} fetched, ${stage.tileStats.hit} from .tile-cache)`);

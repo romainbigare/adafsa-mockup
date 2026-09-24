@@ -19,6 +19,7 @@
  *   within  optional { sel, text }: look only inside the first match of this
  *   x, y    where on the element: 'left' | 'center' | 'right', 'top' | 'middle'
  *           | 'bottom', or a share of its width / height (0 to 1)
+ *   ink     optional: measure the element's words, not its box
  *   dx, dy  a nudge in CSS pixels, applied after x and y. A marker on an
  *           element's left edge is pulled 8 pixels further left unless dx says
  *           otherwise, so it sits on the border rather than on the first word.
@@ -27,7 +28,11 @@
  * Al Ain with palms of three varieties, strawberries and vegetables, whose
  * trees score in the lowest band, so its first problem is the trees. The
  * orchard map uses #123 instead — palms of three varieties and a block of
- * limes, dense enough for the dots to read as an orchard at this size. */
+ * limes, dense enough for the dots to read as an orchard at this size.
+ *
+ * The screens are laptop screens with the menu folded narrow, and the points
+ * sit in a column 2.25 inches wide down each side of the laptop, so the lines
+ * are kept short: a heading of a few words and one sentence under it. */
 
 /* The farm the two farm-level slides follow. */
 export const EXAMPLE_FARM = 182;
@@ -53,6 +58,9 @@ export const COVER = {
   }
 };
 
+/* Markers sit in the white space beside what they point at wherever the page
+ * leaves some — next to a figure's number, at the end of a row of chips, on
+ * the edge of a card — so they never cover the words they explain. */
 export const SCREENS = [
   {
     id: 'overview',
@@ -61,39 +69,38 @@ export const SCREENS = [
       title: 'All your farms on one page',
       intro: 'The first page. It shows what is grown in the whole region, and where.',
       points: [
-        { head: 'Choose what to count', text: 'A region, and the crop groups: cereals, fodder, vegetables, palms, fruit trees.' },
+        { head: 'The menu', text: 'Every part of the website. Point at an icon to see its pages.' },
+        { head: 'Choose what to count', text: 'A region, and the crop groups.' },
         { head: 'The big numbers', text: 'Farms, land, and land in use. 10 dunums = 1 hectare.' },
-        { head: 'Where the farms are', text: 'Each circle is a number of farms. Zoom in, and it splits.' },
-        { head: 'What is grown', text: 'Each crop group, by land and by number of farms.' }
+        { head: 'Where the farms are', text: 'Each circle is a group of farms. Zoom in to split it.' }
       ]
     },
     az: {
-      title: 'Bütün təsərrüfatlarınız bir səhifədə',
+      title: 'Bütün təsərrüfatlar bir səhifədə',
       intro: 'İlk səhifə. Bütün bölgədə nəyin və harada becərildiyini göstərir.',
       points: [
-        { head: 'Nəyi sayacağınızı seçin', text: 'Bölgə və bitki qrupları: dənli, yem, tərəvəz, xurma, meyvə ağacları.' },
+        { head: 'Menyu', text: 'Saytın bütün bölmələri. Səhifələri görmək üçün ikonun üzərinə gəlin.' },
+        { head: 'Nəyi sayacağınızı seçin', text: 'Bölgə və bitki qrupları.' },
         { head: 'Əsas rəqəmlər', text: 'Təsərrüfatlar, torpaq və istifadə olunan torpaq. 10 dönüm = 1 hektar.' },
-        { head: 'Təsərrüfatlar haradadır', text: 'Hər dairə bir neçə təsərrüfatdır. Yaxınlaşdırın, dairə bölünür.' },
-        { head: 'Nə becərilir', text: 'Hər bitki qrupu: torpağa və təsərrüfat sayına görə.' }
+        { head: 'Təsərrüfatlar haradadır', text: 'Hər dairə bir qrup təsərrüfatdır. Bölmək üçün yaxınlaşdırın.' }
       ]
     },
     markers: [
-      { sel: '.filter-bar .select', x: 'left', y: 'middle' },
-      { sel: '.figure', x: 'left', y: 'middle' },
-      { sel: '.leaflet-container', x: 'left', y: 0.3 },
-      { sel: 'section.card', text: 'Crops by area', x: 'left', y: 'top', dy: 22 }
+      { sel: '.nav-list', x: 'right', y: 0.45, dx: 4 },
+      { sel: '.filter-bar .chip-toggle', text: 'Forest Trees', x: 'right', y: 'middle', dx: 34 },
+      { sel: '.figure .value', ink: true, x: 'right', y: 'bottom', dx: 34, dy: 8 },
+      { sel: '.leaflet-container', x: 0.1, y: 0.6 }
     ]
   },
   {
     id: 'crops',
     route: '#/m/crop/inventory',
-    map: { id: 'crop-inventory', fitFarms: true },
     en: {
       title: 'What grows where',
       intro: 'The field crops on every farm: which crop, on how much land, and on which farm.',
       points: [
-        { head: 'Open a crop group', text: 'Tick a group, or open it and pick one crop, like alfalfa or tomato.' },
-        { head: 'Coloured by crop', text: 'Each dot is a farm. The colour is its main crop group.' },
+        { head: 'Open a crop group', text: 'Tick a group, or open it to pick one crop.' },
+        { head: 'Coloured by crop', text: 'Each dot is a farm, in the colour of its main crop.' },
         { head: 'Land for each crop', text: 'Dunums and share. Click a group to see its crops.' }
       ]
     },
@@ -101,15 +108,15 @@ export const SCREENS = [
       title: 'Harada nə becərilir',
       intro: 'Hər təsərrüfatda tarla bitkiləri: hansı bitki, nə qədər torpaqda və hansı təsərrüfatda.',
       points: [
-        { head: 'Bitki qrupunu açın', text: 'Qrupu seçin və ya açıb bir bitki seçin, məsələn, yonca və ya pomidor.' },
-        { head: 'Bitkiyə görə rəng', text: 'Hər nöqtə bir təsərrüfatdır. Rəng onun əsas bitki qrupudur.' },
+        { head: 'Bitki qrupunu açın', text: 'Qrupu seçin və ya açıb bir bitki seçin.' },
+        { head: 'Bitkiyə görə rəng', text: 'Hər nöqtə bir təsərrüfatdır, əsas bitkisinin rəngində.' },
         { head: 'Hər bitkinin torpağı', text: 'Dönüm və pay. Bitkiləri görmək üçün qrupa klikləyin.' }
       ]
     },
     markers: [
-      { sel: '.filter-bar .chip-toggle', text: 'Fodder', x: 'right', y: 'middle', dx: 18 },
-      { sel: '.map-legend', x: 'right', y: 'middle', dx: 30 },
-      { sel: 'section.card', text: 'Area by crop', x: 'left', y: 'top', dy: 22 }
+      { sel: '.filter-bar .chip-toggle', text: 'Open Field', x: 'right', y: 'middle', dx: 34 },
+      { sel: '.map-legend', x: 'right', y: 'middle', dx: 34 },
+      { sel: 'section.card', text: 'Area by crop', x: 'left', y: 'top', dy: 22, dx: -12 }
     ]
   },
   {
@@ -121,7 +128,7 @@ export const SCREENS = [
       intro: 'The satellite finds each tree, counts it, and tells its kind.',
       points: [
         { head: 'All trees, counted', text: 'Date palms, fruit trees and forest trees.' },
-        { head: 'One dot, one tree', text: 'Zoom in to a farm. The colour of the dot is the variety.' },
+        { head: 'One dot, one tree', text: 'Zoom in to a farm. The colour of a dot is its variety.' },
         { head: 'Which variety', text: 'Each colour is one variety of palm or fruit tree.' },
         { head: 'Land under trees', text: 'Dunums of palms, fruit trees and forest trees.' }
       ]
@@ -130,17 +137,17 @@ export const SCREENS = [
       title: 'Hər bağda hər ağac',
       intro: 'Peyk hər ağacı tapır, sayır və onun növünü deyir.',
       points: [
-        { head: 'Bütün ağaclar sayılır', text: 'Xurma palmaları, meyvə ağacları və meşə ağacları.' },
+        { head: 'Bütün ağaclar sayılır', text: 'Xurma palmaları, meyvə və meşə ağacları.' },
         { head: 'Bir nöqtə, bir ağac', text: 'Təsərrüfata yaxınlaşın. Nöqtənin rəngi sortu göstərir.' },
         { head: 'Hansı sort', text: 'Hər rəng bir xurma və ya meyvə ağacı sortudur.' },
         { head: 'Ağacların torpağı', text: 'Xurma, meyvə və meşə ağaclarının dönümü.' }
       ]
     },
     markers: [
-      { sel: '.figure', x: 'left', y: 'middle' },
-      { sel: '.leaflet-container', x: 0.62, y: 0.55 },
-      { sel: '.map-legend', x: 'right', y: 'top', dy: 14 },
-      { sel: 'section.card', text: 'Area by tree group', x: 'left', y: 'top', dy: 22 }
+      { sel: '.figure .value', ink: true, x: 'right', y: 'bottom', dx: 34, dy: 8 },
+      { sel: '.leaflet-container', x: 0.64, y: 0.5 },
+      { sel: '.map-legend', x: 'right', y: 'top', dx: 34, dy: 16 },
+      { sel: 'section.card', text: 'Area by tree group', x: 'left', y: 'top', dy: 22, dx: -12 }
     ]
   },
   {
@@ -151,26 +158,26 @@ export const SCREENS = [
       title: 'Plant health, farm by farm',
       intro: 'The satellite measures how green and strong the trees are. A low score is an early warning.',
       points: [
-        { head: 'A score from 0 to 100', text: 'For palms and for fruit trees. 80 or more is healthy.' },
+        { head: 'A score from 0 to 100', text: 'For palms and fruit trees. 80 or more is healthy.' },
         { head: 'Who to visit first', text: 'Here: 6 farms have very stressed trees.' },
-        { head: 'Four levels', text: 'Healthy, fair, stressed, very stressed. Green is good, red is bad.' },
+        { head: 'Four levels', text: 'Healthy, fair, stressed, very stressed.' },
         { head: 'Health on the map', text: 'The score of each area. Zoom in to see each farm.' }
       ]
     },
     az: {
-      title: 'Bitki sağlamlığı, təsərrüfat-təsərrüfat',
+      title: 'Hər təsərrüfatda bitki sağlamlığı',
       intro: 'Peyk ağacların nə qədər yaşıl və güclü olduğunu ölçür. Aşağı bal erkən xəbərdarlıqdır.',
       points: [
         { head: '0-dan 100-ə qədər bal', text: 'Xurma və meyvə ağacları üçün. 80 və yuxarı sağlamdır.' },
         { head: 'Əvvəlcə kimə baş çəkmək', text: 'Burada: 6 təsərrüfatda ağaclar çox zəifdir.' },
-        { head: 'Dörd səviyyə', text: 'Sağlam, orta, zəif, çox zəif. Yaşıl yaxşıdır, qırmızı pisdir.' },
+        { head: 'Dörd səviyyə', text: 'Sağlam, orta, zəif, çox zəif.' },
         { head: 'Xəritədə sağlamlıq', text: 'Hər ərazinin balı. Hər təsərrüfatı görmək üçün yaxınlaşdırın.' }
       ]
     },
     markers: [
-      { sel: '.figure', x: 'left', y: 'middle' },
-      { sel: '.callout', x: 'left', y: 'middle' },
-      { sel: 'section.card', text: 'Palm trees', x: 'left', y: 'top', dy: 50 },
+      { sel: '.figure .value', ink: true, x: 'right', y: 'bottom', dx: 34, dy: 8 },
+      { sel: '.callout', x: 0.45, y: 'middle' },
+      { sel: 'section.card', text: 'Palm trees', x: 'left', y: 'top', dy: 57, dx: -12 },
       { sel: '.leaflet-container', x: 'left', y: 0.3 }
     ]
   },
@@ -183,8 +190,8 @@ export const SCREENS = [
       points: [
         { head: 'The farm in numbers', text: 'Size, land in use, trees, and how many problems.' },
         { head: 'What is wrong', text: 'Here: the trees look very stressed.' },
-        { head: 'Where it is', text: 'The farm’s real boundary, on the satellite picture.' },
-        { head: 'What it grows now', text: 'Each crop, and how much land it takes.' }
+        { head: 'What it grows now', text: 'Each crop, and how much land it takes.' },
+        { head: 'Its trees', text: 'Here: 59 palms, with a health score of 46.' }
       ]
     },
     az: {
@@ -193,15 +200,15 @@ export const SCREENS = [
       points: [
         { head: 'Rəqəmlərlə təsərrüfat', text: 'Ölçü, istifadə olunan torpaq, ağaclar və problemlərin sayı.' },
         { head: 'Nə problem var', text: 'Burada: ağaclar çox zəif görünür.' },
-        { head: 'Harada yerləşir', text: 'Təsərrüfatın həqiqi sərhədi, peyk şəklində.' },
-        { head: 'İndi nə becərir', text: 'Hər bitki və onun tutduğu torpaq.' }
+        { head: 'İndi nə becərir', text: 'Hər bitki və onun tutduğu torpaq.' },
+        { head: 'Ağacları', text: 'Burada: 59 xurma palması, sağlamlıq balı 46.' }
       ]
     },
     markers: [
-      { sel: '.figure', x: 'left', y: 'middle' },
-      { sel: '.callout', x: 'left', y: 'middle' },
-      { sel: 'section.card', text: 'Where it is', x: 'left', y: 'top', dy: 22 },
-      { sel: 'section.card', text: 'What it grows now', x: 'left', y: 'top', dy: 22 }
+      { sel: '.figure .value', ink: true, x: 'right', y: 'bottom', dx: 34, dy: 8 },
+      { sel: '.callout', x: 0.6, y: 'middle' },
+      { sel: 'section.card', text: 'What it grows now', x: 'left', y: 'top', dy: 22, dx: -10 },
+      { sel: 'section.card', text: 'Every variety on this holding', x: 'left', y: 'top', dy: 22, dx: -12 }
     ]
   },
   {
@@ -211,27 +218,27 @@ export const SCREENS = [
       title: 'From a score to a farm visit',
       intro: 'What to check on this farm. The website does not name the disease. It shows where to look.',
       points: [
-        { head: 'Most urgent first', text: 'Each problem, with a short reason in plain words.' },
-        { head: 'What to do', text: 'Here: look for lack of water, salt in the soil, or pests.' },
+        { head: 'Most urgent first', text: 'Each problem, with a short reason.' },
+        { head: 'What to do', text: 'Look for lack of water, salt in the soil, or pests.' },
         { head: 'Take it to the farm', text: 'Print one page for the visit.' },
-        { head: 'A possible cause', text: 'Here the farm used only 70% of the water it is allowed.' }
+        { head: 'A possible cause', text: 'The farm used only 70% of the water it is allowed.' }
       ]
     },
     az: {
       title: 'Baldan təsərrüfat ziyarətinə',
       intro: 'Bu təsərrüfatda nəyi yoxlamaq lazımdır. Sayt xəstəliyin adını demir. Harada baxmağı göstərir.',
       points: [
-        { head: 'Ən təcili birinci', text: 'Hər problem və sadə sözlərlə qısa səbəbi.' },
-        { head: 'Nə etməli', text: 'Burada: su çatışmazlığını, torpaqda duzu və ya zərərvericiləri axtarın.' },
+        { head: 'Ən təcili birinci', text: 'Hər problem və qısa səbəbi.' },
+        { head: 'Nə etməli', text: 'Su çatışmazlığını, torpaqda duzu və ya zərərvericiləri axtarın.' },
         { head: 'Təsərrüfata aparın', text: 'Ziyarət üçün bir səhifə çap edin.' },
-        { head: 'Mümkün səbəb', text: 'Burada təsərrüfat ona ayrılan suyun yalnız 70 faizini istifadə edib.' }
+        { head: 'Mümkün səbəb', text: 'Təsərrüfat ona ayrılan suyun yalnız 70 faizini istifadə edib.' }
       ]
     },
     markers: [
-      { sel: 'section.card', text: 'What needs attention', x: 'left', y: 'top', dy: 22 },
-      { sel: '.issue .action', x: 'left', y: 'middle', dx: -26 },
-      { sel: '.header-tools .btn', text: 'Print', x: 'right', y: 'middle', dx: 12 },
-      { sel: 'section.card', text: 'Water in', x: 'left', y: 'top', dy: 22 }
+      { sel: 'section.card', text: 'What needs attention', x: 'left', y: 'top', dy: 22, dx: -12 },
+      { sel: '.issue .action', x: 'left', y: 'middle', dx: -34 },
+      { sel: '.header-tools .btn', text: 'Print', x: 'center', y: 'bottom', dy: 22 },
+      { sel: 'section.card', text: 'Water in', x: 'left', y: 'top', dy: 22, dx: -12 }
     ]
   }
 ];

@@ -35,7 +35,7 @@ const tileType = (b) => (b[0] === 0x89 && b[1] === 0x50 ? 'image/png' : 'image/j
  * .tile-cache, so a second build draws its maps without a network at all.
  *
  * Only the deck builds use this. The published site keeps the real tile URLs. */
-export async function openStage({ viewport, scale = 2 }) {
+export async function openStage({ viewport, scale = 2, storage = {} }) {
   const tileStats = { hit: 0, fetched: 0, failed: 0 };
   const tileFailures = [];
   const inFlight = new Map();
@@ -96,6 +96,11 @@ export async function openStage({ viewport, scale = 2 }) {
   });
   const page = await browser.newPage({ viewport, deviceScaleFactor: scale });
   await page.addInitScript((relay) => { globalThis.ADAFSA_TILE_RELAY = relay; }, `http://127.0.0.1:${port}/__tiles`);
+  /* Browser preferences the app would otherwise remember from a person — the
+   * narrow menu, for one — set before the first page draws. */
+  await page.addInitScript((entries) => {
+    for (const [key, value] of Object.entries(entries)) localStorage.setItem(key, value);
+  }, storage);
 
   /* Fifty unattended renders without this, and a screen that throws halfway
    * through is photographed mid-collapse with nobody the wiser until it prints. */
