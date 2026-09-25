@@ -422,10 +422,13 @@ SCREENS.forEach((screen, index) => {
     }
   });
 
-  text(s, [
-    { text: CLOSING.en.next, options: { fontSize: 15, bold: true, color: WHITE, breakLine: true } },
-    { text: CLOSING.az.next, options: { fontSize: 14, color: PALE } }
-  ], { x: 0.75, y: 6.3, w: 10.5, h: 0.75, valign: 'top' });
+  /* A closing line under the cards, when the deck has one to say. */
+  if (CLOSING.en.next) {
+    text(s, [
+      { text: CLOSING.en.next, options: { fontSize: 15, bold: true, color: WHITE, breakLine: true } },
+      { text: CLOSING.az.next, options: { fontSize: 14, color: PALE } }
+    ], { x: 0.75, y: 6.3, w: 10.5, h: 0.75, valign: 'top' });
+  }
   s.addNotes(`${CLOSING.en.title}\n${CLOSING.az.title}`);
   pageNumber(s, TOTAL, PALE);
 }
