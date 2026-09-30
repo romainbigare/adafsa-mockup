@@ -191,6 +191,9 @@
   .hdr{ display: flex; align-items: center; gap: 8pt; font-size: 7.5pt; color: var(--caption); }
   .hdr .srch, .frame .bar2 .srch{ flex: 1; border: 1px solid var(--border-lt); border-radius: 3px; padding: 1pt 6pt; color: var(--meta); }
   .sel.on{ border-color: #BFD9C8; background: var(--tint); }
+  .cmap{ position: relative; height: 58pt; background: #F2EDE3; border-radius: 3px; }
+  .cmap span{ position: absolute; background: #6B7280; color: #fff; border-radius: 9pt; padding: 0 5pt;
+              font-size: 6.5pt; line-height: 12pt; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -288,58 +291,6 @@
     </div>
   </div>
 
-  <div class="suggest" style="margin-top:16pt">
-    <div class="label">Other ways into the same pages</div>
-    <p>Ordering by module follows the contract, which helps when the client checks what was
-    delivered. The same pages can also be reached by the question somebody is asking, or by
-    the crop they care about. One can be the main menu, with a switch for the others.</p>
-
-    <div class="opts">
-      <div class="opt">
-        <div class="snip-hd">A · By module</div>
-        <div class="snip-bd mini">
-          <div class="it"><b>Executive View</b></div>
-          <div class="it">Crop Monitoring</div>
-          <div class="it">Tree Monitoring</div>
-          <div class="it">Land Use &amp; Structures</div>
-          <div class="it">Irrigation Efficiency</div>
-          <div class="it">Crop Water Calculator</div>
-          <div class="it">Yield Optimisation</div>
-          <div class="it"><b>Farm Monitoring</b></div>
-          <div class="it"><b>Reports</b></div>
-          <div class="tiny" style="margin-top:5pt">Matches the contract, line by line.</div>
-        </div>
-      </div>
-      <div class="opt">
-        <div class="snip-hd">B · By question</div>
-        <div class="snip-bd mini">
-          <div class="grp">What do we have?</div>
-          <div class="it">Crops, trees, land, structures</div>
-          <div class="grp">How is it going?</div>
-          <div class="it">Canopy, irrigation, water, yield</div>
-          <div class="grp">What has changed?</div>
-          <div class="it">Crops, trees, structures, irrigation</div>
-          <div class="grp">One farm</div>
-          <div class="it">Farm Monitoring</div>
-          <div class="tiny" style="margin-top:5pt">Suits a first-time user.</div>
-        </div>
-      </div>
-      <div class="opt">
-        <div class="snip-hd">C · By crop</div>
-        <div class="snip-bd mini">
-          <div class="it">Cereals</div>
-          <div class="it">Fodder</div>
-          <div class="it on">Open field ▾</div>
-          <div class="navsub"><div>Tomato: area, yield, water</div></div>
-          <div class="it">Date palm</div>
-          <div class="it">Fruit trees</div>
-          <div class="it">Forest trees</div>
-          <div class="tiny" style="margin-top:5pt">Suits a question like "tomatoes this season".</div>
-        </div>
-      </div>
-    </div>
-    <div class="cap">The pages stay the same. Only the way into them changes.</div>
-  </div>
 </div>
 
 <!-- ============================= TWO ============================= -->
@@ -401,61 +352,67 @@
 <!-- ============================= THREE ============================= -->
 <div class="section">
   <div class="eyebrow">Three</div>
-  <h2>Keeping the Executive View about capacity</h2>
+  <h2>A focused Executive View</h2>
 
   <div class="found">
     <div class="label">What we found</div>
-    <p>The Executive View opens with the right numbers for an agency: farms, fields, trees,
-    and cultivated, fallow and barren land. Its tabs for open agriculture, protected
-    agriculture and structures are a clear way in. Two elements pull it toward health instead:
-    a canopy health bar for the whole emirate, and farm counts drawn as red bubbles, which
-    read as an alarm.</p>
-    <p>The cards under Open Agriculture also stop at the group. Cultivated Fields names its
-    crops as a line of text, so "how many farms grow tomatoes, on how many dunums?" has no
-    answer on the page.</p>
+    <p>The Executive View already leads with the right kind of number for an agency: how many
+    farms there are, and how much land is cultivated or fallow. That is a strong start.</p>
+    <p>Around those numbers the page holds a great deal: fields, trees and a tree split, barren
+    land and structures, a dark header card, three tabs, a tree species table, a canopy health
+    bar and a map with its own layer panel. The dark card pulls the eye away from everything
+    below it. The tabs sit halfway down on the right, and switching between them moves the
+    page, so the reader loses their place. Most of this content is good; it simply has a better
+    home in one of the modules.</p>
   </div>
 
-  <div class="ev-row" style="align-items:flex-end">
-    <div style="flex:0 0 72mm"><div class="ev" style="margin:0"><img src="img/cluster-map.png" style="width:72mm"></div></div>
-    <div style="flex:1"><div class="ev" style="margin:0"><img src="img/canopy-bar.png" style="width:100%"></div>
-      <div class="cap">Left: farm counts drawn in red. Right: a health bar for the whole emirate.</div></div>
-  </div>
+  <div class="ev"><img src="img/hero.png" style="width:150mm"></div>
+  <div class="cap">The dark header card at the top of the page.</div>
+  <div class="ev"><img src="img/tabs.png" style="width:150mm"></div>
+  <div class="cap">The 3 tabs and a map button, halfway down the page on the right.</div>
 
-  <div class="suggest">
+  <div class="suggest" style="break-before:page;margin-top:0">
     <div class="label">What we suggest</div>
-    <p>We would keep the page and its tabs, and make 3 changes. The canopy health bar moves to
-    Tree Monitoring, where health is the subject. The farm-count bubbles take a neutral colour,
-    since they count rather than judge. And each card under Open Agriculture opens into its
-    crops, with the area and the number of farms for each.</p>
+    <p>We would keep the Executive View to one question: what do we have, and where? Four
+    figures, one map that counts farms, and two short crop tables. Everything else moves to
+    the module that owns it, where it gets more room than it has today. The header card takes
+    the same light style as the rest of the page, and the tabs are no longer needed.</p>
 
     <div class="snip snip-2" style="align-items:stretch">
       <div>
-        <div class="snip-hd">The Executive View, block by block</div>
+        <div class="snip-hd">Stays on the Executive View</div>
         <div class="snip-bd">
-          <div class="evb"><span class="k keep">Keep</span>Farms, fields, trees</div>
-          <div class="evb"><span class="k keep">Keep</span>Cultivated, fallow and barren land, structures</div>
-          <div class="evb"><span class="k keep">Keep</span>Tabs: open, protected, structures</div>
-          <div class="evb"><span class="k add">Add</span>Each card opens into its crops</div>
-          <div class="evb"><span class="k keep">Keep</span>Species table</div>
-          <div class="evb"><span class="k move">Move</span>Canopy health bar, to Tree Monitoring</div>
-          <div class="evb"><span class="k change">Change</span>Map bubbles in a neutral colour</div>
+          <div class="strip" style="margin-bottom:5pt">
+            <div><div class="k">Farms</div><div class="v">24,082</div></div>
+            <div><div class="k">Area (du)</div><div class="v">2.69M</div></div>
+            <div><div class="k">Farmed (du)</div><div class="v">1.43M</div></div>
+            <div><div class="k">Crops now</div><div class="v">18</div></div>
+          </div>
+          <div class="cmap"><span style="left:18%;top:30%">4,210</span><span style="left:52%;top:22%">7,940</span><span style="left:70%;top:58%">9,120</span><span style="left:30%;top:66%">2,812</span></div>
+          <div class="tiny" style="margin:3pt 0 5pt">Farm counts in a neutral colour, splitting as you zoom.</div>
+          <div class="snip-2" style="gap:6pt">
+            <table><tr><th>Crops by area</th><th class="num">du</th></tr>
+              <tr><td>▸ Cereals</td><td class="num">124k</td></tr><tr><td>▸ Fodder</td><td class="num">287k</td></tr><tr><td>▸ Open field</td><td class="num">391k</td></tr><tr><td>▸ Date palm</td><td class="num">802k</td></tr></table>
+            <table><tr><th>Crops by farms</th><th class="num">farms</th></tr>
+              <tr><td>▸ Cereals</td><td class="num">1,120</td></tr><tr><td>▸ Fodder</td><td class="num">6,840</td></tr><tr><td>▸ Open field</td><td class="num">3,415</td></tr><tr><td>▸ Date palm</td><td class="num">19,760</td></tr></table>
+          </div>
+          <div class="tiny" style="margin-top:3pt">Each row opens into its crops.</div>
         </div>
       </div>
-      <div>
-        <div class="snip-hd">Cultivated Fields, opened</div>
+      <div style="flex:0 0 70mm">
+        <div class="snip-hd">Finds a home in a module</div>
         <div class="snip-bd">
-          <table>
-            <tr><th>Crop</th><th class="num">Dunums</th><th class="num">Farms</th></tr>
-            <tr><td>Rhodes grass</td><td class="num">412,300</td><td class="num">6,840</td></tr>
-            <tr><td>Tomato</td><td class="num">96,500</td><td class="num">2,115</td></tr>
-            <tr><td>Cucumber</td><td class="num">54,200</td><td class="num">1,380</td></tr>
-            <tr><td>Fodder maize</td><td class="num">48,900</td><td class="num">960</td></tr>
-            <tr><td class="tiny">and 14 more crops</td><td></td><td></td></tr>
-          </table>
+          <div class="evb"><span class="k move">Trees</span>Tree count, split and species table → Tree Monitoring</div>
+          <div class="evb"><span class="k move">Health</span>Canopy health bar → Tree Monitoring</div>
+          <div class="evb"><span class="k move">Land</span>Barren land, protected agriculture, structures → Land Use &amp; Structures</div>
+          <div class="evb"><span class="k move">Fields</span>Field count → Land Use &amp; Structures</div>
+          <div class="evb"><span class="k move">Layers</span>Farm and field boundaries → the farm page</div>
+          <div class="evb"><span class="k change">Tabs</span>Replaced by the module pages in the menu</div>
+          <div class="evb"><span class="k change">Header</span>Light, like every other card</div>
         </div>
       </div>
     </div>
-    <div class="cap">The page keeps its shape. Figures are for illustration.</div>
+    <div class="cap">Nothing is lost. Each block moves to the page where it is the main subject. Figures are for illustration.</div>
   </div>
 </div>
 

@@ -8,6 +8,8 @@ const { chromium } = createRequire(import.meta.url)('playwright');
 const shots = process.argv[2];
 // [output, source, x, y, w, h, outWidth]
 const CROPS = [
+  ['hero.png', '01-landing.png', 280, 80, 1136, 350, 900],
+  ['tabs.png', '01-landing.png', 280, 455, 1136, 180, 900],
   ['header.png', '01-landing.png', 256, 0, 1184, 56, 1184],
   ['sync.png', '01-landing.png', 10, 790, 236, 70, 236],
   ['farm-page.png', '03-nav-farm.png', 0, 0, 1440, 4392, 300],
