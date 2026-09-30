@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RASAD platform — Wafra Review</title>
+<style>
+  @font-face { font-family: Poppins; font-weight: 300; src: url(../review/fonts/Poppins-300.ttf); }
+  @font-face { font-family: Poppins; font-weight: 400; src: url(../review/fonts/Poppins-400.ttf); }
+  @font-face { font-family: Poppins; font-weight: 500; src: url(../review/fonts/Poppins-500.ttf); }
+  @font-face { font-family: Poppins; font-weight: 600; src: url(../review/fonts/Poppins-600.ttf); }
+  @font-face { font-family: Poppins; font-weight: 700; src: url(../review/fonts/Poppins-700.ttf); }
+
+  :root{
+    --ink:#1C211F; --red:#A8362A; --green:#2B7048; --rule:#3D7A56;
+    --eyebrow:#9AA19D; --caption:#5D6663; --meta:#8B938E;
+    --border:#D9DEDB; --border-lt:#E6E9E7; --panel:#F3F5F4; --tint:#F6FAF7;
+    /* crop groups and status ramp, as in src/domain/palette.js */
+    --cereals:#eda100; --fodder:#1baf7a; --open:#4a3aa7; --palm:#2a78d6; --fruit:#e87ba4; --forest:#008300;
+    --s1:#1a7f4b; --s2:#7fb069; --s3:#e0b02a; --s4:#dd7a3c; --s5:#c0392b;
+  }
+
+  @page{
+    size: A4; margin: 20mm;
+    @bottom-right{
+      content: counter(page);
+      font-family: Poppins; font-weight: 300; font-size: 8pt; color: #A8AEAA;
+    }
+  }
+  @page:first{ @bottom-right{ content: none; } }
+
+  *{ box-sizing: border-box; }
+  body{ font-family: Poppins; font-weight: 300; font-size: 10.5pt; line-height: 17pt;
+        color: var(--ink); margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  p{ margin: 0 0 10pt; }
+  p:last-child{ margin-bottom: 0; }
+  b{ font-weight: 500; }
+
+  /* ---------- cover ---------- */
+  .cover{ height: 255mm; position: relative; }
+  .cover h1{ font-weight: 700; font-size: 27pt; line-height: 34pt; letter-spacing: -.01em;
+             margin: 0 0 9pt; }
+  .cover .sub{ font-weight: 500; font-size: 13pt; line-height: 18pt; margin: 0 0 8pt; }
+  .cover .by{ font-weight: 300; font-size: 10pt; color: var(--caption); margin: 0; }
+  .cover img{ position: absolute; bottom: 0; left: 0; width: 47mm; }
+
+  /* ---------- section furniture ---------- */
+  .section{ break-before: page; }
+  .eyebrow{ font-weight: 400; font-size: 8pt; line-height: 11pt; letter-spacing: .22em;
+            text-transform: uppercase; color: var(--eyebrow); margin: 0 0 9pt; }
+  h2{ font-weight: 500; font-size: 15.5pt; line-height: 21pt; margin: 0 0 20pt; }
+  .label{ font-weight: 500; font-size: 9pt; line-height: 12pt; letter-spacing: .12em;
+          text-transform: uppercase; margin: 0 0 11pt; }
+  .found .label{ color: var(--red); }
+  .suggest{ border-left: 2pt solid var(--rule); padding-left: 16pt; margin-top: 22pt; }
+  .suggest .label{ color: var(--green); }
+  .cap{ font-weight: 300; font-size: 8.5pt; line-height: 12pt; color: var(--caption); margin: 5pt 0 0; }
+  .suggest .cap{ margin-top: 7pt; }
+
+  /* ---------- evidence ---------- */
+  .ev{ margin-top: 12pt; break-inside: avoid; }
+  .ev img{ display: block; border: 1px solid var(--border-lt); max-width: 100%; }
+  .ev-row{ margin-top: 12pt; display: flex; gap: 12pt; align-items: flex-start; break-inside: avoid; }
+
+  /* ---------- drawn snippets ---------- */
+  .snip{ border: 1px solid var(--border); border-radius: 3px; margin-top: 12pt;
+         overflow: hidden; break-inside: avoid; }
+  .snip-hd{ background: var(--panel); border-bottom: 1px solid var(--border-lt);
+            padding: 5pt 10pt; font-weight: 400; font-size: 8.5pt; line-height: 11pt; color: var(--caption); }
+  .snip-bd{ padding: 9pt 10pt; }
+  .snip-2{ display: flex; gap: 12pt; align-items: flex-start; }
+  .snip-2 > *{ flex: 1; }
+  .tiny{ font-size: 7pt; line-height: 10pt; color: var(--meta); }
+
+  .mini{ font-size: 8pt; line-height: 12pt; }
+  .mini .grp{ font-weight: 500; font-size: 7pt; letter-spacing: .14em; text-transform: uppercase;
+              color: var(--meta); margin: 8pt 0 3pt; }
+  .mini .grp:first-child{ margin-top: 0; }
+  .mini .it{ padding: 1.5pt 0; }
+
+  .navitem{ border: 1px solid var(--border-lt); border-radius: 3px; padding: 3.5pt 7pt; margin-bottom: 3.5pt; }
+  .navitem.on{ background: var(--tint); border-color: #CFE3D6; }
+  .navitem .t{ font-weight: 500; font-size: 8pt; line-height: 11pt; }
+  .navitem .d{ font-size: 7pt; line-height: 9.5pt; color: var(--meta); }
+  .navsub{ padding: 2pt 0 0 10pt; font-size: 7.5pt; line-height: 11.5pt; }
+  .navsub div::before{ content: "·  "; color: var(--meta); }
+  .navfoot{ border-top: 1px solid var(--border-lt); margin-top: 6pt; padding-top: 5pt;
+            font-size: 7.5pt; line-height: 12pt; color: var(--caption); }
+
+  .strip{ display: flex; border: 1px solid var(--border-lt); border-radius: 3px; }
+  .strip div{ flex: 1; padding: 5pt 8pt; border-right: 1px solid var(--border-lt); }
+  .strip div:last-child{ border-right: 0; }
+  .strip .k{ font-size: 6.5pt; line-height: 9pt; color: var(--meta); }
+  .strip .v{ font-weight: 500; font-size: 9pt; line-height: 13pt; }
+  .strip .c{ font-size: 6.5pt; line-height: 9pt; color: var(--caption); }
+  .up{ color: #1a7f4b; } .down{ color: #b0574a; }
+
+  table{ width: 100%; border-collapse: collapse; font-size: 7.5pt; line-height: 11pt; }
+  th{ text-align: left; font-weight: 500; font-size: 7pt; color: var(--caption);
+      border-bottom: 1px solid var(--border-lt); padding: 3pt 5pt; }
+  td{ padding: 2.5pt 5pt; border-bottom: 1px solid #F0F2F1; }
+  tr:last-child td{ border-bottom: 0; }
+  td.num, th.num{ text-align: right; }
+  tr.sub td:first-child{ padding-left: 16pt; color: var(--caption); }
+  .bar{ height: 5pt; background: #ECEFED; border-radius: 1pt; position: relative; width: 60pt; }
+  .bar i{ position: absolute; left: 0; top: 0; bottom: 0; border-radius: 1pt; }
+  .sw{ display: inline-block; width: 7pt; height: 7pt; border-radius: 2px; vertical-align: -1pt; margin-right: 4pt; }
+
+  .chip{ display: inline-block; border: 1px solid var(--border); border-radius: 10pt; padding: 1pt 5.5pt;
+         font-size: 7pt; line-height: 10.5pt; margin: 0 2pt 3pt 0; background: #fff; }
+  .chip.on{ border-color: #BFD9C8; background: var(--tint); }
+  .chip.off{ color: var(--meta); }
+  .sel{ display: inline-block; border: 1px solid var(--border); border-radius: 3px; padding: 1pt 5pt;
+        font-size: 7pt; line-height: 10.5pt; margin-right: 3pt; }
+  .sel.dis{ color: var(--meta); border-style: dashed; }
+  .anchor{ position: relative; display: inline-block; }
+  .pop{ position: absolute; left: 0; top: 15pt; border: 1px solid var(--border); border-radius: 3px;
+        padding: 4pt 8pt; width: 96pt; font-size: 7.5pt; line-height: 12pt; background: #fff; }
+  .box{ display: inline-block; width: 6.5pt; height: 6.5pt; border: 1px solid #9AA19D; border-radius: 1.5pt;
+        margin-right: 5pt; vertical-align: -0.5pt; }
+  .box.on{ background: var(--green); border-color: var(--green); }
+
+  .path{ display: flex; align-items: center; gap: 5pt; font-size: 8pt; line-height: 12pt; margin-top: 4pt; }
+  .path .n{ border: 1px solid var(--border-lt); border-radius: 3px; padding: 2pt 7pt; background: #fff; }
+  .path .a{ color: var(--meta); }
+  .path .h{ width: 58pt; font-size: 7pt; color: var(--meta); }
+
+  .wire{ border: 1px solid var(--border-lt); border-radius: 3px; padding: 5pt; background: #fff; }
+  .wire .s{ height: 9pt; border-radius: 2px; background: #EEF1EF; margin-bottom: 4pt; }
+  .wire .m{ height: 24pt; border-radius: 2px; background: #F2EDE3; margin-bottom: 4pt; }
+  .wire .g{ height: 24pt; border-radius: 2px; background: #EAF1FB; margin-bottom: 4pt; }
+  .wire .l{ height: 3pt; background: #EEF1EF; margin: 3pt 0; border-radius: 1pt; }
+  .lvl .h{ font-weight: 500; font-size: 8pt; line-height: 11pt; }
+  .lvl .d{ font-size: 7pt; line-height: 10pt; color: var(--meta); margin-bottom: 4pt; min-height: 20pt; }
+  .arrow{ flex: 0 0 10pt !important; align-self: center; color: var(--meta); text-align: center; }
+
+  .blocks div{ border: 1px solid var(--border-lt); border-radius: 2px; padding: 2pt 6pt; margin-bottom: 3pt;
+               font-size: 7.5pt; line-height: 10.5pt; }
+  .blocks .lv1{ border-left: 3pt solid #9ec5f4; } .blocks .lv3{ border-left: 3pt solid #e0b02a; }
+  .blocks .lv2{ border-left: 3pt solid #7fb069; }
+
+  .tabs{ display: flex; border-bottom: 1px solid var(--border-lt); font-size: 8pt; line-height: 12pt; }
+  .tabs div{ padding: 4pt 10pt; color: var(--caption); }
+  .tabs .on{ color: var(--ink); font-weight: 500; border-bottom: 2px solid var(--green); }
+  .tabs .ex{ margin-left: auto; color: var(--meta); }
+  .find{ border: 1px solid var(--border-lt); border-radius: 3px; padding: 4pt 7pt; margin-top: 4pt;
+         font-size: 7.5pt; line-height: 11pt; }
+  .find .t{ font-weight: 500; font-size: 8pt; }
+  .tag{ font-size: 6.5pt; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; margin-right: 5pt; }
+  .strike{ text-decoration: line-through; color: var(--meta); }
+
+  .scale{ display: flex; height: 12pt; border-radius: 2px; overflow: hidden; font-size: 6.5pt; line-height: 12pt;
+          color: #fff; font-weight: 500; text-align: center; }
+  .ticks{ display: flex; font-size: 6.5pt; line-height: 9pt; color: var(--meta); }
+  .formula{ font-size: 8.5pt; line-height: 13pt; font-weight: 500; }
+
+  .rules td:first-child{ font-weight: 500; width: 58pt; vertical-align: top; }
+  .rules td{ vertical-align: top; }
+
+  .frame{ display: flex; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; margin-top: 12pt;
+          break-inside: avoid; }
+  .frame .rail{ width: 112pt; background: #FBFCFB; border-right: 1px solid var(--border-lt);
+                padding: 8pt; font-size: 7.5pt; line-height: 13pt; }
+  .frame .rail .on{ font-weight: 500; }
+  .frame .rail .foot{ margin-top: 10pt; color: var(--caption); }
+  .frame .main{ flex: 1; }
+  .frame .bar2{ border-bottom: 1px solid var(--border-lt); padding: 5pt 9pt; font-size: 7.5pt; color: var(--caption);
+                display: flex; gap: 10pt; align-items: center; }
+  .frame .bar2 .srch{ flex: 1; border: 1px solid var(--border-lt); border-radius: 3px; padding: 1pt 6pt; color: var(--meta); }
+  .frame .ctx{ padding: 4pt 9pt; font-size: 7pt; color: var(--caption); background: var(--panel);
+               border-bottom: 1px solid var(--border-lt); }
+  .frame .stage{ padding: 8pt 9pt; }
+  .ph{ border: 1px dashed #D2D8D5; border-radius: 3px; padding: 6pt 8pt; font-size: 7.5pt; line-height: 11pt;
+       color: var(--meta); }
+  .ph b{ color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- ============================= COVER ============================= -->
+<div class="cover">
+  <h1>RASAD platform</h1>
+  <div class="sub">Wafra Review</div>
+  <div class="by">Reviewed 30 September 2026 by Romain Bigare, Director of Digital Systems</div>
+  <img src="../review/img/wafra-logo.png" alt="Wafra Greentech">
+</div>
+
+<!-- ============================= ONE ============================= -->
+<div class="section">
+  <div class="eyebrow">One</div>
+  <h2>The menu does not show what the client is buying</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The side menu has 8 items. 4 of them are the work: Executive View, Farm, Farm
+    Monitoring and Reports. The other 4 are support: Raise Ticket, Contact Us, Feedback,
+    and Account and Settings.</p>
+    <p>The 6 modules in the contract do not appear in the menu. They sit as 6 small cards
+    in the middle of the Farm page, with one number each. Nobody can go straight to
+    Irrigation Efficiency, and a new user cannot tell from the menu what the platform
+    measures.</p>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would make the menu a list of what the client pays for. Overview sits at the top.
+    The 6 modules follow, by name, and each one opens into its own pages: one for what
+    exists now, one for what has changed. Individual Farms and Reports come next. The 4
+    support items become one Support entry at the foot of the menu. Every page has its own
+    link, so a view can be sent to a colleague.</p>
+
+    <div class="snip snip-2">
+      <div>
+        <div class="snip-hd">Current — 8 items, no modules</div>
+        <div class="snip-bd mini">
+          <div class="grp">Sovereign Ops</div>
+          <div class="it">Executive View</div>
+          <div class="it">Farm</div>
+          <div class="it">Farm Monitoring</div>
+          <div class="it">Reports</div>
+          <div class="grp">Support &amp; System</div>
+          <div class="it">Raise Ticket</div>
+          <div class="it">Contact Us</div>
+          <div class="it">Feedback</div>
+          <div class="it">Account and Settings</div>
+        </div>
+      </div>
+      <div>
+        <div class="snip-hd">Suggested — the 6 modules, by name</div>
+        <div class="snip-bd">
+          <div class="navitem"><div class="t">Overview</div><div class="d">What we have, and where</div></div>
+          <div class="navitem on"><div class="t">Crop Monitoring</div>
+            <div class="navsub"><div>Crops and area</div><div>Cereals and fodder</div><div>Open field crops</div><div>Fallow land</div></div></div>
+          <div class="navitem"><div class="t">Tree Monitoring</div></div>
+          <div class="navitem"><div class="t">Land Use &amp; Structures</div></div>
+          <div class="navitem"><div class="t">Irrigation Efficiency</div></div>
+          <div class="navitem"><div class="t">Crop Water Calculator</div></div>
+          <div class="navitem"><div class="t">Yield Optimisation</div></div>
+          <div class="navitem"><div class="t">Individual Farms</div></div>
+          <div class="navitem"><div class="t">Reports</div></div>
+          <div class="navfoot">Support · Account</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Opening a module shows its pages. Crop Monitoring holds 4.</div>
+  </div>
+</div>
+
+<!-- ============================= TWO ============================= -->
+<div class="section">
+  <div class="eyebrow">Two</div>
+  <h2>One page carries every level of detail</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The Farm page is about 5,400 pixels tall: six screens of scrolling. It mixes the
+    whole emirate, one farm picked from a menu, and 15 farms ranked as large cards. The
+    Executive View and Farm Monitoring each bring a layout of their own, so a user does not
+    know where to look first.</p>
+  </div>
+
+  <div class="ev-row">
+    <div style="flex:0 0 24mm"><div class="ev" style="margin:0"><img src="img/farm-page.png" style="width:24mm"></div></div>
+    <div style="flex:1">
+      <div class="tiny" style="margin-bottom:5pt">The Farm page, top to bottom. Colour shows the level each block talks about.</div>
+      <div class="blocks">
+        <div class="lv1">Map of the emirate with layers</div>
+        <div class="lv1">4 figures for the emirate</div>
+        <div class="lv3">Water and yield for one farm, picked from a menu</div>
+        <div class="lv1">Share bars: land use, crop type, trees</div>
+        <div class="lv2">6 module cards, one number each</div>
+        <div class="lv2">A detail table for the card that is open</div>
+        <div class="lv3">15 farms ranked, as large cards</div>
+      </div>
+      <div class="tiny" style="margin-top:5pt"><span class="sw" style="background:#9ec5f4"></span>Emirate
+        &nbsp; <span class="sw" style="background:#7fb069"></span>Module &nbsp; <span class="sw" style="background:#e0b02a"></span>One farm</div>
+    </div>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would split the product into 3 levels. The Overview shows the emirate, or one
+    province. A module page shows one topic across all farms, then the farms behind it. A
+    farm page shows one farm across all topics. Every page is built from the same 3 blocks:
+    a strip of figures, one chart or map, and one table. Lists of farms become table rows
+    that can be sorted, searched and exported, since 15 cards already fill two screens and
+    the contract covers more than 25,000 farms.</p>
+
+    <div class="snip">
+      <div class="snip-hd">3 levels, one page shape</div>
+      <div class="snip-bd snip-2">
+        <div class="lvl"><div class="h">1 · Overview</div><div class="d">Emirate or province. What we have, and where.</div>
+          <div class="wire"><div class="s"></div><div class="m"></div><div class="l"></div><div class="l"></div><div class="l" style="width:70%"></div></div></div>
+        <div class="arrow">→</div>
+        <div class="lvl"><div class="h">2 · Module</div><div class="d">One topic across all farms, then the farms.</div>
+          <div class="wire"><div class="s"></div><div class="g"></div><div class="l"></div><div class="l"></div><div class="l" style="width:70%"></div></div></div>
+        <div class="arrow">→</div>
+        <div class="lvl"><div class="h">3 · Farm</div><div class="d">One farm across all topics.</div>
+          <div class="wire"><div class="s"></div><div class="m" style="height:22pt"></div><div class="l"></div><div class="l"></div><div class="l" style="width:70%"></div></div></div>
+      </div>
+    </div>
+    <div class="cap">Each page: a strip of figures, then a map or a chart, then a table.</div>
+  </div>
+</div>
+
+<!-- ============================= THREE ============================= -->
+<div class="section">
+  <div class="eyebrow">Three</div>
+  <h2>The first page mixes what we have with how it is doing</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The Executive View opens with the right kind of numbers: farms, fields, trees,
+    cultivated, fallow and barren land, structures. It then adds a canopy health bar for the
+    whole emirate, and draws farm counts as red bubbles, which read as an alarm.</p>
+    <p>At the level of the emirate, the question is production capacity: what is grown,
+    where, and on how much land. Health belongs to a farm and its inspector. There is also no
+    crop table, so "how many farms grow tomatoes this year, on how many dunums?" has no
+    answer on the first page.</p>
+  </div>
+
+  <div class="ev-row" style="align-items:flex-end">
+    <div style="flex:0 0 72mm"><div class="ev" style="margin:0"><img src="img/cluster-map.png" style="width:72mm"></div></div>
+    <div style="flex:1"><div class="ev" style="margin:0"><img src="img/canopy-bar.png" style="width:100%"></div>
+      <div class="cap">Left: farm counts drawn in red. Right: a health bar for the whole emirate, on the first page.</div></div>
+  </div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would keep the first page to an inventory: 4 figures (farms, farm area, land in
+    production, crops growing this month), a map of plain grey bubbles that count farms and
+    split as you zoom, and 2 tables: crops by area, and crops by number of farms. Each row
+    opens from a group to its crops. Share bars run against 100%, so the grey part is the
+    rest of the answer. Health moves to the module pages and the farm page.</p>
+
+    <div class="snip">
+      <div class="snip-hd">Crops by area — one of the 2 tables</div>
+      <div class="snip-bd">
+        <table>
+          <tr><th>Crop</th><th class="num">Dunums</th><th class="num">Share</th><th></th></tr>
+          <tr><td><span class="sw" style="background:var(--cereals)"></span>▸ Cereals</td><td class="num">1,240</td><td class="num">7.0%</td><td><div class="bar"><i style="width:7%;background:var(--cereals)"></i></div></td></tr>
+          <tr><td><span class="sw" style="background:var(--fodder)"></span>▸ Fodder</td><td class="num">2,870</td><td class="num">16.3%</td><td><div class="bar"><i style="width:16.3%;background:var(--fodder)"></i></div></td></tr>
+          <tr><td><span class="sw" style="background:var(--open)"></span>▾ Open field</td><td class="num">3,910</td><td class="num">22.2%</td><td><div class="bar"><i style="width:22.2%;background:var(--open)"></i></div></td></tr>
+          <tr class="sub"><td>Tomato</td><td class="num">1,120</td><td class="num">6.4%</td><td><div class="bar"><i style="width:6.4%;background:var(--open)"></i></div></td></tr>
+          <tr class="sub"><td>Cucumber</td><td class="num">640</td><td class="num">3.6%</td><td><div class="bar"><i style="width:3.6%;background:var(--open)"></i></div></td></tr>
+          <tr><td><span class="sw" style="background:var(--palm)"></span>▸ Date palm</td><td class="num">8,020</td><td class="num">45.6%</td><td><div class="bar"><i style="width:45.6%;background:var(--palm)"></i></div></td></tr>
+          <tr><td><span class="sw" style="background:var(--fruit)"></span>▸ Fruit trees</td><td class="num">1,140</td><td class="num">6.5%</td><td><div class="bar"><i style="width:6.5%;background:var(--fruit)"></i></div></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="cap">Open field is opened to show its crops. The second table counts farms instead of dunums. Figures are for illustration.</div>
+  </div>
+</div>
+
+<!-- ============================= FOUR ============================= -->
+<div class="section">
+  <div class="eyebrow">Four</div>
+  <h2>The filters do not reach the data</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>The header holds a region menu, and some lists carry region chips of their own. Other
+    screens have no filter at all. There is no way to filter by crop or tree type, so the
+    share bars and tables always show every type at once.</p>
+    <p>No list opens from a crop group to its crops, or from a crop to the farms that grow it.
+    A simple question — how many farms grow tomatoes in Al Ain, and which ones — has no
+    answer on any screen.</p>
+  </div>
+
+  <div class="ev"><img src="img/header.png" style="width:170mm"></div>
+  <div class="cap">The header: a region menu and coverage labels, with no crop or tree filter.</div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would put one filter bar under the title of every page. It holds the region — the
+    emirate, one of the 3 provinces, then the farm centre — and one chip per group, in a fixed
+    order: cereals, fodder, open field, date palm, fruit trees, forest trees. The chip's name
+    turns its group on or off. Its arrow opens the crops or varieties inside.</p>
+    <p>The bar is live. The figures, the chart, the map and every table on the page change
+    together, with no apply button. The filter is kept in the page link. Each page offers only
+    the chips that change its answer, since a switch that moves nothing is worse than no switch.
+    Every summary row opens into its parts, and every farm name opens the farm.</p>
+
+    <div class="snip">
+      <div class="snip-hd">One live filter bar, on every page</div>
+      <div class="snip-bd">
+        <div><span class="sel">Al Ain ▾</span>
+          <span class="chip off">Cereals ▾</span><span class="chip off">Fodder ▾</span><span class="anchor"><span class="chip on">Open field ▾</span><div class="pop"><div><span class="box on"></span>Tomato</div><div><span class="box"></span>Cucumber</div><div><span class="box"></span>Eggplant</div><div class="tiny">and 15 more</div></div></span><span class="chip off">Date palm ▾</span><span class="chip off">Fruit trees ▾</span><span class="chip off">Forest trees ▾</span></div>
+        <div style="height:56pt"></div>
+        <div class="tiny" style="margin:0 0 2pt">Everything below the bar now counts tomatoes in Al Ain.</div>
+        <div class="path"><span class="h">By place</span><span class="n">Emirate</span><span class="a">→</span><span class="n">Province</span><span class="a">→</span><span class="n">Farm centre</span><span class="a">→</span><span class="n">Farm</span></div>
+        <div class="path"><span class="h">By type</span><span class="n">Group</span><span class="a">→</span><span class="n">Crop or variety</span><span class="a">→</span><span class="n">Farms that grow it</span><span class="a">→</span><span class="n">Farm</span></div>
+      </div>
+    </div>
+    <div class="cap">3 clicks answer the tomato question.</div>
+  </div>
+</div>
+
+<!-- ============================= FIVE ============================= -->
+<div class="section">
+  <div class="eyebrow">Five</div>
+  <h2>Everything is shown as "now"</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>Every number describes today. No figure says whether it went up or down since last
+    quarter or last year, there is no chart over time, and no list of the farms that changed.
+    For an agency, the direction of travel is often the point: is fodder shrinking, is more
+    land left fallow, are farms irrigating better than a year ago? The contract also names a
+    seasonal change report, annual tree change and a quarterly irrigation trend.</p>
+  </div>
+
+  <div class="ev"><img src="img/kpis.png" style="width:120mm"></div>
+  <div class="cap">4 figures for a farm, with no sense of direction.</div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would make 2 changes. Every headline figure carries its change and a small trend
+    line, against last quarter or last year, chosen with one switch. And every module gets a
+    Change page beside its Now page: a chart over time, the biggest movers, and the farms
+    behind the movement, oldest to newest. Crops, irrigation and yield use 6 quarters, the
+    smallest window with both a last-quarter and a last-year reading. Trees and structures
+    use 3 years, because they move slowly. Change pages carry no map. Until enough history
+    exists, the page says so plainly.</p>
+
+    <div class="snip">
+      <div class="snip-hd">A figure with its change, and a Change page</div>
+      <div class="snip-bd snip-2" style="align-items:stretch">
+        <div style="flex:0 0 118pt">
+          <div class="strip" style="display:block"><div style="border:0">
+            <div class="k">Cereals and fodder</div>
+            <div class="v">4,110 dunums</div>
+            <div class="c"><span class="up">▲ 6.1%</span> vs a year ago</div>
+            <svg width="100" height="22" viewBox="0 0 100 22" style="margin-top:4pt">
+              <polyline fill="none" stroke="#2B7048" stroke-width="1.5" points="2,17 20,15 38,16 56,11 74,9 96,5"/>
+              <circle cx="96" cy="5" r="2" fill="#2B7048"/></svg>
+          </div></div>
+          <div class="tiny" style="margin-top:6pt">Switch: <b>vs last quarter</b> · vs last year</div>
+        </div>
+        <div>
+          <svg width="100%" viewBox="0 0 260 92" style="max-height:62pt">
+            <g font-family="Poppins" font-size="6" fill="#8B938E">
+              <text x="4" y="90">Q2 25</text><text x="46" y="90">Q3 25</text><text x="88" y="90">Q4 25</text>
+              <text x="130" y="90">Q1 26</text><text x="172" y="90">Q2 26</text><text x="214" y="90">Q3 26</text></g>
+            <g>
+              <rect x="4" y="44" width="28" height="36" fill="#1baf7a"/><rect x="4" y="26" width="28" height="18" fill="#eda100"/>
+              <rect x="46" y="40" width="28" height="40" fill="#1baf7a"/><rect x="46" y="24" width="28" height="16" fill="#eda100"/>
+              <rect x="88" y="42" width="28" height="38" fill="#1baf7a"/><rect x="88" y="20" width="28" height="22" fill="#eda100"/>
+              <rect x="130" y="38" width="28" height="42" fill="#1baf7a"/><rect x="130" y="14" width="28" height="24" fill="#eda100"/>
+              <rect x="172" y="36" width="28" height="44" fill="#1baf7a"/><rect x="172" y="16" width="28" height="20" fill="#eda100"/>
+              <rect x="214" y="34" width="28" height="46" fill="#1baf7a"/><rect x="214" y="12" width="28" height="22" fill="#eda100"/>
+            </g>
+          </svg>
+          <div class="tiny"><span class="sw" style="background:#eda100"></span>Cereals &nbsp;<span class="sw" style="background:#1baf7a"></span>Fodder &nbsp;— dunums, 6 quarters</div>
+        </div>
+        <div style="flex:0 0 100pt" class="mini">
+          <div class="grp">Biggest movers</div>
+          <div class="it">Rhodes grass <span class="up">+210</span></div>
+          <div class="it">Alfalfa <span class="up">+95</span></div>
+          <div class="it">Barley <span class="down">−120</span></div>
+          <div class="it">Sorghum <span class="down">−60</span></div>
+        </div>
+      </div>
+      <div class="snip-bd" style="padding-top:0">
+        <table>
+          <tr><th>Farm</th><th>Province</th><th class="num">12 months ago</th><th class="num">3 months ago</th><th class="num">Now</th><th class="num">vs a year ago</th></tr>
+          <tr><td>Farm 0412</td><td>Al Ain</td><td class="num">38 du</td><td class="num">22 du</td><td class="num">0 du</td><td class="num down">stopped</td></tr>
+          <tr><td>Farm 1873</td><td>Al Dhafra</td><td class="num">12 du</td><td class="num">20 du</td><td class="num">31 du</td><td class="num up">+158%</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="cap">The farm table runs oldest to newest, like the chart, and sorts to find who stopped or started. Figures are for illustration.</div>
+  </div>
+</div>
+
+<!-- ============================= SIX ============================= -->
+<div class="section">
+  <div class="eyebrow">Six</div>
+  <h2>The farm page is written for a scientist</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>Farm Monitoring opens on satellite codes (S1, S2, S3), cloud cover to two decimals,
+    pass times to the second, and NDVI, NDWI and SAVI switches. An inspector preparing a visit
+    wants to know what the farm grows, how it is doing, and what to check. None of that is
+    written in plain words.</p>
+    <p>The farm cards also give farmer instructions, such as "Increase pivot delivery by 12%
+    between 19:00 and 04:00". Watering schedules, soil salinity and weather belong in the
+    farmer's app. The contract sells these modules without prescriptive irrigation advice.</p>
+  </div>
+
+  <div class="ev"><img src="img/passes.png" style="width:150mm"></div>
+  <div class="cap">The first thing a user reads about a farm: satellite passes and cloud cover.</div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would give each farm 2 pages in plain words, and one closed tab for experts. The
+    profile gives the area, province and farm centre, what the farm grows now, its trees, its
+    irrigation efficiency, its water this month, and what changed since last quarter. The
+    second page lists what to check on a visit, as neutral findings, most important first,
+    with a print button. The satellite detail — passes, indices and the field table — moves
+    into a tab that stays closed until someone opens it. Nothing is lost; it moves one level
+    deeper.</p>
+
+    <div class="snip">
+      <div class="tabs"><div>Profile</div><div class="on">What to check (3)</div><div class="ex">Satellite detail ▸</div></div>
+      <div class="snip-bd">
+        <div class="find"><span class="tag bad" style="color:var(--s5)">Act</span><span class="t">Water use 32% above crop demand this month</span>
+          <div class="tiny">Most of the excess is on the citrus block. Check the meter and the watering times on the visit.</div></div>
+        <div class="find"><span class="tag" style="color:var(--s3)">Watch</span><span class="t">Irrigation efficiency fell from 81 to 72 since last quarter</span>
+          <div class="tiny">Now in the Acceptable band. Still above the subsidy line of 65.</div></div>
+        <div class="find"><span class="tag" style="color:var(--s3)">Watch</span><span class="t">12 dunums fewer under cultivation than a year ago</span></div>
+        <div class="tiny" style="margin-top:7pt">Instead of: <span class="strike">"Increase pivot delivery by 12% between 19:00 and 04:00."</span></div>
+      </div>
+    </div>
+    <div class="cap">Findings say what is true and what to look at. They do not tell the farmer how to water.</div>
+  </div>
+</div>
+
+<!-- ============================= SEVEN ============================= -->
+<div class="section">
+  <div class="eyebrow">Seven</div>
+  <h2>The scores use their own scales</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>Irrigation efficiency is shown in 4 bands: Excellent, Good, Moderate and Low, so a
+    farm at 78 shows as Good. Canopy health is an NDVI percentage. Water is flagged as
+    overdraft as soon as the balance goes below zero. The contract defines all 3 differently,
+    and each drives a real decision: who keeps a subsidy, which trees are stressed, which farm
+    uses too much water. With two scales, the same farm is judged twice.</p>
+  </div>
+
+  <div class="ev"><img src="img/ranking-row.png" style="width:130mm"></div>
+  <div class="cap">"Canopy health (NDVI)" and one-word labels on the ranking cards.</div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would define each score once, as the contract does, and let every screen read that
+    one definition: the name, the band edges, the words and the colours. Irrigation efficiency
+    gets 5 bands and a line at 65 for subsidy, with a list of the farms on each side. The
+    Canopy Health Index gets one number per farm for palms and one for fruit trees.
+    Over-allocation is flagged each month when use is more than 25% above crop demand, and
+    broken down by crop to show where the water goes.</p>
+
+    <div class="snip">
+      <div class="snip-hd">3 scores, defined once</div>
+      <div class="snip-bd">
+        <div class="tiny" style="margin-bottom:3pt">Irrigation efficiency (IER, 0–100)</div>
+        <div class="scale">
+          <div style="flex:50;background:var(--s5)">Critical</div><div style="flex:15;background:var(--s4)">Poor</div>
+          <div style="flex:15;background:var(--s3);color:#1C211F">Acceptable</div><div style="flex:10;background:var(--s2);color:#1C211F">Good</div>
+          <div style="flex:10;background:var(--s1)">Excellent</div></div>
+        <div class="ticks"><div style="flex:50">0</div><div style="flex:15">50</div><div style="flex:15"><b style="color:var(--ink)">65 · subsidy line</b></div><div style="flex:10">80</div><div style="flex:10">90</div></div>
+
+        <div class="tiny" style="margin:10pt 0 3pt">Water use against crop demand, this month</div>
+        <div class="scale">
+          <div style="flex:100;background:var(--s1)">Up to demand</div><div style="flex:25;background:var(--s3);color:#1C211F">Up to 25% over</div>
+          <div style="flex:35;background:var(--s5)">Over-allocated</div></div>
+        <div class="ticks"><div style="flex:100">0%</div><div style="flex:25">100%</div><div style="flex:35"><b style="color:var(--ink)">125% · flag</b></div></div>
+
+        <div class="tiny" style="margin:10pt 0 3pt">Canopy Health Index, per farm — palms and fruit trees apart</div>
+        <div class="formula">CHI = NDRE × 40% + EVI × 35% + NDWI × 25%</div>
+      </div>
+    </div>
+    <div class="cap">Each scale lives in one place in the code, and every page, table and export reads it.</div>
+  </div>
+</div>
+
+<!-- ============================= EIGHT ============================= -->
+<div class="section">
+  <div class="eyebrow">Eight</div>
+  <h2>The screens are loud</h2>
+
+  <div class="found">
+    <div class="label">What we found</div>
+    <p>A single screen uses green, teal, blue, orange, yellow, purple and red, often with no
+    meaning: the small caption under each figure has its own colour. Dark teal headers sit next
+    to white cards. Almost every number is in a coloured pill, every section opens with an icon
+    in a tinted square, and many labels are capitals at 9 or 10 pixels.</p>
+    <p>Titles are long and abstract. Some lines claim things that nothing on screen supports.
+    Together these make the product look generated rather than designed, and an official will
+    ask what the claims mean.</p>
+  </div>
+
+  <div class="ev-row" style="align-items:center">
+    <div style="flex:1"><div class="ev" style="margin:0"><img src="img/telemetry-title.png" style="width:100%"></div></div>
+    <div style="flex:0 0 42mm"><div class="ev" style="margin:0"><img src="img/sync.png" style="width:42mm"></div></div>
+  </div>
+  <div class="cap">A section title, and a status line in the menu.</div>
+
+  <div class="suggest">
+    <div class="label">What we suggest</div>
+    <p>We would adopt a short set of rules, and hold every screen to them.</p>
+
+    <div class="snip snip-2">
+      <div class="snip-bd">
+        <table class="rules">
+          <tr><td>Page</td><td>White cards on light grey. One header style.</td></tr>
+          <tr><td>Colour</td><td>Grey text. One green for actions and selection.</td></tr>
+          <tr><td>Status</td><td>The 5-step ramp, only where something is judged.<br>
+            <span class="sw" style="background:var(--s1)"></span><span class="sw" style="background:var(--s2)"></span><span class="sw" style="background:var(--s3)"></span><span class="sw" style="background:var(--s4)"></span><span class="sw" style="background:var(--s5)"></span></td></tr>
+          <tr><td>Crop groups</td><td>One colour each, in a fixed order.<br>
+            <span class="sw" style="background:var(--cereals)"></span><span class="sw" style="background:var(--fodder)"></span><span class="sw" style="background:var(--open)"></span><span class="sw" style="background:var(--palm)"></span><span class="sw" style="background:var(--fruit)"></span><span class="sw" style="background:var(--forest)"></span></td></tr>
+          <tr><td>Type</td><td>One font. 12 px at least. Sentence case.</td></tr>
+          <tr><td>Pills</td><td>For a status only. Icons in the menu only.</td></tr>
+          <tr><td>Unit</td><td>Dunum everywhere. Hectares in the export.</td></tr>
+        </table>
+      </div>
+      <div class="snip-bd">
+        <table>
+          <tr><th>Current</th><th>Suggested</th></tr>
+          <tr><td>Farm-Specific Water Demand &amp; Sovereign Yield Telemetry</td><td>Water and yield</td></tr>
+          <tr><td>Farm Performance &amp; Agronomic Ranking Intelligence</td><td>Farm ranking</td></tr>
+          <tr><td>Operations Domain &amp; Interactive Deep Dives</td><td>Land use</td></tr>
+          <tr><td>Sovereign Agricultural Reports &amp; Telemetry Audits</td><td>Reports</td></tr>
+          <tr><td>System Sync: Connected</td><td>Data as of 22 Sep 2026</td></tr>
+          <tr><td>100% Boundary Verified</td><td class="tiny">remove</td></tr>
+          <tr><td>18,442 RPW Bio-Acoustic Sensors Active</td><td class="tiny">remove</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="cap">Name the thing. Show a claim only if someone can explain it, and give it a date.</div>
+  </div>
+</div>
+
+<!-- ======================== BRINGING IT TOGETHER ======================== -->
+<div class="section">
+  <div class="eyebrow">Bringing it together</div>
+  <h2>Every page in one frame</h2>
+
+  <p>Each screen appears to have been designed on its own, so each brings its own layout,
+  its own boxes and its own colours. We would place every page in the same frame. That settles
+  most of the 8 points above at once, and it makes each new page cheaper to build. The frame
+  also keeps what already works well: the English and Arabic switch, the search box, the
+  Reports page, and a date on the data.</p>
+
+  <div class="frame">
+    <div class="rail">
+      <div>Overview</div>
+      <div class="on">Crop Monitoring</div>
+      <div>Tree Monitoring</div>
+      <div>Land Use &amp; Structures</div>
+      <div>Irrigation Efficiency</div>
+      <div>Crop Water Calculator</div>
+      <div>Yield Optimisation</div>
+      <div>Individual Farms</div>
+      <div>Reports</div>
+      <div class="foot">Support · Account</div>
+    </div>
+    <div class="main">
+      <div class="bar2"><span>Al Ain ▾</span><span class="srch">Search farms by name or ID</span><span>EN | AR</span><span>Account</span></div>
+      <div class="ctx">Al Ain · 9,120 farms · 312,400 dunums · data as of 22 Sep 2026, updated monthly</div>
+      <div class="stage">
+        <div style="font-weight:500;font-size:9pt;margin-bottom:4pt">Cereals and fodder</div>
+        <div style="margin-bottom:6pt"><span class="chip on">Cereals ▾</span><span class="chip on">Fodder ▾</span></div>
+        <div class="strip" style="margin-bottom:6pt">
+          <div><div class="k">Area now</div><div class="v">4,110 du</div></div>
+          <div><div class="k">vs a year ago</div><div class="v up">▲ 6.1%</div></div>
+          <div><div class="k">Farms</div><div class="v">1,284</div></div>
+          <div><div class="k">Crops</div><div class="v">6</div></div>
+        </div>
+        <div class="snip-2">
+          <div class="ph"><b>Chart or map</b><br>the thing somebody came to look at</div>
+          <div class="ph"><b>Table</b><br>the same set, filtered together</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cap">The pages keep their content and gain a shared shape. Figures are for illustration.</div>
+
+  <p style="margin-top:14pt">The frame has 4 parts. The top bar holds what stays true
+  everywhere: the region, one search box for farms, the language switch and the account.
+  Choosing a region once holds as somebody moves between pages.</p>
+  <p>The rail on the left holds the Overview, the 6 modules, Individual Farms and Reports,
+  with Support at the foot.</p>
+  <p>A context line sits under the bar on every page. It gives the region, the number of
+  farms, the area and the date of the data, so somebody always knows what they are looking at
+  and how fresh it is.</p>
+  <p>The page itself starts with its title and the filter bar, then the same 3 blocks every
+  time: a strip of figures, a chart or a map, and a table. Once those exist, a new module is a
+  set of figures, one chart and one table, rather than another page to design. Because the
+  frame is one piece, it also turns right-to-left for Arabic as one piece.</p>
+</div>
+
+</body>
+</html>
