@@ -267,6 +267,7 @@ Tone rules, learned the hard way and still worth following:
 | How the mockup runs and is structured | `README.md` |
 | Evidence: captured production pages | `docs/design/` |
 | The deck and the research behind it | `presentation/` |
+| The short English/Azerbaijani tour for partners | `docs/ADAFSA_Platform_Tour_EN_AZ.pptx`, built by `tools/tourdeck.mjs` |
 
 The best appendix to any conversation about this project is five minutes of clicking
 through it.

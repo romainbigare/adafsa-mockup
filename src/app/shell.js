@@ -8,6 +8,7 @@
 import { h, clear, append } from './dom.js';
 import { icon } from './icons.js';
 import { NAV, NAV_FOOTER, locate } from './nav.js';
+import { readCompact, writeCompact } from './navPrefs.js';
 import { href, currentParams } from './router.js';
 import { filterBar } from '../components/filterBar.js';
 
@@ -35,6 +36,20 @@ function navLink(entry, { child = false, expandable = false } = {}) {
  * which module you are inside. */
 let menu = null;
 
+/* THE NARROW MENU IS THE SAME MENU.
+ *
+ * Folding it to icons changes a class on the body and nothing else: the same
+ * list, the same links, the same current page. With the labels gone, a
+ * module's pages open beside its icon on hover or focus, under the module's
+ * name — the one thing the icon cannot say. The fold is a choice, remembered
+ * in this browser; the menu opens wide until somebody makes it. */
+function setCompact(on, button) {
+  document.body.classList.toggle('nav-compact', on);
+  button.setAttribute('aria-pressed', String(on));
+  button.setAttribute('aria-label', on ? 'Make the menu wide' : 'Make the menu narrow');
+  button.title = on ? 'Wide menu' : '';
+}
+
 function buildNav(root) {
   clear(root);
   const items = NAV.map((entry) => {
@@ -43,18 +58,34 @@ function buildNav(root) {
     const children = (entry.children || []).map((child) => ({ entry: child, link: navLink(child, { child: true }) }));
     if (children.length) {
       li.append(h('div', { class: 'nav-fold' },
-        h('ul', { class: 'nav-sub' }, ...children.map((c) => h('li', {}, c.link)))));
+        h('ul', { class: 'nav-sub' },
+          h('li', { class: 'nav-fly-title', 'aria-hidden': 'true', text: entry.label }),
+          ...children.map((c) => h('li', {}, c.link)))));
     }
     return { entry, li, link, children };
   });
   const footer = NAV_FOOTER.map((entry) => ({ entry, link: navLink(entry) }));
 
+  const fold = h('button', {
+    class: 'nav-collapse',
+    type: 'button',
+    onclick: () => {
+      const on = !document.body.classList.contains('nav-compact');
+      setCompact(on, fold);
+      writeCompact(on);
+      /* Maps size themselves to their box; the box just changed width. */
+      window.dispatchEvent(new Event('resize'));
+    }
+  }, icon('chevron', { size: 15 }), h('span', { class: 'nav-label', text: 'Narrow menu' }));
+  setCompact(readCompact(), fold);
+
   append(root, [
     h('div', { class: 'nav-brand' },
       h('strong', { text: 'ADAFSA' }),
-      h('span', { text: 'Agricultural Monitoring Platform' })),
+      h('span', { text: 'Agricultural Monitoring Platform' }),
+      h('div', { class: 'nav-mark', 'aria-hidden': 'true' }, icon('crop', { size: 18 }))),
     h('ul', { class: 'nav-list' }, ...items.map((i) => i.li)),
-    h('div', { class: 'nav-foot' }, ...footer.map((f) => f.link))
+    h('div', { class: 'nav-foot' }, ...footer.map((f) => f.link), fold)
   ]);
   return { root, items, footer };
 }
