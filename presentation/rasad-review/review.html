@@ -114,7 +114,7 @@
   .sel.dis{ color: var(--meta); border-style: dashed; }
   .anchor{ position: relative; display: inline-block; }
   .pop{ position: absolute; left: 0; top: 15pt; border: 1px solid var(--border); border-radius: 3px;
-        padding: 4pt 8pt; width: 96pt; font-size: 7.5pt; line-height: 12pt; background: #fff; }
+        padding: 4pt 8pt; width: 122pt; font-size: 7.5pt; line-height: 12pt; background: #fff; }
   .box{ display: inline-block; width: 6.5pt; height: 6.5pt; border: 1px solid #9AA19D; border-radius: 1.5pt;
         margin-right: 5pt; vertical-align: -0.5pt; }
   .box.on{ background: var(--green); border-color: var(--green); }
@@ -172,6 +172,25 @@
   .ph{ border: 1px dashed #D2D8D5; border-radius: 3px; padding: 6pt 8pt; font-size: 7.5pt; line-height: 11pt;
        color: var(--meta); }
   .ph b{ color: var(--ink); }
+
+  .mods{ font-size: 7pt; line-height: 9.5pt; }
+  .mods td{ vertical-align: top; padding: 1.8pt 5pt; }
+  .mods td:first-child{ font-weight: 500; white-space: nowrap; }
+  .mods td:nth-child(2){ white-space: nowrap; }
+  .opts{ display: flex; gap: 8pt; margin-top: 10pt; break-inside: avoid; }
+  .opts .mini{ font-size: 7.5pt; line-height: 10.5pt; }
+  .opts .snip-bd{ padding: 6pt 8pt; }
+  .opts .mini .grp{ margin: 5pt 0 1pt; }
+  .opt{ flex: 1; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+  .mini .it.on{ font-weight: 500; }
+  .evb{ display: flex; font-size: 7.5pt; line-height: 11pt; padding: 2.5pt 0; border-bottom: 1px solid #F0F2F1; }
+  .evb:last-child{ border-bottom: 0; }
+  .evb .k{ flex: 0 0 40pt; font-size: 6.5pt; font-weight: 500; letter-spacing: .08em;
+           text-transform: uppercase; }
+  .k.keep{ color: var(--meta); } .k.add{ color: var(--green); } .k.move{ color: #B07515; } .k.change{ color: #2a78d6; }
+  .hdr{ display: flex; align-items: center; gap: 8pt; font-size: 7.5pt; color: var(--caption); }
+  .hdr .srch, .frame .bar2 .srch{ flex: 1; border: 1px solid var(--border-lt); border-radius: 3px; padding: 1pt 6pt; color: var(--meta); }
+  .sel.on{ border-color: #BFD9C8; background: var(--tint); }
 </style>
 </head>
 <body>
@@ -187,30 +206,28 @@
 <!-- ============================= ONE ============================= -->
 <div class="section">
   <div class="eyebrow">One</div>
-  <h2>The menu does not show what the client is buying</h2>
+  <h2>Giving the six modules a place in the menu</h2>
 
   <div class="found">
     <div class="label">What we found</div>
-    <p>The side menu has 8 items. 4 of them are the work: Executive View, Farm, Farm
-    Monitoring and Reports. The other 4 are support: Raise Ticket, Contact Us, Feedback,
-    and Account and Settings.</p>
-    <p>The 6 modules in the contract do not appear in the menu. They sit as 6 small cards
-    in the middle of the Farm page, with one number each. Nobody can go straight to
-    Irrigation Efficiency, and a new user cannot tell from the menu what the platform
-    measures.</p>
+    <p>The side menu has 8 items. Executive View, Farm, Farm Monitoring and Reports carry the
+    work, and the other 4 are support: Raise Ticket, Contact Us, Feedback, and Account and
+    Settings.</p>
+    <p>The 6 modules named in the contract are reached through cards on the Farm page, with
+    one number each. A module has no page of its own, so there is no place to show all of its
+    deliverables, and a new user cannot tell from the menu what the platform measures.</p>
   </div>
 
   <div class="suggest">
     <div class="label">What we suggest</div>
-    <p>We would make the menu a list of what the client pays for. Overview sits at the top.
-    The 6 modules follow, by name, and each one opens into its own pages: one for what
-    exists now, one for what has changed. Individual Farms and Reports come next. The 4
-    support items become one Support entry at the foot of the menu. Every page has its own
-    link, so a view can be sent to a colleague.</p>
+    <p>We would give each module its own entry in the menu, with a small group of pages under
+    it. The existing screens keep their place: the Executive View stays at the top, Farm
+    Monitoring becomes the page for one farm, and Reports stays the place for exports. The 4
+    support items can share one Support entry at the foot of the menu.</p>
 
     <div class="snip snip-2">
       <div>
-        <div class="snip-hd">Current — 8 items, no modules</div>
+        <div class="snip-hd">Current — 8 items</div>
         <div class="snip-bd mini">
           <div class="grp">Sovereign Ops</div>
           <div class="it">Executive View</div>
@@ -225,37 +242,117 @@
         </div>
       </div>
       <div>
-        <div class="snip-hd">Suggested — the 6 modules, by name</div>
+        <div class="snip-hd">Suggested breakdown by the 6 modules</div>
         <div class="snip-bd">
-          <div class="navitem"><div class="t">Overview</div><div class="d">What we have, and where</div></div>
+          <div class="navitem"><div class="t">Executive View</div><div class="d">What we have, and where</div></div>
           <div class="navitem on"><div class="t">Crop Monitoring</div>
-            <div class="navsub"><div>Crops and area</div><div>Cereals and fodder</div><div>Open field crops</div><div>Fallow land</div></div></div>
+            <div class="navsub"><div>Crops and area</div><div>Seasonal change</div><div>Fallow land</div></div></div>
           <div class="navitem"><div class="t">Tree Monitoring</div></div>
           <div class="navitem"><div class="t">Land Use &amp; Structures</div></div>
           <div class="navitem"><div class="t">Irrigation Efficiency</div></div>
           <div class="navitem"><div class="t">Crop Water Calculator</div></div>
           <div class="navitem"><div class="t">Yield Optimisation</div></div>
-          <div class="navitem"><div class="t">Individual Farms</div></div>
+          <div class="navitem"><div class="t">Farm Monitoring</div><div class="d">One farm</div></div>
           <div class="navitem"><div class="t">Reports</div></div>
           <div class="navfoot">Support · Account</div>
         </div>
       </div>
     </div>
-    <div class="cap">Opening a module shows its pages. Crop Monitoring holds 4.</div>
+    <div class="cap">Opening a module shows its pages. The existing screens keep their names.</div>
+  </div>
+
+  <div class="suggest" style="break-before:page;margin-top:0">
+    <div class="label">What goes in each module</div>
+    <p>Each module needs 2 or 3 pages to hold its contract deliverables. As a starting point:</p>
+    <div class="snip">
+      <div class="snip-hd">What each module measures and shows</div>
+      <div class="snip-bd">
+        <table class="mods">
+          <tr><th>Module</th><th>Pages</th><th>What is measured and shown</th></tr>
+          <tr><td>Crop Monitoring</td><td>Crops and area</td><td>Crop location and type. Cultivated area per farm and per crop, in dunums.</td></tr>
+          <tr><td></td><td>Seasonal change</td><td>New and abandoned cultivation against the same season last year.</td></tr>
+          <tr><td></td><td>Fallow land</td><td>Land ready for cultivation but not planted, per farm. Resting under or over 12 months.</td></tr>
+          <tr><td>Tree Monitoring</td><td>Tree count</td><td>Tree location and count. Species and variety: date palm cultivars, fruit, forest trees.</td></tr>
+          <tr><td></td><td>Canopy health</td><td>Canopy Health Index per farm, palms and fruit trees apart. Farms under stress.</td></tr>
+          <tr><td></td><td>Annual change</td><td>New plantings, removals and canopy loss against last year.</td></tr>
+          <tr><td>Land Use &amp; Structures</td><td>Land use</td><td>Open and protected agriculture, structures and barren land, as area and share.</td></tr>
+          <tr><td></td><td>Structures</td><td>Count and footprint by type: housing, storage, animal enclosures, utilities.</td></tr>
+          <tr><td>Irrigation Efficiency</td><td>Scores</td><td>IER score and band per farm, province averages, farms above the subsidy line of 65.</td></tr>
+          <tr><td></td><td>Trend</td><td>Score by quarter. Farms that improved and farms that fell.</td></tr>
+          <tr><td>Crop Water Calculator</td><td>Monthly demand</td><td>Water demand per farm and per crop, in m³ per dunum. Farms more than 25% over demand.</td></tr>
+          <tr><td></td><td>Season budget</td><td>Water per crop over its growing season, and per kilo harvested.</td></tr>
+          <tr><td>Yield Optimisation</td><td>Yield forecast</td><td>Tonnes per dunum per farm and crop. Farms below the crop average. Production by province.</td></tr>
+          <tr><td></td><td>Crop calendar</td><td>When each crop is in the ground, month by month.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="suggest" style="margin-top:16pt">
+    <div class="label">Other ways into the same pages</div>
+    <p>Ordering by module follows the contract, which helps when the client checks what was
+    delivered. The same pages can also be reached by the question somebody is asking, or by
+    the crop they care about. One can be the main menu, with a switch for the others.</p>
+
+    <div class="opts">
+      <div class="opt">
+        <div class="snip-hd">A · By module</div>
+        <div class="snip-bd mini">
+          <div class="it"><b>Executive View</b></div>
+          <div class="it">Crop Monitoring</div>
+          <div class="it">Tree Monitoring</div>
+          <div class="it">Land Use &amp; Structures</div>
+          <div class="it">Irrigation Efficiency</div>
+          <div class="it">Crop Water Calculator</div>
+          <div class="it">Yield Optimisation</div>
+          <div class="it"><b>Farm Monitoring</b></div>
+          <div class="it"><b>Reports</b></div>
+          <div class="tiny" style="margin-top:5pt">Matches the contract, line by line.</div>
+        </div>
+      </div>
+      <div class="opt">
+        <div class="snip-hd">B · By question</div>
+        <div class="snip-bd mini">
+          <div class="grp">What do we have?</div>
+          <div class="it">Crops, trees, land, structures</div>
+          <div class="grp">How is it going?</div>
+          <div class="it">Canopy, irrigation, water, yield</div>
+          <div class="grp">What has changed?</div>
+          <div class="it">Crops, trees, structures, irrigation</div>
+          <div class="grp">One farm</div>
+          <div class="it">Farm Monitoring</div>
+          <div class="tiny" style="margin-top:5pt">Suits a first-time user.</div>
+        </div>
+      </div>
+      <div class="opt">
+        <div class="snip-hd">C · By crop</div>
+        <div class="snip-bd mini">
+          <div class="it">Cereals</div>
+          <div class="it">Fodder</div>
+          <div class="it on">Open field ▾</div>
+          <div class="navsub"><div>Tomato: area, yield, water</div></div>
+          <div class="it">Date palm</div>
+          <div class="it">Fruit trees</div>
+          <div class="it">Forest trees</div>
+          <div class="tiny" style="margin-top:5pt">Suits a question like "tomatoes this season".</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">The pages stay the same. Only the way into them changes.</div>
   </div>
 </div>
 
 <!-- ============================= TWO ============================= -->
 <div class="section">
   <div class="eyebrow">Two</div>
-  <h2>One page carries every level of detail</h2>
+  <h2>Separating the levels of detail</h2>
 
   <div class="found">
     <div class="label">What we found</div>
-    <p>The Farm page is about 5,400 pixels tall: six screens of scrolling. It mixes the
-    whole emirate, one farm picked from a menu, and 15 farms ranked as large cards. The
-    Executive View and Farm Monitoring each bring a layout of their own, so a user does not
-    know where to look first.</p>
+    <p>The Farm page gathers a lot of useful content: land use, crop and tree shares, the 6
+    module cards, and a ranking of farms. It is about 5,400 pixels tall, or six screens of
+    scrolling, and it moves between the whole emirate, one farm picked from a menu, and a list
+    of 15 farms. A reader has to work out, block by block, which level each part is about.</p>
   </div>
 
   <div class="ev-row">
@@ -278,127 +375,138 @@
 
   <div class="suggest">
     <div class="label">What we suggest</div>
-    <p>We would split the product into 3 levels. The Overview shows the emirate, or one
-    province. A module page shows one topic across all farms, then the farms behind it. A
-    farm page shows one farm across all topics. Every page is built from the same 3 blocks:
-    a strip of figures, one chart or map, and one table. Lists of farms become table rows
-    that can be sorted, searched and exported, since 15 cards already fill two screens and
-    the contract covers more than 25,000 farms.</p>
+    <p>We would keep the existing screens and give each one a single level. The Executive
+    View covers the emirate or one province. The new module pages cover one topic across all
+    farms. Farm Monitoring covers one farm. Almost everything on the Farm page already has a
+    home in that scheme, so the work is mostly moving blocks rather than building them.</p>
+    <p>The ranking is worth one more change. As rows in a table rather than cards, the same
+    farms can be sorted, searched and exported, and the list still works at 25,000 farms.</p>
 
     <div class="snip">
-      <div class="snip-hd">3 levels, one page shape</div>
-      <div class="snip-bd snip-2">
-        <div class="lvl"><div class="h">1 · Overview</div><div class="d">Emirate or province. What we have, and where.</div>
-          <div class="wire"><div class="s"></div><div class="m"></div><div class="l"></div><div class="l"></div><div class="l" style="width:70%"></div></div></div>
-        <div class="arrow">→</div>
-        <div class="lvl"><div class="h">2 · Module</div><div class="d">One topic across all farms, then the farms.</div>
-          <div class="wire"><div class="s"></div><div class="g"></div><div class="l"></div><div class="l"></div><div class="l" style="width:70%"></div></div></div>
-        <div class="arrow">→</div>
-        <div class="lvl"><div class="h">3 · Farm</div><div class="d">One farm across all topics.</div>
-          <div class="wire"><div class="s"></div><div class="m" style="height:22pt"></div><div class="l"></div><div class="l"></div><div class="l" style="width:70%"></div></div></div>
+      <div class="snip-hd">Where each block of the Farm page goes</div>
+      <div class="snip-bd">
+        <table>
+          <tr><th>On the Farm page today</th><th>Moves to</th></tr>
+          <tr><td><span class="sw" style="background:#9ec5f4"></span>Map, emirate figures, share bars</td><td>Executive View</td></tr>
+          <tr><td><span class="sw" style="background:#7fb069"></span>6 module cards and their detail tables</td><td>The 6 module pages, one card each, grown into a page</td></tr>
+          <tr><td><span class="sw" style="background:#7fb069"></span>Ranking by health, yield, IER and water</td><td>Each module's farm table, as sortable rows</td></tr>
+          <tr><td><span class="sw" style="background:#e0b02a"></span>Water and yield for one farm</td><td>Farm Monitoring</td></tr>
+        </table>
       </div>
     </div>
-    <div class="cap">Each page: a strip of figures, then a map or a chart, then a table.</div>
+    <div class="cap">Nothing is dropped. Each block moves to the page that matches its level.</div>
   </div>
 </div>
 
 <!-- ============================= THREE ============================= -->
 <div class="section">
   <div class="eyebrow">Three</div>
-  <h2>The first page mixes what we have with how it is doing</h2>
+  <h2>Keeping the Executive View about capacity</h2>
 
   <div class="found">
     <div class="label">What we found</div>
-    <p>The Executive View opens with the right kind of numbers: farms, fields, trees,
-    cultivated, fallow and barren land, structures. It then adds a canopy health bar for the
-    whole emirate, and draws farm counts as red bubbles, which read as an alarm.</p>
-    <p>At the level of the emirate, the question is production capacity: what is grown,
-    where, and on how much land. Health belongs to a farm and its inspector. There is also no
-    crop table, so "how many farms grow tomatoes this year, on how many dunums?" has no
-    answer on the first page.</p>
+    <p>The Executive View opens with the right numbers for an agency: farms, fields, trees,
+    and cultivated, fallow and barren land. Its tabs for open agriculture, protected
+    agriculture and structures are a clear way in. Two elements pull it toward health instead:
+    a canopy health bar for the whole emirate, and farm counts drawn as red bubbles, which
+    read as an alarm.</p>
+    <p>The cards under Open Agriculture also stop at the group. Cultivated Fields names its
+    crops as a line of text, so "how many farms grow tomatoes, on how many dunums?" has no
+    answer on the page.</p>
   </div>
 
   <div class="ev-row" style="align-items:flex-end">
     <div style="flex:0 0 72mm"><div class="ev" style="margin:0"><img src="img/cluster-map.png" style="width:72mm"></div></div>
     <div style="flex:1"><div class="ev" style="margin:0"><img src="img/canopy-bar.png" style="width:100%"></div>
-      <div class="cap">Left: farm counts drawn in red. Right: a health bar for the whole emirate, on the first page.</div></div>
+      <div class="cap">Left: farm counts drawn in red. Right: a health bar for the whole emirate.</div></div>
   </div>
 
   <div class="suggest">
     <div class="label">What we suggest</div>
-    <p>We would keep the first page to an inventory: 4 figures (farms, farm area, land in
-    production, crops growing this month), a map of plain grey bubbles that count farms and
-    split as you zoom, and 2 tables: crops by area, and crops by number of farms. Each row
-    opens from a group to its crops. Share bars run against 100%, so the grey part is the
-    rest of the answer. Health moves to the module pages and the farm page.</p>
+    <p>We would keep the page and its tabs, and make 3 changes. The canopy health bar moves to
+    Tree Monitoring, where health is the subject. The farm-count bubbles take a neutral colour,
+    since they count rather than judge. And each card under Open Agriculture opens into its
+    crops, with the area and the number of farms for each.</p>
 
-    <div class="snip">
-      <div class="snip-hd">Crops by area — one of the 2 tables</div>
-      <div class="snip-bd">
-        <table>
-          <tr><th>Crop</th><th class="num">Dunums</th><th class="num">Share</th><th></th></tr>
-          <tr><td><span class="sw" style="background:var(--cereals)"></span>▸ Cereals</td><td class="num">1,240</td><td class="num">7.0%</td><td><div class="bar"><i style="width:7%;background:var(--cereals)"></i></div></td></tr>
-          <tr><td><span class="sw" style="background:var(--fodder)"></span>▸ Fodder</td><td class="num">2,870</td><td class="num">16.3%</td><td><div class="bar"><i style="width:16.3%;background:var(--fodder)"></i></div></td></tr>
-          <tr><td><span class="sw" style="background:var(--open)"></span>▾ Open field</td><td class="num">3,910</td><td class="num">22.2%</td><td><div class="bar"><i style="width:22.2%;background:var(--open)"></i></div></td></tr>
-          <tr class="sub"><td>Tomato</td><td class="num">1,120</td><td class="num">6.4%</td><td><div class="bar"><i style="width:6.4%;background:var(--open)"></i></div></td></tr>
-          <tr class="sub"><td>Cucumber</td><td class="num">640</td><td class="num">3.6%</td><td><div class="bar"><i style="width:3.6%;background:var(--open)"></i></div></td></tr>
-          <tr><td><span class="sw" style="background:var(--palm)"></span>▸ Date palm</td><td class="num">8,020</td><td class="num">45.6%</td><td><div class="bar"><i style="width:45.6%;background:var(--palm)"></i></div></td></tr>
-          <tr><td><span class="sw" style="background:var(--fruit)"></span>▸ Fruit trees</td><td class="num">1,140</td><td class="num">6.5%</td><td><div class="bar"><i style="width:6.5%;background:var(--fruit)"></i></div></td></tr>
-        </table>
+    <div class="snip snip-2" style="align-items:stretch">
+      <div>
+        <div class="snip-hd">The Executive View, block by block</div>
+        <div class="snip-bd">
+          <div class="evb"><span class="k keep">Keep</span>Farms, fields, trees</div>
+          <div class="evb"><span class="k keep">Keep</span>Cultivated, fallow and barren land, structures</div>
+          <div class="evb"><span class="k keep">Keep</span>Tabs: open, protected, structures</div>
+          <div class="evb"><span class="k add">Add</span>Each card opens into its crops</div>
+          <div class="evb"><span class="k keep">Keep</span>Species table</div>
+          <div class="evb"><span class="k move">Move</span>Canopy health bar, to Tree Monitoring</div>
+          <div class="evb"><span class="k change">Change</span>Map bubbles in a neutral colour</div>
+        </div>
+      </div>
+      <div>
+        <div class="snip-hd">Cultivated Fields, opened</div>
+        <div class="snip-bd">
+          <table>
+            <tr><th>Crop</th><th class="num">Dunums</th><th class="num">Farms</th></tr>
+            <tr><td>Rhodes grass</td><td class="num">412,300</td><td class="num">6,840</td></tr>
+            <tr><td>Tomato</td><td class="num">96,500</td><td class="num">2,115</td></tr>
+            <tr><td>Cucumber</td><td class="num">54,200</td><td class="num">1,380</td></tr>
+            <tr><td>Fodder maize</td><td class="num">48,900</td><td class="num">960</td></tr>
+            <tr><td class="tiny">and 14 more crops</td><td></td><td></td></tr>
+          </table>
+        </div>
       </div>
     </div>
-    <div class="cap">Open field is opened to show its crops. The second table counts farms instead of dunums. Figures are for illustration.</div>
+    <div class="cap">The page keeps its shape. Figures are for illustration.</div>
   </div>
 </div>
 
 <!-- ============================= FOUR ============================= -->
 <div class="section">
   <div class="eyebrow">Four</div>
-  <h2>The filters do not reach the data</h2>
+  <h2>Letting the filters reach every page</h2>
 
   <div class="found">
     <div class="label">What we found</div>
-    <p>The header holds a region menu, and some lists carry region chips of their own. Other
-    screens have no filter at all. There is no way to filter by crop or tree type, so the
-    share bars and tables always show every type at once.</p>
+    <p>The header already holds a region menu, which is the right place for it. Some lists
+    add region chips of their own, and there is no filter for crop or tree type, so the share
+    bars and tables always show every type at once.</p>
     <p>No list opens from a crop group to its crops, or from a crop to the farms that grow it.
     A simple question — how many farms grow tomatoes in Al Ain, and which ones — has no
     answer on any screen.</p>
   </div>
 
   <div class="ev"><img src="img/header.png" style="width:170mm"></div>
-  <div class="cap">The header: a region menu and coverage labels, with no crop or tree filter.</div>
+  <div class="cap">The header today: a region menu, coverage labels, search and the language switch.</div>
 
   <div class="suggest">
     <div class="label">What we suggest</div>
-    <p>We would put one filter bar under the title of every page. It holds the region — the
-    emirate, one of the 3 provinces, then the farm centre — and one chip per group, in a fixed
-    order: cereals, fodder, open field, date palm, fruit trees, forest trees. The chip's name
-    turns its group on or off. Its arrow opens the crops or varieties inside.</p>
-    <p>The bar is live. The figures, the chart, the map and every table on the page change
-    together, with no apply button. The filter is kept in the page link. Each page offers only
-    the chips that change its answer, since a switch that moves nothing is worse than no switch.
-    Every summary row opens into its parts, and every farm name opens the farm.</p>
+    <p>We would build on the header. Next to the region menu, a second menu picks crop and
+    tree types: the groups in a fixed order — cereals, fodder, open field, date palm, fruit
+    trees, forest trees — each opening into its crops or varieties. It can take the place of
+    the coverage labels.</p>
+    <p>Both menus then apply to every page, and to every figure, chart, map and table on it at
+    once, with no apply button. The choice is kept in the page link and holds as somebody
+    moves between pages, so the chips on single lists are no longer needed. Summary rows open
+    into their parts, and every farm name opens the farm.</p>
 
     <div class="snip">
-      <div class="snip-hd">One live filter bar, on every page</div>
+      <div class="snip-hd">The same header, with a crop menu beside the region</div>
       <div class="snip-bd">
-        <div><span class="sel">Al Ain ▾</span>
-          <span class="chip off">Cereals ▾</span><span class="chip off">Fodder ▾</span><span class="anchor"><span class="chip on">Open field ▾</span><div class="pop"><div><span class="box on"></span>Tomato</div><div><span class="box"></span>Cucumber</div><div><span class="box"></span>Eggplant</div><div class="tiny">and 15 more</div></div></span><span class="chip off">Date palm ▾</span><span class="chip off">Fruit trees ▾</span><span class="chip off">Forest trees ▾</span></div>
-        <div style="height:56pt"></div>
-        <div class="tiny" style="margin:0 0 2pt">Everything below the bar now counts tomatoes in Al Ain.</div>
+        <div class="hdr"><span class="sel">Al Ain ▾</span><span class="anchor"><span class="sel on">Open field: Tomato ▾</span><div class="pop"><div class="tiny">Cereals · Fodder</div><div><b>Open field</b></div><div><span class="box on"></span>Tomato</div><div><span class="box"></span>Cucumber</div><div class="tiny">Date palm · Fruit · Forest</div></div></span>
+          <span class="srch">Search farms, cadastre, plots…</span><span>EN | AR</span><span class="tiny">Account</span></div>
+        <div style="height:80pt"></div>
+        <div class="tiny" style="margin:0 0 2pt">Every page now counts tomatoes in Al Ain, until the menus change again.</div>
         <div class="path"><span class="h">By place</span><span class="n">Emirate</span><span class="a">→</span><span class="n">Province</span><span class="a">→</span><span class="n">Farm centre</span><span class="a">→</span><span class="n">Farm</span></div>
         <div class="path"><span class="h">By type</span><span class="n">Group</span><span class="a">→</span><span class="n">Crop or variety</span><span class="a">→</span><span class="n">Farms that grow it</span><span class="a">→</span><span class="n">Farm</span></div>
       </div>
     </div>
-    <div class="cap">3 clicks answer the tomato question.</div>
+    <div class="cap">3 clicks answer the tomato question, from any page.</div>
   </div>
 </div>
 
 <!-- ============================= FIVE ============================= -->
 <div class="section">
   <div class="eyebrow">Five</div>
-  <h2>Everything is shown as "now"</h2>
+  <h2>Adding the direction of travel</h2>
 
   <div class="found">
     <div class="label">What we found</div>
@@ -414,16 +522,16 @@
 
   <div class="suggest">
     <div class="label">What we suggest</div>
-    <p>We would make 2 changes. Every headline figure carries its change and a small trend
-    line, against last quarter or last year, chosen with one switch. And every module gets a
-    Change page beside its Now page: a chart over time, the biggest movers, and the farms
+    <p>We would make 2 changes. Every existing figure, on the Executive View, the module
+    cards and Farm Monitoring, carries its change and a small trend line, against last quarter or last year, chosen with one switch. And every module gets a
+    Change view, as a page or a tab: a chart over time, the biggest movers, and the farms
     behind the movement, oldest to newest. Crops, irrigation and yield use 6 quarters, the
     smallest window with both a last-quarter and a last-year reading. Trees and structures
     use 3 years, because they move slowly. Change pages carry no map. Until enough history
     exists, the page says so plainly.</p>
 
     <div class="snip">
-      <div class="snip-hd">A figure with its change, and a Change page</div>
+      <div class="snip-hd">A figure with its change, and a Change view</div>
       <div class="snip-bd snip-2" style="align-items:stretch">
         <div style="flex:0 0 118pt">
           <div class="strip" style="display:block"><div style="border:0">
@@ -475,14 +583,15 @@
 <!-- ============================= SIX ============================= -->
 <div class="section">
   <div class="eyebrow">Six</div>
-  <h2>The farm page is written for a scientist</h2>
+  <h2>Writing the farm page for an inspector</h2>
 
   <div class="found">
     <div class="label">What we found</div>
-    <p>Farm Monitoring opens on satellite codes (S1, S2, S3), cloud cover to two decimals,
+    <p>Farm Monitoring brings a lot together for one farm: health, yield, irrigation, water and
+    a field table. It opens, though, on satellite codes (S1, S2, S3), cloud cover to two decimals,
     pass times to the second, and NDVI, NDWI and SAVI switches. An inspector preparing a visit
-    wants to know what the farm grows, how it is doing, and what to check. None of that is
-    written in plain words.</p>
+    wants to know what the farm grows, how it is doing, and what to check. That is hard to
+    find in plain words.</p>
     <p>The farm cards also give farmer instructions, such as "Increase pivot delivery by 12%
     between 19:00 and 04:00". Watering schedules, soil salinity and weather belong in the
     farmer's app. The contract sells these modules without prescriptive irrigation advice.</p>
@@ -493,13 +602,12 @@
 
   <div class="suggest">
     <div class="label">What we suggest</div>
-    <p>We would give each farm 2 pages in plain words, and one closed tab for experts. The
-    profile gives the area, province and farm centre, what the farm grows now, its trees, its
-    irrigation efficiency, its water this month, and what changed since last quarter. The
-    second page lists what to check on a visit, as neutral findings, most important first,
-    with a print button. The satellite detail — passes, indices and the field table — moves
-    into a tab that stays closed until someone opens it. Nothing is lost; it moves one level
-    deeper.</p>
+    <p>We would keep the page and change its order. It opens on a plain profile: the 4
+    figures already there, what the farm grows, its trees, and what changed since last
+    quarter. A second tab lists what to check on a visit, as neutral findings, most important
+    first, with a print button. The satellite strip, the indices and the field table move into
+    a Satellite detail tab, kept for the specialists who need them. Nothing is lost; it moves
+    one level deeper.</p>
 
     <div class="snip">
       <div class="tabs"><div>Profile</div><div class="on">What to check (3)</div><div class="ex">Satellite detail ▸</div></div>
@@ -519,7 +627,7 @@
 <!-- ============================= SEVEN ============================= -->
 <div class="section">
   <div class="eyebrow">Seven</div>
-  <h2>The scores use their own scales</h2>
+  <h2>Aligning the scores with the contract</h2>
 
   <div class="found">
     <div class="label">What we found</div>
@@ -569,17 +677,18 @@
 <!-- ============================= EIGHT ============================= -->
 <div class="section">
   <div class="eyebrow">Eight</div>
-  <h2>The screens are loud</h2>
+  <h2>A calmer visual language</h2>
 
   <div class="found">
     <div class="label">What we found</div>
-    <p>A single screen uses green, teal, blue, orange, yellow, purple and red, often with no
+    <p>The product has a clear identity: the ADAFSA lockup, a bilingual name and a steady
+    green. Around it, a single screen uses green, teal, blue, orange, yellow, purple and red, often with no
     meaning: the small caption under each figure has its own colour. Dark teal headers sit next
     to white cards. Almost every number is in a coloured pill, every section opens with an icon
     in a tinted square, and many labels are capitals at 9 or 10 pixels.</p>
     <p>Titles are long and abstract. Some lines claim things that nothing on screen supports.
-    Together these make the product look generated rather than designed, and an official will
-    ask what the claims mean.</p>
+    Together they make the product feel busier than it is, and an official will ask what
+    the claims mean.</p>
   </div>
 
   <div class="ev-row" style="align-items:center">
@@ -608,7 +717,7 @@
       </div>
       <div class="snip-bd">
         <table>
-          <tr><th>Current</th><th>Suggested</th></tr>
+          <tr><th>Today</th><th>Suggested</th></tr>
           <tr><td>Farm-Specific Water Demand &amp; Sovereign Yield Telemetry</td><td>Water and yield</td></tr>
           <tr><td>Farm Performance &amp; Agronomic Ranking Intelligence</td><td>Farm ranking</td></tr>
           <tr><td>Operations Domain &amp; Interactive Deep Dives</td><td>Land use</td></tr>
@@ -626,33 +735,32 @@
 <!-- ======================== BRINGING IT TOGETHER ======================== -->
 <div class="section">
   <div class="eyebrow">Bringing it together</div>
-  <h2>Every page in one frame</h2>
+  <h2>Working from a common page frame</h2>
 
-  <p>Each screen appears to have been designed on its own, so each brings its own layout,
-  its own boxes and its own colours. We would place every page in the same frame. That settles
-  most of the 8 points above at once, and it makes each new page cheaper to build. The frame
-  also keeps what already works well: the English and Arabic switch, the search box, the
-  Reports page, and a date on the data.</p>
+  <p>Each screen has so far been designed on its own, so each brings its own layout, its own
+  boxes and its own colours. We would place every page in one shared frame. That settles most
+  of the 8 points above at once, and it makes each new page cheaper to build. Much of the frame
+  already exists: the header holds the region menu, the search box, the English and Arabic
+  switch and the account, and the Reports page is the natural home for exports.</p>
 
   <div class="frame">
     <div class="rail">
-      <div>Overview</div>
+      <div>Executive View</div>
       <div class="on">Crop Monitoring</div>
       <div>Tree Monitoring</div>
       <div>Land Use &amp; Structures</div>
       <div>Irrigation Efficiency</div>
       <div>Crop Water Calculator</div>
       <div>Yield Optimisation</div>
-      <div>Individual Farms</div>
+      <div>Farm Monitoring</div>
       <div>Reports</div>
       <div class="foot">Support · Account</div>
     </div>
     <div class="main">
-      <div class="bar2"><span>Al Ain ▾</span><span class="srch">Search farms by name or ID</span><span>EN | AR</span><span>Account</span></div>
-      <div class="ctx">Al Ain · 9,120 farms · 312,400 dunums · data as of 22 Sep 2026, updated monthly</div>
+      <div class="bar2"><span class="sel">Al Ain ▾</span><span class="sel on">Cereals, Fodder ▾</span><span class="srch">Search farms by name or ID</span><span>EN | AR</span><span>Account</span></div>
+      <div class="ctx">Al Ain · cereals and fodder · 1,284 farms · 4,110 dunums · data as of 22 Sep 2026, updated monthly</div>
       <div class="stage">
-        <div style="font-weight:500;font-size:9pt;margin-bottom:4pt">Cereals and fodder</div>
-        <div style="margin-bottom:6pt"><span class="chip on">Cereals ▾</span><span class="chip on">Fodder ▾</span></div>
+        <div style="font-weight:500;font-size:9pt;margin-bottom:6pt">Crop Monitoring · Seasonal change</div>
         <div class="strip" style="margin-bottom:6pt">
           <div><div class="k">Area now</div><div class="v">4,110 du</div></div>
           <div><div class="k">vs a year ago</div><div class="v up">▲ 6.1%</div></div>
@@ -669,17 +777,17 @@
   <div class="cap">The pages keep their content and gain a shared shape. Figures are for illustration.</div>
 
   <p style="margin-top:14pt">The frame has 4 parts. The top bar holds what stays true
-  everywhere: the region, one search box for farms, the language switch and the account.
-  Choosing a region once holds as somebody moves between pages.</p>
-  <p>The rail on the left holds the Overview, the 6 modules, Individual Farms and Reports,
-  with Support at the foot.</p>
-  <p>A context line sits under the bar on every page. It gives the region, the number of
-  farms, the area and the date of the data, so somebody always knows what they are looking at
-  and how fresh it is.</p>
-  <p>The page itself starts with its title and the filter bar, then the same 3 blocks every
-  time: a strip of figures, a chart or a map, and a table. Once those exist, a new module is a
-  set of figures, one chart and one table, rather than another page to design. Because the
-  frame is one piece, it also turns right-to-left for Arabic as one piece.</p>
+  everywhere: the region and the crop menus side by side, one search box for farms, the
+  language switch and the account. A choice made there holds as somebody moves between pages.</p>
+  <p>The rail on the left holds the Executive View, the 6 modules, Farm Monitoring and
+  Reports, with Support at the foot. Any of the menu orders in point One fits here.</p>
+  <p>A context line sits under the bar on every page. It repeats the selection and gives the
+  number of farms, the area and the date of the data, so somebody always knows what they are
+  looking at and how fresh it is.</p>
+  <p>The page itself follows the same 3 blocks every time: a strip of figures, a chart or a
+  map, and a table. Once those exist, a new module is a set of figures, one chart and one
+  table, rather than another page to design. Because the frame is one piece, it also turns
+  right-to-left for Arabic as one piece.</p>
 </div>
 
 </body>
