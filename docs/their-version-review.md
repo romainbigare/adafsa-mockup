@@ -23,6 +23,13 @@ Screenshots are in `docs/their-version/`.
   less, better or worse, compared with last quarter and last year. Their mockup shows
   only "now". Our mockup has a change page in almost every module. This is the biggest
   gap (section 7).
+- **No live filters, and no drill-down.** In our mockup, one filter bar on every page
+  (region + crop / tree types) changes every number, chart, map and table at once, and
+  you can go down from the emirate to a province to one farm, and from a crop group to one
+  crop. Their mockup cannot answer a question like "how many farms grow tomatoes in Al
+  Ain?" (section 8).
+- **Mark already gave the answer to most of this.** His review of our first version asked
+  for many of the same changes their mockup now needs (section 9).
 - **The look is crowded and feels AI-made.** Too many colours, dark and light headers
   mixed, badges everywhere, very small text, and long "buzzword" titles (section 6).
 - **Some things they did well**, and we should take them: Arabic, a Reports page,
@@ -86,10 +93,9 @@ Screenshots are in `docs/their-version/`.
    emirate map, one farm's water and yield, share bars, six module cards, a table and a
    ranking of 15 big cards. There is no clear order from big picture to detail. A user
    does not know where to look first.
-5. **No clear levels of detail.** Our mockup always goes emirate → province → farm, and
-   category → crop → variety, with the same filter bar on every page. In theirs, some
-   lists have region chips, some have a region menu, some have nothing. The crop and tree
-   taxonomy cannot be used as a filter.
+5. **No live filters and no clear levels of detail.** In theirs, some lists have region
+   chips, some have a region menu, some have nothing. The crop and tree types cannot be
+   used as a filter. See section 8.
 6. **The IER bands are not the contract bands.** They use 4 words: Excellent, Good,
    Moderate, Low. The contract has 5: Excellent 90–100, Good 80–89, Acceptable 65–79,
    Poor 50–64, Critical below 50. Their IER 78 shows as "Good"; in the contract it is
@@ -238,74 +244,253 @@ empty chart. Our IER trend page has this state; every change page needs it.
 
 ---
 
-## 8. Side by side
+## 8. Live filters and drill-down
+
+### What our mockup does
+
+**One filter bar, on every page, and it is live.** It sits under the page title. It has:
+
+- a **region** menu: the whole emirate, or one of the three provinces (Abu Dhabi, Al Ain,
+  Al Dhafra), plus a place for the farm centre;
+- one **chip per crop or tree group**, in a fixed order: cereals, fodder, open field,
+  date palm, fruit trees, forest trees. Click the name to turn the group on or off. Click
+  the small arrow to open the group and pick single crops or varieties (for example only
+  tomatoes, or only Khalas palms).
+
+When the user changes a filter, **everything on the page changes together**: the big
+numbers, the charts, the map and every table. Nothing needs a "search" or "apply" button.
+The filter is also kept in the page link, so a filtered view can be sent to a colleague
+exactly as it is.
+
+Each page shows **only the filters that change its answer**. The cereals page offers
+cereals and fodder; the tree change page offers palms and fruit trees; the fallow page
+has no crop filter at all. A switch that changes nothing is worse than no switch.
+
+**Drill-down, in two directions:**
+
+- **By place:** emirate → province → farm centre → farm. On the maps, bubbles show the
+  number of farms and split into smaller bubbles as you zoom in; on the tree map you see
+  single trees, coloured by variety, once you are inside a farm. On the canopy and IER
+  maps, a bubble shows the average of the farms under it, on the same colour scale at
+  every zoom.
+- **By type:** crop group → crop → farm. Summary tables open from a group (cereals) to
+  its crops (wheat, barley). Farm tables open a row to show every crop on that farm. Every
+  farm name opens the farm's own page.
+
+This answers the everyday questions in two clicks: *"How many farms grow tomatoes in Al
+Ain, and on how many dunums?"* — pick Al Ain, open "open field", pick tomatoes. *"Which
+farms in Al Dhafra stopped growing fodder?"* — the cereals and fodder page, Al Dhafra,
+fodder, sort the farm table by change.
+
+### What their mockup does
+
+- Region chips on some lists, a region menu in the header, nothing on other screens.
+- No crop or tree filter. Share bars and tables show all types at once.
+- No drill-down from a group to a crop, or from a crop to the farms that grow it.
+- Filters are not kept in the link.
+
+### What to change
+
+1. Put **one filter bar** under the title of every page: region + crop / tree groups.
+2. Make it **move everything on the page** at once.
+3. Let each chip **open into crops and varieties**.
+4. Make every summary row **open into its parts**, and every farm name **open the farm**.
+5. Keep the filter **in the link**.
+
+---
+
+## 9. What Mark's reviews already tell us
+
+Mark reviewed our first mockup in a long call (`docs/adafsa-mockup-review.md`), then
+walked the next version screen by screen (`docs/monday-review-changes.md`). Many of his
+comments were about the same problems their mockup has now. They are the best guide for
+what to change, because they come from the person who speaks to ADAFSA. Times in
+brackets point into the call transcript.
+
+### Menu and structure
+
+- **Support is one button, not half the menu.** *"More than half of these navigation
+  buttons are about support"* [00:00:06]. Their menu has four support entries (Raise
+  Ticket, Contact Us, Feedback, Account and Settings). Merge them into one "Support".
+- **Three levels: overview → modules → individual farm** [00:04:27, 00:13:29]. Each level
+  has its own page layout.
+- **The agreed menu order:** Overview → Crop Monitoring → Tree Monitoring → Land Use &
+  Structures → Irrigation Efficiency → Crop Water Calculator → Yield Optimisation →
+  Individual Farms [00:15:51]. Their mockup should use the same names and order, so the
+  two versions speak the same language to ADAFSA.
+- **Each module is a group of sub-pages**, and almost every module has a **change
+  tracking** sub-page [00:51:04, 00:54:27].
+- **No violations** — ADAFSA agreed they are not tracked [00:00:06].
+
+### The first page
+
+- **Inventory, not health.** *"As a ministry or an agency, they want to track production
+  capacity, not necessarily health. Health comes under farm-level analytics"* [00:35:31].
+  Their Executive View is mostly inventory — good — but it also has an emirate-wide
+  "Canopy Health & Vigor" bar, and the Farm page ranks farms by health first. Move health
+  to the module and farm levels.
+- **The map shows counts, with no colour.** Bubbles with the number of farms that split as
+  you zoom, *"forget about the colours"* [00:26:31]. Their cluster map uses red bubbles,
+  which reads as an alarm. Add province borders and major roads [00:32:13].
+- **Two summary tables: crops by dunum, and crops by number of farms**, each opening from
+  a group to a crop [00:26:54, 00:40:25]. *"Tomato season is starting, someone very quickly
+  wants to know how many farmers are growing tomatoes this year and what's the size. You
+  go to the home page for that"* [00:39:52]. Their Executive View has a tree species table
+  but no crop table like this.
+- **Province is political.** Each province is run by a member of the royal family, and
+  *"sometimes they'd like the results for Al Ain, or the results for Al Dhafra"*
+  [00:17:24]. The region choice must work on every page.
+- **The taxonomy is a filter** [00:23:53]: cereals, fodder, open field, date palm, fruit
+  trees, forest trees, in that order [00:37:37].
+
+### Maps
+
+- **Fewer maps.** *"There's a danger in too many maps. It's hard data"* [00:57:00]. No map
+  on change pages, no yield map, no fallow map. Their mockup puts a large map on the
+  Executive View, the Farm page and Farm Monitoring.
+- **The tree map shows species only inside a farm** — every farm is a mix, so colouring a
+  province by one species would be invented (Monday review, T1).
+
+### Change over time
+
+- **Change tracking on every module**, as hard numbers and a list of farms, not a map
+  [00:54:27, 00:56:29].
+- **Seasonal crop change:** *"who's growing tomatoes, what has increased, what has
+  decreased from last year… give me the list of farms that have stopped growing tomatoes
+  and grew them before"* [00:47:47].
+- **IER trend:** *"I'd rather have a trend line. Raw numbers. And then list for me the
+  farms that deteriorated"* [01:01:36] — last quarter's score, this quarter's score, and
+  the change, sortable.
+- **Structures:** even if only five structures change, *"they need to know right away"*
+  [00:59:47].
+- **No week-to-week comparison** — too small a change to mean anything [00:23:07]. We use
+  last quarter and last year.
+
+### Module by module
+
+- **Trees:** count, species and variety on one page; **canopy health is one number per
+  farm**, one for palms and one for fruit trees [00:57:22]; annual change on its own page.
+- **Fallow land has three states:** cultivated; resting under 12 months; resting over 12
+  months (Monday review, C4). Their mockup has one fallow number.
+- **Irrigation efficiency:** score, band, and zone average, where **zone = province**
+  [01:02:16]; a sortable table to find *"every farm in Al Ain that's flagged for priority
+  intervention"* [01:00:16].
+- **Yield:** no map. Per crop: the average yield and the share of farms below it, then
+  farms ranked [01:03:50]. A **crop calendar** by month [01:04:50]. Production forecast
+  at **province** level [01:03:50].
+- **Water, in two pairs** [01:18:28 – 01:23:47]:
+  1. *Operational:* monthly water demand → water per crop → **over-allocation flag,
+     raised against the month** (by the end of the season it is too late to act).
+  2. *Planning:* seasonal water budget per crop — *"an amazing tool for policy design"* —
+     with **m³ per kilo** of harvest.
+  Their mockup shows daily, weekly and monthly demand against a quota, but not the
+  per-crop view, the monthly flag or the season budget.
+- **Fruit trees are part of the water module**; forest trees are not [01:22:11].
+
+### The farm page
+
+- **Two pages per farm:** basic stats (crops, breakdown, irrigation efficiency), then
+  corrective actions [01:25:24]. Mark's example: *"I'm the inspector, I'm going to visit
+  my five farms… I get the profile, the list of issues"* [00:18:09].
+- **No MMC farmer content.** Soil moisture, weather, crop growth phase and irrigation
+  schedules are *"too much for government. It's not our deliverables. It'll be in the
+  farmer app"* [01:27:36]. Their Farm Monitoring and advisories have exactly this kind of
+  content (root-zone salinity, "increase pivot delivery between 19:00 and 04:00"). The
+  satellite detail can stay one level deeper for experts (Bad 2), but the farmer advice
+  must go.
+- **Dates, not clock times.** Mark asked why the page showed "08:42". *"It would be more
+  of a date than a time in real life"* [00:36:21]. Their pass times to the second
+  ("05:25:47") are the same thing.
+- **Farm centre next to every farm.** ADAFSA officers search by farm centre. Show the
+  column and the filter even while the data is not there yet (Monday review, item 30).
+
+### Things Mark removed — not gaps
+
+- **Flood irrigation detection** — *"It was a mistake, it needs to be taken out"*
+  [01:02:36].
+- **Accuracy figures** — measured by sampling, outside the platform [00:53:56, 01:07:26].
+- **The yield trend map** — *"I would rather not put the map. If they want it, we'll put
+  it back in"* [01:02:57].
+- **Structures tier 3** (pump room vs filtration vs desalination) — doubtful; tier 2 for
+  the October rollout [00:30:24].
+
+---
+
+## 10. Side by side
 
 | Topic | Their mockup | Our mockup |
 |---|---|---|
-| Menu shows the six modules | No | Yes, each with 2–3 sub-pages |
+| Menu shows the six modules | No | Yes, each with 2–4 sub-pages |
+| Support in the menu | Four entries | One entry |
 | Information structure | One long Farm page mixing all levels | Two page types: "Now" (numbers, map, tables) and "Change" (trend, movers, farms) |
 | Change over time | None | 10 time views: 6 quarters for crops, IER, yield; 3 years for trees and structures |
-| Levels of detail | Mixed; no taxonomy filter | Emirate → province → farm, and category → crop → variety, on every page |
-| Landing page | Executive View: inventory numbers | Overview: inventory numbers, count map, two distribution tables |
-| Per-farm page | Scientist view (satellite codes, cloud %, indices) | Plain farm profile, plus a list of findings for an inspector visit |
+| Filters | Region on some lists; no crop or tree filter | One live filter bar on every page: region + crop / tree groups, opening into varieties |
+| Drill-down | None | Emirate → province → farm centre → farm; group → crop → farm; every farm opens its page |
+| Landing page | Executive View: inventory numbers, plus an emirate health bar | Overview: inventory only, count map, crops by dunum and by farm |
+| Maps | Large map on three screens | Only where the question is "where"; none on change pages |
+| Per-farm page | Scientist view (satellite codes, cloud %, indices, farmer advice) | Plain farm profile, then a list of findings for an inspector visit |
 | Field level | Yes (field table) | No |
 | Satellite / index detail | Yes, up front | No — should be added one level deeper |
 | IER bands, subsidy list, water rule | Not the contract ones | Contract bands, IER-65 list, > 25% rule |
+| Fallow land | One number | Three states over 6 quarters |
+| Water | Daily / weekly / monthly demand vs quota | Monthly demand and flag per crop; season budget and m³ per kilo |
 | Arabic / right-to-left | Yes (partly translated) | Not built (layout is ready for it) |
 | Global search | Yes, in header | Only inside tables |
 | Reports / exports page | Yes, 6 tables | No page; CSV on every table |
 | Data date shown | Yes, per farm | No |
-| Link to share a view | No | Yes, every view has its own link |
+| Link to share a view | No | Yes, every view and filter has its own link |
 | Visual style | Crowded, many colours, dark and light mixed, small text | Plain, one colour rule, few badges |
 | Phone width | Menu covers the screen | Has phone-width layout rules |
-| Support | Four pages (ticket, contact, feedback, settings) | One page |
 
 ---
 
-## 9. What we should take from them
+## 11. What we should take from them
 
 1. **Arabic / RTL.** Their switch and translations are a head start.
 2. **A Reports page.** One place for all exports. Add farm boundaries (GeoJSON),
    Shapefile and a monthly PDF summary, as the contract asks.
 3. **Global farm search in the header.** Farm ID or name, straight to the farm profile.
-4. **A data date on every page.** "Data as of 22 Sep 2026 · updated monthly". Use the
-   contract's rhythm per module: crops monthly, trees quarterly, structures monthly, IER
-   weekly, yield monthly, water weekly/monthly.
+4. **A data date on every page.** "Data as of 22 Sep 2026 · updated monthly" — a date,
+   not a clock time. Use the contract's rhythm per module: crops monthly, trees
+   quarterly, structures monthly, IER weekly, yield monthly, water weekly/monthly.
 5. **An expert layer at farm level.** A "Satellite detail" tab on our farm profile:
    image dates, the indices, and a field table. Closed by default.
 6. **The "top / low performers" summary** as a short block above our ranked tables.
 
 ---
 
-## 10. What they should take from us
+## 12. What they should take from us
 
-1. **The menu: six modules, each with its sub-pages.** ADAFSA must see what it pays for.
+1. **The menu: six modules, each with its sub-pages,** in the order Mark agreed, and one
+   Support entry.
 2. **Time evolution** — section 7. A change page per module, and a change line under
    every big number.
-3. **The page structure.** "Now" pages and "Change" pages, each short: figures → one
+3. **Live filters and drill-down** — section 8. One filter bar on every page that moves
+   everything at once; emirate → province → farm; group → crop → farm.
+4. **The page structure.** "Now" pages and "Change" pages, each short: figures → one
    chart or map → one table.
-4. **One filter bar on every page.** Region, and the crop / tree taxonomy as chips that
-   open into varieties.
-5. **The plain farm profile** first, with the scientist view one level deeper.
-6. **Contract rules, exactly.** IER 5 bands and the IER-65 subsidy list; the > 25%
-   over-allocation rule; the Canopy Health Index; fallow land in three states.
-7. **The visual rules** in section 6.
-8. **A link for every view**, so a page can be sent to a colleague.
+5. **An inventory first page**, with the two crop tables (by dunum, by farm) and a
+   count-only map.
+6. **The plain farm profile** first, with corrective actions on a second page, and the
+   scientist view one level deeper. No farmer advice.
+7. **Contract rules, exactly.** IER 5 bands and the IER-65 subsidy list; the > 25%
+   over-allocation rule, raised against the month; the Canopy Health Index, one number
+   per farm for palms and one for fruit trees; fallow land in three states.
+8. **The visual rules** in section 6.
+9. **A link for every view**, so a page can be sent to a colleague.
 
 ---
 
-## 11. What neither version shows yet
+## 13. What neither version shows yet
 
-The contract asks for these. Worth planning together.
+The contract asks for these, and Mark did not remove them. Worth planning together.
 
-- **Flood irrigation detection** (Module 4), with its own accuracy target.
-- **An accuracy panel.** Payment depends on accuracy at M3, M6, M9 and M12 on 20 farms.
-  "Target / measured / next survey" per module would show the contract's own scoreboard.
-- **PDF monthly report** and **milestone accuracy reports**.
-- **REST API** and **Shapefile** export.
-- **Yield trend map** and **district production forecast** (Module 5).
+- **Monthly PDF report** (plus Excel / CSV), as the Data Exchange Framework says.
+- **REST API** (JSON per farm) and **Shapefile / GeoJSON** exports with farm boundaries.
 - **Water per crop for tariffs** (Module 6): we show water per crop, but not the tariff
   purpose.
-- **Canopy health over time**: neither version shows whether tree health is getting
+- **Canopy health over time:** neither version shows whether tree health is getting
   better or worse.
-- **Water history**: neither version shows water use month after month.
+- **Water history:** neither version shows water use month after month.
+- **Crop production on the first page:** Mark wants it later — *"the next table they'd
+  like to see is the crop production"* [00:42:15] — once the measuring window is agreed.
