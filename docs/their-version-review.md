@@ -1,6 +1,6 @@
 # Review of the RASAD mockup
 
-The written companion to `presentation/RASAD_Wafra_Review.pdf`. The PDF is the short,
+The written companion to `presentation/260930_RASAD_Wafra_Review.pdf`. The PDF is the short,
 visual version to share with the team. This file keeps the detail behind it.
 
 **What:** a review of the other team's ADAFSA mockup.

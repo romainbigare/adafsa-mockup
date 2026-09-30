@@ -12,7 +12,7 @@ does about it.
   page on the shared frame. Source and build script in `review/`; rebuild with
   `pip install weasyprint pillow && python3 review/build.py`.
 - **`adafsa-redesign-draft.pptx`** — the same argument as slides, for presenting live.
-- **`RASAD_Wafra_Review.pdf`** — the same house style, applied to the other team's RASAD
+- **`260930_RASAD_Wafra_Review.pdf`** — the same house style, applied to the other team's RASAD
   mockup: eight findings and a closing page on the shared frame. Source in `rasad-review/`;
   rebuild with `NODE_PATH=$(npm root -g) node rasad-review/build.mjs` (Playwright's
   Chromium, no WeasyPrint). `rasad-review/crop.mjs` cuts the evidence pictures from full-page

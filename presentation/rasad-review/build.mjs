@@ -7,7 +7,7 @@ import path from 'node:path';
 
 const { chromium } = createRequire(import.meta.url)('playwright');
 const here = path.dirname(fileURLToPath(import.meta.url));
-const out = path.join(here, '..', 'RASAD_Wafra_Review.pdf');
+const out = path.join(here, '..', '260930_RASAD_Wafra_Review.pdf');
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
